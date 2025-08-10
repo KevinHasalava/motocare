@@ -1,15 +1,16 @@
-// frontend/src/components/Header.jsx
+// frontend/src/components/Header.jsx (Updated to use Logo component)
 import React, { useState } from 'react';
 import {
   AppBar, Toolbar, Typography, Button, IconButton, Drawer, List, ListItem, 
   ListItemButton, ListItemText, Box, Container, Stack
 } from '@mui/material';
 import {
-  Event as CalendarIcon, Menu as MenuIcon, DirectionsCar as CarIcon
+  Event as CalendarIcon, Menu as MenuIcon,
+  Login as LoginIcon, AccountCircle as ProfileIcon, Logout as LogoutIcon
 } from '@mui/icons-material';
-import { gradientText } from '../utils/theme';
+import Logo from './Logo';
 
-const Header = ({ navItems, onBookNowClick, theme }) => {
+const Header = ({ navItems, onBookNowClick, onLoginClick, onLogoutClick, isLoggedIn, userProfile, theme }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleDrawer = (open) => (event) => {
@@ -19,6 +20,12 @@ const Header = ({ navItems, onBookNowClick, theme }) => {
     setIsMenuOpen(open);
   };
 
+  const handleLogoClick = () => {
+    // Navigate to home page or scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Or use navigation: navigate('/');
+  };
+
   const drawerContent = (
     <Box
       sx={{ width: 250, p: 2, backgroundColor: 'background.default', height: '100%' }}
@@ -26,6 +33,16 @@ const Header = ({ navItems, onBookNowClick, theme }) => {
       onClick={toggleDrawer(false)}
       onKeyDown={toggleDrawer(false)}
     >
+      {/* Logo in Mobile Menu */}
+      <Box sx={{ mb: 3, pb: 2, borderBottom: '1px solid rgba(51, 65, 85, 0.5)' }}>
+        <Logo 
+          size="medium" 
+          variant="default" 
+          clickable={true}
+          onClick={handleLogoClick}
+        />
+      </Box>
+
       <List>
         {navItems.map((item) => (
           <ListItem key={item} disablePadding>
@@ -35,6 +52,53 @@ const Header = ({ navItems, onBookNowClick, theme }) => {
           </ListItem>
         ))}
       </List>
+      
+      {/* Login/Profile Section */}
+      {isLoggedIn ? (
+        <>
+          <Box sx={{ p: 2, borderBottom: '1px solid rgba(51, 65, 85, 0.5)', mb: 2 }}>
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <ProfileIcon sx={{ color: 'primary.main' }} />
+              <Typography variant="body1" color="text.primary">
+                {userProfile?.name || 'User'}
+              </Typography>
+            </Stack>
+          </Box>
+          <Button
+            variant="contained" 
+            fullWidth 
+            startIcon={<LogoutIcon />} 
+            onClick={onLogoutClick}
+            sx={{ 
+              mt: 2, 
+              py: 1.5, 
+              background: `linear-gradient(to right, ${theme.palette.error.main}, ${theme.palette.error.dark})` 
+            }}
+          >
+            Logout
+          </Button>
+        </>
+      ) : (
+        <Button
+          variant="outlined" 
+          fullWidth 
+          startIcon={<LoginIcon />} 
+          onClick={onLoginClick}
+          sx={{ 
+            mt: 2, 
+            py: 1.5,
+            borderColor: 'primary.main',
+            color: 'primary.main',
+            '&:hover': {
+              borderColor: 'primary.light',
+              backgroundColor: 'rgba(99, 102, 241, 0.1)'
+            }
+          }}
+        >
+          Login
+        </Button>
+      )}
+      
       <Button
         variant="contained" 
         fullWidth 
@@ -65,23 +129,19 @@ const Header = ({ navItems, onBookNowClick, theme }) => {
       >
         <Container maxWidth="xl">
           <Toolbar disableGutters sx={{ justifyContent: 'space-between', height: 80 }}>
-            {/* Logo */}
-            <Stack direction="row" alignItems="center" spacing={1.5}>
-              <CarIcon sx={{ fontSize: 40, color: 'primary.main' }} />
-              <Box>
-                <Typography variant="h5" component="h1" sx={{ ...gradientText, fontWeight: 'bold' }}>
-                  Moto-Care
-                </Typography>
-                <Typography sx={{ 
-                  fontSize: '0.75rem', 
-                  color: 'primary.light', 
-                  fontWeight: 'semibold', 
-                  letterSpacing: '0.1em' 
-                }}>
-                  PRO
-                </Typography>
-              </Box>
-            </Stack>
+            
+            {/* Logo - Now using the Logo component */}
+            <Logo 
+              size="medium" 
+              variant="default" 
+              clickable={true}
+              onClick={handleLogoClick}
+              customStyle={{ 
+                '&:hover': { 
+                  transform: 'scale(1.02)' // Subtle hover effect for header
+                }
+              }}
+            />
 
             {/* Desktop Navigation */}
             <Stack direction="row" spacing={4} alignItems="center" sx={{ display: { xs: 'none', md: 'flex' } }}>
@@ -109,6 +169,63 @@ const Header = ({ navItems, onBookNowClick, theme }) => {
                   {item}
                 </Button>
               ))}
+              
+              {/* Auth Section - Desktop */}
+              {isLoggedIn ? (
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <IconButton
+                    onClick={() => console.log('Profile clicked')}
+                    sx={{
+                      color: 'primary.main',
+                      '&:hover': { 
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        transform: 'scale(1.1)'
+                      }
+                    }}
+                  >
+                    <ProfileIcon sx={{ fontSize: 32 }} />
+                  </IconButton>
+                  <Typography variant="body2" color="text.secondary">
+                    {userProfile?.name || 'User'}
+                  </Typography>
+                  <Button
+                    onClick={onLogoutClick}
+                    variant="outlined"
+                    size="small"
+                    startIcon={<LogoutIcon />}
+                    sx={{
+                      borderColor: 'error.main',
+                      color: 'error.main',
+                      '&:hover': {
+                        borderColor: 'error.light',
+                        backgroundColor: 'rgba(244, 67, 54, 0.1)'
+                      }
+                    }}
+                  >
+                    Logout
+                  </Button>
+                </Stack>
+              ) : (
+                <Button
+                  onClick={onLoginClick}
+                  variant="outlined"
+                  startIcon={<LoginIcon />}
+                  sx={{
+                    px: 3, 
+                    py: 1.5,
+                    borderColor: 'primary.main',
+                    color: 'primary.main',
+                    '&:hover': { 
+                      borderColor: 'primary.light',
+                      backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                      transform: 'scale(1.05)'
+                    }
+                  }}
+                >
+                  Login
+                </Button>
+              )}
+              
               <Button
                 onClick={onBookNowClick} 
                 variant="contained" 

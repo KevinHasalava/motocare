@@ -1,13 +1,13 @@
-// frontend/src/components/Footer.jsx
+// frontend/src/components/Footer.jsx (Updated to use Logo component)
 import React from 'react';
 import {
   Box, Container, Grid, Stack, Typography
 } from '@mui/material';
 import {
-  DirectionsCar as CarIcon, LocationOn as MapPinIcon, 
-  Mail as MailIcon, Phone as PhoneIcon, CheckCircle as CheckCircleIcon
+  LocationOn as MapPinIcon, Mail as MailIcon, Phone as PhoneIcon, 
+  CheckCircle as CheckCircleIcon
 } from '@mui/icons-material';
-import { gradientText } from '../utils/theme';
+import Logo from './Logo';
 
 const Footer = () => (
   <Box 
@@ -24,18 +24,27 @@ const Footer = () => (
   >
     <Container maxWidth="lg">
       <Grid container spacing={6}>
+        
+        {/* Company Info Section - Now using Logo component */}
         <Grid item xs={12} md={5}>
-          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
-            <CarIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-            <Typography variant="h5" component="h3" sx={{ ...gradientText, fontWeight: 'bold' }}>
-              Moto-Care
-            </Typography>
-          </Stack>
+          <Box sx={{ mb: 2 }}>
+            <Logo 
+              size="medium" 
+              variant="white" 
+              showSubtitle={true}
+              clickable={true}
+              onClick={() => {
+                // Scroll to top or navigate to home
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
+          </Box>
           <Typography color="text.secondary" sx={{ mb: 3 }}>
             Revolutionizing vehicle servicing with cutting-edge technology and unmatched customer experience.
           </Typography>
         </Grid>
         
+        {/* Contact Information */}
         <Grid item xs={12} sm={6} md={3.5}>
           <Typography variant="h6" component="h4" sx={{ mb: 3 }}>
             Contact Information
@@ -62,6 +71,7 @@ const Footer = () => (
           </Stack>
         </Grid>
         
+        {/* Our Services */}
         <Grid item xs={12} sm={6} md={3.5}>
           <Typography variant="h6" component="h4" sx={{ mb: 3 }}>
             Our Services
@@ -95,6 +105,7 @@ const Footer = () => (
         </Grid>
       </Grid>
       
+      {/* Copyright Section */}
       <Box sx={{ 
         mt: 8, 
         pt: 4, 

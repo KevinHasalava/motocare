@@ -99,19 +99,51 @@ const HeroSection = ({ isVisible, onBookNowClick, stats, theme }) => (
           </Button>
         </Stack>
         
-        <Grid container spacing={4}>
-          {stats.map((stat) => (
-            <Grid item xs={6} md={3} key={stat.label}>
-              {stat.icon}
-              <Typography variant="h4" component="div" sx={{ fontWeight: 'black', mt: 1 }}>
-                {stat.value}
-              </Typography>
-              <Typography color="text.secondary">
-                {stat.label}
-              </Typography>
-            </Grid>
-          ))}
-        </Grid>
+        <Grid container spacing={4} justifyContent="center" alignItems="stretch">
+  {stats.map((stat) => (
+    <Grid 
+      item 
+      xs={6} 
+      md={3} 
+      key={stat.label} 
+      sx={{ 
+        display: 'flex', 
+        color: 'text.white',
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        textAlign: 'center',
+        textEmphasisColor: 'black',
+        
+        // height එක දෙනවා එක height එකකට items සෙමතු කරන්න
+        height: '100%', 
+        // මේකෙන් items අතර space එක හොඳින් තියෙනවා
+        padding: 2, 
+        borderRadius: 2,
+        boxShadow: 2,
+        bgcolor: 'background.white',
+      }}
+    >
+      {stat.icon}
+      <Typography 
+        variant="h4" 
+        component="div" 
+        sx={{ 
+          fontWeight: 'bold',  // black වෙනුවට bold හොඳයි readability එකට
+          mt: 1, 
+          lineHeight: 1.2,
+          color: 'primary.main'
+        }}
+      >
+        {stat.value}
+      </Typography>
+      <Typography color="text.secondary" sx={{ mt: 0.5 }}>
+        {stat.label}
+      </Typography>
+    </Grid>
+  ))}
+</Grid>
+
+
       </Box>
     </Fade>
   </Container>
