@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route, BrowserRouter } from 'react-router-dom';
 import './index.css';
 import App from './App';
-import VehicleServiceLanding from './components/VehicleServiceLanding';
+import Header from './components/Header';
+import Landing from './components/Landing';
 import reportWebVitals from './reportWebVitals';
 
 
@@ -12,7 +13,8 @@ root.render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<App />} />
-      <Route path="/home" element={<VehicleServiceLanding />} />
+      <Route path="/Header" element={<Header />} />
+      <Route path="/home" element={<Landing/>} />
     </Routes>
   </BrowserRouter> 
 );
