@@ -3,7 +3,7 @@ import React from 'react';
 import {
   Box, Container, Typography, Grid, Paper, Fade
 } from '@mui/material';
-import { gradientText } from '../utils/theme';
+import { gradientText } from '../../utils/theme';
 
 const FeaturesSection = ({ isVisible, features, theme }) => (
   <Box component="section" id="features" sx={{ py: 12 }}>

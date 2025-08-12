@@ -3,7 +3,7 @@ import React from 'react';
 import {
   Box, Container, Paper, Typography, Button
 } from '@mui/material';
-import { gradientText } from '../utils/theme';
+import { gradientText } from '../../utils/theme';
 
 const CtaSection = ({ onBookNowClick, theme }) => (
   <Box component="section" sx={{ py: 12 }}>

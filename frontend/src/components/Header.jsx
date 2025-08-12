@@ -8,7 +8,7 @@ import {
   Event as CalendarIcon, Menu as MenuIcon,
   Login as LoginIcon, AccountCircle as ProfileIcon, Logout as LogoutIcon
 } from '@mui/icons-material';
-import Logo from './Logo';
+import Logo from './Landing_Page/Logo';
 
 const Header = ({ navItems, onBookNowClick, onLoginClick, onLogoutClick, isLoggedIn, userProfile, theme }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

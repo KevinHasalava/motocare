@@ -4,8 +4,8 @@ import { Stack, Typography, Box } from '@mui/material';
 import {
   DirectionsCar, Build, Settings, Speed, LocalCarWash, Garage
 } from '@mui/icons-material';
-import { gradientText } from '../utils/theme';
-import { logoConfig } from '../config/logoConfig';
+import { gradientText } from '../../utils/theme';
+import { logoConfig } from '../../config/logoConfig';
 
 // Icon component mapping
 const iconComponents = {

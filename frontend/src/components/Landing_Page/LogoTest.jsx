@@ -6,8 +6,8 @@ import {
   FormControlLabel, TextField
 } from '@mui/material';
 import Logo from './Logo';
-import { theme } from '../utils/theme';
-import { logoConfig, enableImageLogo, enableIconLogo, updateBrandName } from '../config/logoConfig';
+import { theme } from '../../utils/theme';
+import { logoConfig, enableImageLogo, enableIconLogo, updateBrandName } from '../../config/logoConfig';
 
 const LogoTest = () => {
   const [logoSize, setLogoSize] = useState('medium');

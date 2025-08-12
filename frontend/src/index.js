@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, BrowserRouter } from 'react-rou
 import './index.css';
 import App from './App';
 import Header from './components/Header';
-import Landing from './components/Landing';
+import Landing from './components/pages/Landing';
 import reportWebVitals from './reportWebVitals';
 
 

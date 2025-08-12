@@ -11,12 +11,12 @@ import {
 } from '@mui/icons-material';
 
 // Import components
-import Header from './Header';
-import Footer from './Footer';
-import HeroSection from './HeroSection';
-import FeaturesSection from './FeaturesSection';
-import ProcessSection from './ProcessSection';
-import CtaSection from './CtaSection';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import HeroSection from '../components/Landing_Page/HeroSection';
+import FeaturesSection from '../components/Landing_Page/FeaturesSection';
+import ProcessSection from '../components/Landing_Page/ProcessSection';
+import CtaSection from '../components/Landing_Page/CtaSection';
 
 // Import theme and data
 import { theme, backgroundKeyframes, mockData } from '../utils/theme';

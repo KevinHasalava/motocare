@@ -7,7 +7,7 @@ import {
   LocationOn as MapPinIcon, Mail as MailIcon, Phone as PhoneIcon, 
   CheckCircle as CheckCircleIcon
 } from '@mui/icons-material';
-import Logo from './Logo';
+import Logo from './Landing_Page/Logo';
 
 const Footer = () => (
   <Box 

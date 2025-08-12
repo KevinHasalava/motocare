@@ -6,7 +6,7 @@ import {
 import {
   ArrowForward as ArrowRightIcon, PlayArrow as PlayIcon
 } from '@mui/icons-material';
-import { gradientText } from '../utils/theme';
+import { gradientText } from '../../utils/theme';
 
 const HeroSection = ({ isVisible, onBookNowClick, stats, theme }) => (
   <Container 

@@ -3,7 +3,7 @@ import React from 'react';
 import {
   Box, Container, Typography, Stack, Fade
 } from '@mui/material';
-import { gradientText } from '../utils/theme';
+import { gradientText } from '../../utils/theme';
 
 const ProcessSection = ({ isVisible, processSteps, theme }) => (
   <Box 
