@@ -10,6 +10,7 @@ export const theme = createTheme({
     text: { primary: '#f8fafc', secondary: '#94a3b8' },
     info: { main: '#06b6d4' },
     success: { main: '#22c55e' },
+    success: { main: '#22c55e' },
   },
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
@@ -67,6 +68,11 @@ export const mockData = {
       description: "Advanced tools ensure accurate diagnosis and efficient repairs.", 
       gradient: `linear-gradient(to right, ${theme.palette.success.main}, ${theme.palette.success.dark})` 
     },
+    { 
+      title: "Live Queue Update", 
+      description: "Real-time progress tracking so you never miss your turn.", 
+      gradient: `linear-gradient(to right, ${theme.palette.success  .main}, ${theme.palette.success.dark})` 
+    }
   ],
   
   processSteps: [

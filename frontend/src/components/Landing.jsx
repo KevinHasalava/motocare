@@ -6,7 +6,8 @@ import {
 import {
   Event as CalendarIcon, AccessTime as ClockIcon, History as HistoryIcon, 
   Build as WrenchIcon, Star as StarIcon, CheckCircle as CheckCircleIcon, 
-  FlashOn as ZapIcon
+  FlashOn as ZapIcon,
+  DynamicFeed
 } from '@mui/icons-material';
 
 // Import components
@@ -34,7 +35,8 @@ const Landing = () => {
       <CalendarIcon sx={{ fontSize: 48 }} />,
       <ClockIcon sx={{ fontSize: 48 }} />,
       <HistoryIcon sx={{ fontSize: 48 }} />,
-      <WrenchIcon sx={{ fontSize: 48 }} />
+      <WrenchIcon sx={{ fontSize: 48 }} />,
+      <DynamicFeed sx={{ fontSize: 48 }} />,
     ];
     return { ...feature, icon: icons[index] };
   });
