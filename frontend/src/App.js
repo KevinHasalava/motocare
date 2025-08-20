@@ -9,7 +9,8 @@ function App() {
   return (
     <div className="App">
       <h1 className='h1'>hello</h1>
-      <center><button onClick={() => navigate("/VehicleServiceLandin")}>click  </button></center>
+      <center><button onClick={() => navigate("/home")}>click  </button></center>
+      <header/>
     </div>
   );
 }
