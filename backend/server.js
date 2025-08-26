@@ -11,11 +11,16 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('API is running...');
+  res.send('API is running2...');
 });
+
+
+app.use("/api/bookings", bookingRoutes);
 
 // Routes
 // app.use('/api/bookings', require('./routes/bookingRoutes'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+
