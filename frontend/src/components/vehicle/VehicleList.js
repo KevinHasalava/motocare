@@ -1,7 +1,7 @@
 import React from "react";
 import { deleteVehicle } from "../../api/vehicleService";
 
-const VehicleList = ({ vehicles, onVehicleDeleted }) => {
+const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this vehicle?")) {
       await deleteVehicle(id);
@@ -33,7 +33,13 @@ const VehicleList = ({ vehicles, onVehicleDeleted }) => {
               <td className="border p-2">{v.brand}</td>
               <td className="border p-2">{v.model}</td>
               <td className="border p-2">{v.year}</td>
-              <td className="border p-2">
+              <td className="border p-2 flex gap-2">
+                <button
+                  onClick={() => onEdit(v)}
+                  className="bg-green-500 text-white px-2 py-1 rounded"
+                >
+                  Edit
+                </button>
                 <button
                   onClick={() => handleDelete(v._id)}
                   className="bg-red-500 text-white px-2 py-1 rounded"
@@ -45,7 +51,9 @@ const VehicleList = ({ vehicles, onVehicleDeleted }) => {
           ))}
           {vehicles.length === 0 && (
             <tr>
-              <td colSpan="7" className="text-center p-2">No vehicles found</td>
+              <td colSpan="7" className="text-center p-2">
+                No vehicles found
+              </td>
             </tr>
           )}
         </tbody>

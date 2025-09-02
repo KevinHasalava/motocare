@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { addVehicle } from "../../api/vehicleService";
+import React, { useState, useEffect } from "react";
+import { addVehicle, updateVehicle } from "../../api/vehicleService";
 
-const VehicleForm = ({ onVehicleAdded }) => {
+const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete }) => {
   const [formData, setFormData] = useState({
     ownerName: "",
     vehicleNumber: "",
@@ -11,6 +11,13 @@ const VehicleForm = ({ onVehicleAdded }) => {
     year: ""
   });
 
+  // if editingVehicle data changes, load it into form
+  useEffect(() => {
+    if (editingVehicle) {
+      setFormData(editingVehicle);
+    }
+  }, [editingVehicle]);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -18,8 +25,18 @@ const VehicleForm = ({ onVehicleAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addVehicle(formData);
-      alert("✅ Vehicle added successfully!");
+      if (editingVehicle) {
+        // update mode
+        await updateVehicle(editingVehicle._id, formData);
+        alert("✅ Vehicle updated successfully!");
+        onUpdateComplete(); // refresh + clear edit mode
+      } else {
+        // add mode
+        await addVehicle(formData);
+        alert("✅ Vehicle added successfully!");
+        onVehicleAdded();
+      }
+
       setFormData({
         ownerName: "",
         vehicleNumber: "",
@@ -28,15 +45,17 @@ const VehicleForm = ({ onVehicleAdded }) => {
         model: "",
         year: ""
       });
-      onVehicleAdded(); // refresh list
     } catch (error) {
-      alert(error.response?.data?.message || "Error adding vehicle");
+      alert(error.response?.data?.message || "Error saving vehicle");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="p-4 border rounded bg-gray-100">
-      <h2 className="text-xl font-bold mb-2">Add Vehicle</h2>
+      <h2 className="text-xl font-bold mb-2">
+        {editingVehicle ? "✏️ Edit Vehicle" : "➕ Add Vehicle"}
+      </h2>
+
       <input
         type="text"
         name="ownerName"
@@ -45,14 +64,17 @@ const VehicleForm = ({ onVehicleAdded }) => {
         onChange={handleChange}
         className="block w-full mb-2 p-2 border"
       />
+
       <input
         type="text"
         name="vehicleNumber"
         placeholder="Vehicle Number"
         value={formData.vehicleNumber}
         onChange={handleChange}
-        className="block w-full mb-2 p-2 border"
+        disabled={!!editingVehicle} // number cannot change in edit
+        className="block w-full mb-2 p-2 border bg-gray-200"
       />
+
       <select
         name="type"
         value={formData.type}
@@ -65,6 +87,7 @@ const VehicleForm = ({ onVehicleAdded }) => {
         <option value="Bike">Bike</option>
         <option value="Van">Van</option>
       </select>
+
       <input
         type="text"
         name="brand"
@@ -73,6 +96,7 @@ const VehicleForm = ({ onVehicleAdded }) => {
         onChange={handleChange}
         className="block w-full mb-2 p-2 border"
       />
+
       <input
         type="text"
         name="model"
@@ -81,6 +105,7 @@ const VehicleForm = ({ onVehicleAdded }) => {
         onChange={handleChange}
         className="block w-full mb-2 p-2 border"
       />
+
       <input
         type="number"
         name="year"
@@ -89,9 +114,25 @@ const VehicleForm = ({ onVehicleAdded }) => {
         onChange={handleChange}
         className="block w-full mb-2 p-2 border"
       />
-      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-        Add Vehicle
+
+      <button
+        type="submit"
+        className={`px-4 py-2 rounded text-white ${
+          editingVehicle ? "bg-green-500" : "bg-blue-500"
+        }`}
+      >
+        {editingVehicle ? "Update Vehicle" : "Add Vehicle"}
       </button>
+
+      {editingVehicle && (
+        <button
+          type="button"
+          onClick={onUpdateComplete}
+          className="ml-2 bg-gray-400 text-white px-4 py-2 rounded"
+        >
+          Cancel
+        </button>
+      )}
     </form>
   );
 };

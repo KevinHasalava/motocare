@@ -3,10 +3,9 @@ import { getVehicles } from "../../api/vehicleService";
 import VehicleForm from "../vehicle/VehicleForm";
 import VehicleList from "../vehicle/VehicleList";
 
-// /Users/waruna/Documents/Waruna  Bopitiya/SLIIT/Projects/Moto-Care/frontend/src/components/VehicleForm.js
-// /Users/waruna/Documents/Waruna  Bopitiya/SLIIT/Projects/Moto-Care/frontend/src/components/pages/VehiclePage.js
 const VehiclePage = () => {
   const [vehicles, setVehicles] = useState([]);
+  const [editingVehicle, setEditingVehicle] = useState(null);
 
   const loadVehicles = async () => {
     const res = await getVehicles();
@@ -20,8 +19,19 @@ const VehiclePage = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">🚗 Vehicle Management</h1>
-      <VehicleForm onVehicleAdded={loadVehicles} />
-      <VehicleList vehicles={vehicles} onVehicleDeleted={loadVehicles} />
+      <VehicleForm
+        onVehicleAdded={loadVehicles}
+        editingVehicle={editingVehicle}
+        onUpdateComplete={() => {
+          loadVehicles();
+          setEditingVehicle(null);
+        }}
+      />
+      <VehicleList
+        vehicles={vehicles}
+        onVehicleDeleted={loadVehicles}
+        onEdit={(vehicle) => setEditingVehicle(vehicle)}
+      />
     </div>
   );
 };
