@@ -11,8 +11,8 @@ app.use(cors());
 app.use(express.json());
 
 
-app.get("/api/notes", (req,res) => {
-  res.status(200).send('Api is working3');
+app.get("/", (req,res) => {
+  res.status(200).send('Api is working..5');
 });
 
 // Routes
