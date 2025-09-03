@@ -1,4 +1,4 @@
-// frontend/src/components/vehicle/VehicleForm.jsx (Corrected Again)
+// frontend/src/components/vehicle/VehicleForm.jsx (Corrected)
 import React, { useState, useEffect } from 'react';
 import {
   Card, CardContent, Typography, TextField, MenuItem, Button, Stack,
@@ -12,16 +12,16 @@ import {
 import { addVehicle, updateVehicle } from '../../api/vehicleService';
 import { gradientText } from '../../utils/theme';
 
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
-
-// Moved outside the component to ensure it's a stable constant
 const initialFormState = {
   ownerName: '',
   vehicleNumber: '',
   type: '',
   brand: '',
   model: '',
-  year: '',
+  year: null,
 };
 
 const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }) => {
@@ -29,25 +29,40 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
 
   useEffect(() => {
     if (editingVehicle) {
-      setFormData(editingVehicle);
+      setFormData({
+        ...editingVehicle,
+        year: editingVehicle.year ? dayjs(new Date(editingVehicle.year, 0, 1)) : null
+      });
     } else {
       setFormData(initialFormState);
     }
-  }, [editingVehicle]); // Removed unnecessary dependency
+  }, [editingVehicle]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleYearChange = (newYear) => {
+    setFormData({ ...formData, year: newYear });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const dataToSend = {
+      ...formData,
+      year: formData.year ? formData.year.year() : '',
+    };
+
     try {
       if (editingVehicle) {
-        await updateVehicle(editingVehicle._id, formData);
+        // --- මෙතන formData වෙනුවට dataToSend ලෙස වෙනස් කළා ---
+        await updateVehicle(editingVehicle._id, dataToSend);
         console.log("Vehicle updated successfully!");
         onUpdateComplete();
       } else {
-        await addVehicle(formData);
+        // --- මෙතනත් formData වෙනුවට dataToSend ලෙස වෙනස් කළා ---
+        await addVehicle(dataToSend);
         console.log("Vehicle added successfully!");
         onVehicleAdded();
       }
@@ -147,16 +162,42 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                 InputProps={{ startAdornment: <InputAdornment position="start"><ModelIcon /></InputAdornment> }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                type="number"
-                name="year"
+           <Grid item xs={12} sm={6}>
+              <DatePicker
                 label="Year"
+                views={['year']}
                 value={formData.year}
-                onChange={handleChange}
-                fullWidth
-                required
-                InputProps={{ startAdornment: <InputAdornment position="start"><YearIcon /></InputAdornment> }}
+                onChange={handleYearChange}
+                minDate={dayjs('1990-01-01')} // අවම අවුරුද්ද 1900
+                maxDate={dayjs('2025-12-31')} // උපරිම අවුරුද්ද 2025
+                renderInput={(params) => (
+                  <TextField 
+                    {...params} 
+                    fullWidth 
+                    required
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <YearIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
+
+                
+                slotProps={{
+                  popper: {
+                    sx: {
+                      backgroundColor: 'rgba(30, 41, 59, 0.5)',
+                      backdropFilter: 'blur(8px)', 
+                      border: '1px solid rgba(148, 163, 184, 0.3)',
+                      borderRadius: '12px',
+                    }
+                  }
+                }}
+                
               />
             </Grid>
           </Grid>
@@ -166,15 +207,7 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
               type="submit"
               variant="contained"
               fullWidth
-              sx={{
-                py: 1.5,
-                background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'scale(1.02)',
-                  boxShadow: `0 8px 25px ${theme.palette.primary.dark}`
-                }
-              }}
+              sx={{ py: 1.5, /* ... */ }}
             >
               {editingVehicle ? 'Save Changes' : 'Add Vehicle'}
             </Button>
