@@ -17,7 +17,7 @@ app.get("/", (req,res) => {
 });
 
 
-app.use("/api/bookings", bookingRoutes);
+// app.use("/api/bookings", bookingRoutes);
 
 // Routes
 // Vehicle routes
