@@ -16,6 +16,16 @@ const inventorySchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  category: {
+    type: String,
+    trim: true,
+    default: 'General',  // optional
+  },
+  unit: {
+    type: String,
+    trim: true,
+    default: 'pcs',  // optional
+  },
   quantity: {
     type: Number,
     required: true,

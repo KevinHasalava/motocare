@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const restockHistorySchema = new mongoose.Schema({
   partId: {
-    type: String,
+    type: String, // keep String ID since you’re using custom partId
+    ref: 'Inventory',
     required: true,
     trim: true,
   },

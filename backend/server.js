@@ -19,5 +19,6 @@ app.get("/", (req,res) => {
 // app.use('/api/bookings', require('./routes/bookingRoutes'));
 app.use('/api/inventory', require('./routes/inventoryRoutes'));
 
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
