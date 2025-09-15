@@ -13,14 +13,15 @@ const getInventory = async (req, res) => {
 // Add item
 const addItem = async (req, res) => {
   try {
-    const { name, quantity, price } = req.body;
-    const newItem = new Inventory({ name, quantity, price });
+    const { partId, name, quantity, price, description, category, unit, lowStockThreshold } = req.body;
+    const newItem = new Inventory({ partId, name, quantity, price, description, category, unit, lowStockThreshold });
     await newItem.save();
     res.status(201).json(newItem);
   } catch (error) {
-    res.status(500).json({ message: 'Error adding item' });
+    res.status(500).json({ message: 'Error adding item', error: error.message });
   }
 };
+
 
 // Update item
 const updateItem = async (req, res) => {
