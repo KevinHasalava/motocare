@@ -1,11 +1,35 @@
 const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  vehicleId: { type: mongoose.Schema.Types.ObjectId, ref: "Vehicle" },
-  date: { type: String, required: true }, // e.g., "2025-08-23"
-  timeSlot: { type: String, required: true }, // e.g., "10:00 AM"
-  status: { type: String, default: "booked" }
+  
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // assuming u have a user model, naththam string ekak daanna puluwan
+    required: true,
+  },
+  vehicle: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Vehicle",
+    required: true,
+  },
+  service: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Service",
+  required: true
+  },
+  date: {
+    type: Date,
+    required: true,
+  },
+  timeSlot: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model("Booking", bookingSchema);
+const Booking = mongoose.model("Booking", bookingSchema);
+module.exports = Booking;
