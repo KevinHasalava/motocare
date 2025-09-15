@@ -1,4 +1,4 @@
-// frontend/src/components/Header.jsx (Updated to use Logo component)
+// frontend/src/components/Header.jsx (Updated to use Logo component and proper navigation)
 import React, { useState } from 'react';
 import {
   AppBar, Toolbar, Typography, Button, IconButton, Drawer, List, ListItem, 
@@ -8,10 +8,12 @@ import {
   Event as CalendarIcon, Menu as MenuIcon,
   Login as LoginIcon, AccountCircle as ProfileIcon, Logout as LogoutIcon
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import Logo from './Landing_Page/Logo';
 
 const Header = ({ navItems, onBookNowClick, onLoginClick, onLogoutClick, isLoggedIn, userProfile, theme }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -21,16 +23,28 @@ const Header = ({ navItems, onBookNowClick, onLoginClick, onLogoutClick, isLogge
   };
 
   const handleLogoClick = () => {
-    // Navigate to home page or scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Or use navigation: navigate('/');
+    if (window.location.pathname !== '/home') {
+      navigate('/home');
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleNavClick = (section) => {
+    if (window.location.pathname !== '/home') {
+      navigate(`/home#${section}`);
+    } else {
+      const el = document.getElementById(section);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
   };
 
   const drawerContent = (
     <Box
       sx={{ width: 250, p: 2, backgroundColor: 'background.default', height: '100%' }}
       role="presentation"
-      onClick={toggleDrawer(false)}
       onKeyDown={toggleDrawer(false)}
     >
       {/* Logo in Mobile Menu */}
@@ -46,7 +60,7 @@ const Header = ({ navItems, onBookNowClick, onLoginClick, onLogoutClick, isLogge
       <List>
         {navItems.map((item) => (
           <ListItem key={item} disablePadding>
-            <ListItemButton href={`#${item.toLowerCase()}`}>
+            <ListItemButton onClick={() => { handleNavClick(item.toLowerCase()); setIsMenuOpen(false); }}>
               <ListItemText primary={item} />
             </ListItemButton>
           </ListItem>
@@ -148,7 +162,7 @@ const Header = ({ navItems, onBookNowClick, onLoginClick, onLogoutClick, isLogge
               {navItems.map((item) => (
                 <Button 
                   key={item} 
-                  href={`#${item.toLowerCase()}`}
+                  onClick={() => handleNavClick(item.toLowerCase())}
                   sx={{
                     color: 'text.secondary', 
                     '&:hover': { color: 'primary.light', backgroundColor: 'transparent' },

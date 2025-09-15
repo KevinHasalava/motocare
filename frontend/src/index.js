@@ -5,6 +5,7 @@ import './index.css';
 import App from './App';
 import Header from './components/Header';
 import Landing from './components/pages/Landing';
+import VehiclePage from './components/pages/VehiclePage';
 import reportWebVitals from './reportWebVitals';
 
 
@@ -15,6 +16,7 @@ root.render(
       <Route path="/" element={<App />} />
       <Route path="/Header" element={<Header />} />
       <Route path="/home" element={<Landing/>} />
+      <Route path="/VehiclePage" element={<VehiclePage/>} />
     </Routes>
   </BrowserRouter> 
 );

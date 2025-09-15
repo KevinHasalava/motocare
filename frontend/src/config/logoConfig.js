@@ -6,7 +6,7 @@ export const logoConfig = {
   // Company/Brand Information
   brand: {
     name: "Moto-Care",
-    subtitle: "PRO",
+ 
     tagline: "Professional Vehicle Care"
   },
 
