@@ -34,7 +34,7 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' &&
-       (event.key === 'Tab' || event.key === 'Shift')) return;
+      (event.key === 'Tab' || event.key === 'Shift')) return;
     setIsMenuOpen(open);
   };
 
@@ -89,7 +89,7 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
       )}
 
       <Button
-      
+
         variant="contained"
         fullWidth
         startIcon={<CalendarIcon />}
@@ -140,7 +140,11 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                 </Button>
               )}
 
-              <Button onClick={onBookNowClick} variant="contained" startIcon={<CalendarIcon />}>
+              <Button
+                onClick={() => navigate("/booking")}   // 👉 always go to /booking
+                variant="contained"
+                startIcon={<CalendarIcon />}
+              >
                 Book Now
               </Button>
             </Stack>

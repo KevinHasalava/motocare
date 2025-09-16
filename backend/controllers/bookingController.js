@@ -1,13 +1,17 @@
 const Booking = require("../models/Booking");
 const Vehicle = require("../models/Vehicle");
 const Service = require("../models/Service");
+const User = require("../models/User"); // important to get mechanics
+const Job = require("../models/Job");
 
+// ----------------- CREATE -----------------
 // ----------------- CREATE -----------------
 const createBooking = async (req, res) => {
   try {
-    const { user, vehicle, date, timeSlot, service } = req.body;
+    const { user, vehicle, date, time, service, mechanic } = req.body;
 
-    if (!user || !vehicle || !date || !timeSlot || !service) {
+    // validate required fields
+    if (!user || !vehicle || !date || !time || !service) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -17,67 +21,121 @@ const createBooking = async (req, res) => {
       return res.status(400).json({ message: "Invalid service type" });
     }
 
-    // avoid duplicate slot booking for same vehicle
-    const existing = await Booking.findOne({ date, timeSlot, vehicle });
-    if (existing) {
-      return res.status(400).json({ message: "Time slot already taken" });
+    // duration
+    const duration = serviceObj.duration || 60;
+    const startTime = new Date(`${date}T${time}:00`);
+    const endTime = new Date(startTime.getTime() + duration * 60000);
+
+    // business hours check
+    const openHour = new Date(`${date}T08:00:00`);
+    const closeHour = new Date(`${date}T17:00:00`);
+    if (startTime < openHour || endTime > closeHour) {
+      return res.status(400).json({ message: "Booking allowed only between 08:00 - 17:00" });
     }
 
-    const booking = new Booking({ user, vehicle, date, timeSlot, service });
+    // assign mechanic (or auto assign)
+    let assignedMechanic = null;
+    if (mechanic) {
+      const mech = await User.findById(mechanic);
+      if (!mech || mech.userType !== "mechanic") {
+        return res.status(400).json({ message: "Invalid mechanic selection" });
+      }
+      assignedMechanic = mech._id;
+    } else {
+      const mech = await User.findOne({ userType: "mechanic" });
+      if (mech) assignedMechanic = mech._id;
+    }
+
+    // check mechanic availability (overlaps)
+    if (assignedMechanic) {
+      const overlap = await Job.findOne({
+        mechanic: assignedMechanic,
+        startTime: { $lt: endTime },
+        endTime: { $gt: startTime },
+        status: { $in: ["Booked", "Ongoing"] }
+      });
+      if (overlap) {
+        return res.status(400).json({ message: "Mechanic not available at this time" });
+      }
+    }
+
+    // create Booking record
+    const booking = new Booking({
+      user,
+      vehicle,
+      service,
+      date,
+      timeSlot: `${date} ${time}`,
+      mechanic: assignedMechanic
+    });
     await booking.save();
 
-    res.status(201).json({ message: "✅ Booking created", booking });
+    // create Job record linked to booking
+    const job = new Job({
+      booking: booking._id,
+      user,
+      vehicle,
+      service,
+      mechanic: assignedMechanic,
+      startTime,
+      endTime,
+      status: "Booked"
+    });
+    await job.save();
+
+    res.status(201).json({ message: "✅ Booking + Job created", booking, job });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// ----------------- READ -----------------
-
-// Get all bookings
+// ----------------- READ ALL -----------------
 const getBookings = async (req, res) => {
   try {
     const bookings = await Booking.find()
       .populate("user", "name email")
       .populate("vehicle", "vehicleNumber brand model type")
-      .populate("service", "name price duration");
+      .populate("service", "name price duration")
+      .populate("mechanic", "name email");
     res.status(200).json(bookings);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// Get single booking
+// ----------------- READ ONE -----------------
 const getBookingById = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id)
       .populate("user", "name email")
       .populate("vehicle", "vehicleNumber brand model type")
-      .populate("service", "name price duration");
-
+      .populate("service", "name price duration")
+      .populate("mechanic", "name email");
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
-
     res.status(200).json(booking);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// Get bookings by user
+// ----------------- BOOKINGS BY USER -----------------
 const getBookingsByUser = async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.params.userId })
       .populate("vehicle", "vehicleNumber brand model")
-      .populate("service", "name price");
+      .populate("service", "name price")
+      .populate("mechanic", "name email");
     res.status(200).json(bookings);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// Available slots for given date
+// ----------------- AVAILABLE SLOTS -----------------
+// Get available slots for given date
 const getAvailableSlots = async (req, res) => {
   try {
     const { date } = req.query;
@@ -85,8 +143,18 @@ const getAvailableSlots = async (req, res) => {
       return res.status(400).json({ message: "Date is required" });
     }
 
+    // Normalize date range
+    const start = new Date(date);
+    const end = new Date(date);
+    end.setDate(end.getDate() + 1);
+
     const SLOTS = ["09:00-10:00", "10:00-11:00", "11:00-12:00", "14:00-15:00"];
-    const bookings = await Booking.find({ date });
+
+    // find bookings within that date range
+    const bookings = await Booking.find({
+      date: { $gte: start, $lt: end }
+    });
+
     const bookedSlots = bookings.map((b) => b.timeSlot);
 
     const available = SLOTS.filter((s) => !bookedSlots.includes(s));
@@ -96,7 +164,7 @@ const getAvailableSlots = async (req, res) => {
   }
 };
 
-// Get vehicles for a user (for dropdown)
+// ----------------- GET VEHICLES OF USER -----------------
 const getUserVehicles = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -107,13 +175,14 @@ const getUserVehicles = async (req, res) => {
   }
 };
 
-// ----------------- UPDATE -----------------
+// ----------------- UPDATE BOOKING -----------------
 const updateBooking = async (req, res) => {
   try {
     const booking = await Booking.findByIdAndUpdate(req.params.id, req.body, { new: true })
       .populate("user", "name email")
       .populate("vehicle", "vehicleNumber brand model")
-      .populate("service", "name price duration");
+      .populate("service", "name price duration")
+      .populate("mechanic", "name email");
 
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
@@ -125,7 +194,7 @@ const updateBooking = async (req, res) => {
   }
 };
 
-// ----------------- DELETE -----------------
+// ----------------- DELETE BOOKING -----------------
 const deleteBooking = async (req, res) => {
   try {
     const booking = await Booking.findByIdAndDelete(req.params.id);
@@ -137,6 +206,8 @@ const deleteBooking = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+
 
 module.exports = {
   createBooking,
