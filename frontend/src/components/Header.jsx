@@ -1,15 +1,26 @@
 // frontend/src/components/Header.jsx (Updated to use Logo component and proper navigation)
+
 import React, { useState } from 'react';
+
 import {
   AppBar, Toolbar, Typography, Button, IconButton, Drawer, List, ListItem, 
   ListItemButton, ListItemText, Box, Container, Stack
 } from '@mui/material';
+
 import {
   Event as CalendarIcon, Menu as MenuIcon,
   Login as LoginIcon, AccountCircle as ProfileIcon, Logout as LogoutIcon
 } from '@mui/icons-material';
+
 import { useNavigate } from 'react-router-dom';
 import Logo from './Landing_Page/Logo';
+import Login from '../pages/Login';
+
+
+const savedUser = JSON.parse(localStorage.getItem("user"));
+const isLoggedIn = !!savedUser;
+
+
 
 const Header = ({ navItems, onBookNowClick, onLoginClick, onLogoutClick, isLoggedIn, userProfile, theme }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -97,7 +108,7 @@ const Header = ({ navItems, onBookNowClick, onLoginClick, onLogoutClick, isLogge
           variant="outlined" 
           fullWidth 
           startIcon={<LoginIcon />} 
-          onClick={onLoginClick}
+          onClick={Login}
           sx={{ 
             mt: 2, 
             py: 1.5,

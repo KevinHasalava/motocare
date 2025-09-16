@@ -4,12 +4,12 @@ import { Box, Container, Typography, GlobalStyles, CssBaseline, ThemeProvider } 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
-import { getVehicles } from '../../api/vehicleService';
-import VehicleForm from '../../components/vehicle/VehicleForm';
-import VehicleList from '../../components/vehicle/VehicleList';
-import { theme, backgroundKeyframes, gradientText, mockData } from '../../utils/theme';
-import Header from '../Header';
-import Footer from '../Footer';
+import { getVehicles } from '../api/vehicleService';
+import VehicleForm from '../components/vehicle/VehicleForm';
+import VehicleList from '../components/vehicle/VehicleList';
+import { theme, backgroundKeyframes, gradientText, mockData } from '../utils/theme';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const VehiclePage = () => {
   const [vehicles, setVehicles] = useState([]);
