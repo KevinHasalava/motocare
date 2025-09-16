@@ -5,48 +5,62 @@ const User = require("../models/User"); // important to get mechanics
 const Job = require("../models/Job");
 
 // ----------------- CREATE -----------------
-// ----------------- CREATE -----------------
 const createBooking = async (req, res) => {
   try {
     const { user, vehicle, date, time, service, mechanic } = req.body;
 
-    // validate required fields
     if (!user || !vehicle || !date || !time || !service) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // validate service exists
+    // validate service
     const serviceObj = await Service.findById(service);
-    if (!serviceObj) {
-      return res.status(400).json({ message: "Invalid service type" });
-    }
+    if (!serviceObj) return res.status(400).json({ message: "Invalid service type" });
 
-    // duration
-    const duration = serviceObj.duration || 60;
+    const duration = serviceObj.duration || 60; // min
     const startTime = new Date(`${date}T${time}:00`);
     const endTime = new Date(startTime.getTime() + duration * 60000);
 
-    // business hours check
+    // business hours
     const openHour = new Date(`${date}T08:00:00`);
     const closeHour = new Date(`${date}T17:00:00`);
     if (startTime < openHour || endTime > closeHour) {
-      return res.status(400).json({ message: "Booking allowed only between 08:00 - 17:00" });
+      return res.status(400).json({ message: "Booking allowed between 08:00 - 17:00" });
     }
 
-    // assign mechanic (or auto assign)
+    // ✅ Mechanic assign
     let assignedMechanic = null;
+
     if (mechanic) {
+      // case: user passed mechanic manually
       const mech = await User.findById(mechanic);
       if (!mech || mech.userType !== "mechanic") {
-        return res.status(400).json({ message: "Invalid mechanic selection" });
+        return res.status(400).json({ message: "Invalid mechanic" });
       }
       assignedMechanic = mech._id;
     } else {
-      const mech = await User.findOne({ userType: "mechanic" });
-      if (mech) assignedMechanic = mech._id;
+      // case: auto assign → find all mechanics
+      const allMechs = await User.find({ userType: "mechanic" });
+
+      // count each mechanic jobs that day
+      let mechWorkload = [];
+      for (const m of allMechs) {
+        const jobsCount = await Job.countDocuments({
+          mechanic: m._id,
+          startTime: { $gte: new Date(`${date}T00:00:00`), $lt: new Date(`${date}T23:59:59`) },
+          status: { $in: ["Booked", "Ongoing"] }
+        });
+        mechWorkload.push({ mech: m._id, count: jobsCount });
+      }
+
+      // pick mechanic with lowest jobs
+      mechWorkload.sort((a, b) => a.count - b.count);
+      if (mechWorkload.length > 0) {
+        assignedMechanic = mechWorkload[0].mech;
+      }
     }
 
-    // check mechanic availability (overlaps)
+    // Availability check for chosen mechanic
     if (assignedMechanic) {
       const overlap = await Job.findOne({
         mechanic: assignedMechanic,
@@ -55,41 +69,33 @@ const createBooking = async (req, res) => {
         status: { $in: ["Booked", "Ongoing"] }
       });
       if (overlap) {
-        return res.status(400).json({ message: "Mechanic not available at this time" });
+        return res.status(400).json({ message: "Chosen mechanic not free at this time" });
       }
     }
 
-    // create Booking record
+    // Save booking
     const booking = new Booking({
-      user,
-      vehicle,
-      service,
-      date,
+      user, vehicle, service, date,
       timeSlot: `${date} ${time}`,
       mechanic: assignedMechanic
     });
     await booking.save();
 
-    // create Job record linked to booking
+    // Save job
     const job = new Job({
       booking: booking._id,
-      user,
-      vehicle,
-      service,
+      user, vehicle, service,
       mechanic: assignedMechanic,
-      startTime,
-      endTime,
+      startTime, endTime,
       status: "Booked"
     });
     await job.save();
 
     res.status(201).json({ message: "✅ Booking + Job created", booking, job });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
-
 // ----------------- READ ALL -----------------
 const getBookings = async (req, res) => {
   try {

@@ -59,7 +59,7 @@ const BookingPage = () => {
 
     try {
       // combine into slot string
-      const timeSlot = `${date} ${time}`;
+      // const timeSlot = `${date} ${time}`;
 
       await axios.post("http://localhost:5000/api/bookings", {
         user: user._id,
@@ -79,6 +79,8 @@ const BookingPage = () => {
   };
 
   return (
+ 
+    
     <Container maxWidth="sm" sx={{ mt: 12 }}>
       <Typography variant="h4" gutterBottom align="center">Book a Service</Typography>
 
