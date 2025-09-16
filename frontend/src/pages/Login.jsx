@@ -21,7 +21,7 @@ const Login = () => {
 
       if (user.userType === "admin") navigate("/admin/dashboard");
       else if (user.userType === "mechanic") navigate("/mechanic/jobs");
-      else navigate("/customer/home");
+      else navigate("/home");
 
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");

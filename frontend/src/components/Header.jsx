@@ -1,71 +1,56 @@
-// frontend/src/components/Header.jsx (Updated to use Logo component and proper navigation)
+// frontend/src/components/Header.jsx
 
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
 import {
-  AppBar, Toolbar, Typography, Button, IconButton, Drawer, List, ListItem, 
+  AppBar, Toolbar, Typography, Button, IconButton, Drawer, List, ListItem,
   ListItemButton, ListItemText, Box, Container, Stack
 } from '@mui/material';
-
 import {
   Event as CalendarIcon, Menu as MenuIcon,
   Login as LoginIcon, AccountCircle as ProfileIcon, Logout as LogoutIcon
 } from '@mui/icons-material';
-
 import { useNavigate } from 'react-router-dom';
 import Logo from './Landing_Page/Logo';
-import Login from '../pages/Login';
 
-
-const savedUser = JSON.parse(localStorage.getItem("user"));
-const isLoggedIn = !!savedUser;
-
-
-
-const Header = ({ navItems, onBookNowClick, onLoginClick, onLogoutClick, isLoggedIn, userProfile, theme }) => {
+const Header = ({ navItems = [], onBookNowClick, theme }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState(null); // ✅ handle login user
   const navigate = useNavigate();
 
-  const toggleDrawer = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
+  // When mount → read localStorage
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
     }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate("/login");
+  };
+
+  const toggleDrawer = (open) => (event) => {
+    if (event.type === 'keydown' &&
+       (event.key === 'Tab' || event.key === 'Shift')) return;
     setIsMenuOpen(open);
   };
 
   const handleLogoClick = () => {
-    if (window.location.pathname !== '/home') {
-      navigate('/home');
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    navigate("/");
   };
 
   const handleNavClick = (section) => {
-    if (window.location.pathname !== '/home') {
-      navigate(`/home#${section}`);
-    } else {
-      const el = document.getElementById(section);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
+    navigate(`/home#${section}`);
   };
 
+  // Drawer content for mobile
   const drawerContent = (
-    <Box
-      sx={{ width: 250, p: 2, backgroundColor: 'background.default', height: '100%' }}
-      role="presentation"
-      onKeyDown={toggleDrawer(false)}
-    >
-      {/* Logo in Mobile Menu */}
+    <Box sx={{ width: 250, p: 2 }}>
       <Box sx={{ mb: 3, pb: 2, borderBottom: '1px solid rgba(51, 65, 85, 0.5)' }}>
-        <Logo 
-          size="medium" 
-          variant="default" 
-          clickable={true}
-          onClick={handleLogoClick}
-        />
+        <Logo size="medium" variant="default" clickable={true} onClick={handleLogoClick} />
       </Box>
 
       <List>
@@ -77,63 +62,39 @@ const Header = ({ navItems, onBookNowClick, onLoginClick, onLogoutClick, isLogge
           </ListItem>
         ))}
       </List>
-      
-      {/* Login/Profile Section */}
-      {isLoggedIn ? (
+
+      {user ? (
         <>
-          <Box sx={{ p: 2, borderBottom: '1px solid rgba(51, 65, 85, 0.5)', mb: 2 }}>
+          <Box sx={{ p: 2, borderTop: '1px solid rgba(51, 65, 85, 0.5)', mb: 2 }}>
             <Stack direction="row" alignItems="center" spacing={1.5}>
               <ProfileIcon sx={{ color: 'primary.main' }} />
               <Typography variant="body1" color="text.primary">
-                {userProfile?.name || 'User'}
+                {user.name}
               </Typography>
             </Stack>
           </Box>
-          <Button
-            variant="contained" 
-            fullWidth 
-            startIcon={<LogoutIcon />} 
-            onClick={onLogoutClick}
-            sx={{ 
-              mt: 2, 
-              py: 1.5, 
-              background: `linear-gradient(to right, ${theme.palette.error.main}, ${theme.palette.error.dark})` 
-            }}
-          >
+          <Button variant="contained" fullWidth startIcon={<LogoutIcon />} onClick={handleLogout}>
             Logout
           </Button>
         </>
       ) : (
         <Button
-          variant="outlined" 
-          fullWidth 
-          startIcon={<LoginIcon />} 
-          onClick={Login}
-          sx={{ 
-            mt: 2, 
-            py: 1.5,
-            borderColor: 'primary.main',
-            color: 'primary.main',
-            '&:hover': {
-              borderColor: 'primary.light',
-              backgroundColor: 'rgba(99, 102, 241, 0.1)'
-            }
-          }}
+          variant="outlined"
+          fullWidth
+          startIcon={<LoginIcon />}
+          onClick={() => navigate("/login")}
         >
           Login
         </Button>
       )}
-      
+
       <Button
-        variant="contained" 
-        fullWidth 
-        startIcon={<CalendarIcon />} 
-        onClick={onBookNowClick}
-        sx={{ 
-          mt: 2, 
-          py: 1.5, 
-          background: `linear-gradient(to right, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})` 
-        }}
+      
+        variant="contained"
+        fullWidth
+        startIcon={<CalendarIcon />}
+        onClick={() => navigate("/booking")}
+        sx={{ mt: 2 }}
       >
         Book Now
       </Button>
@@ -143,147 +104,55 @@ const Header = ({ navItems, onBookNowClick, onLoginClick, onLogoutClick, isLogge
   return (
     <>
       <AppBar
-        position="fixed" 
+        position="fixed"
         elevation={0}
         sx={{
-          backgroundColor: 'rgba(15, 23, 42, 0.8)', 
+          backgroundColor: 'rgba(15, 23, 42, 0.8)',
           backdropFilter: 'blur(10px)',
-          borderBottom: '1px solid', 
-          borderColor: 'rgba(51, 65, 85, 0.5)'
+          borderBottom: '1px solid rgba(51, 65, 85, 0.5)'
         }}
       >
         <Container maxWidth="xl">
           <Toolbar disableGutters sx={{ justifyContent: 'space-between', height: 80 }}>
-            
-            {/* Logo - Now using the Logo component */}
-            <Logo 
-              size="medium" 
-              variant="default" 
-              clickable={true}
-              onClick={handleLogoClick}
-              customStyle={{ 
-                '&:hover': { 
-                  transform: 'scale(1.02)' // Subtle hover effect for header
-                }
-              }}
-            />
+            <Logo size="medium" variant="default" clickable={true} onClick={handleLogoClick} />
 
-            {/* Desktop Navigation */}
+            {/* Desktop Nav Items */}
             <Stack direction="row" spacing={4} alignItems="center" sx={{ display: { xs: 'none', md: 'flex' } }}>
               {navItems.map((item) => (
-                <Button 
-                  key={item} 
-                  onClick={() => handleNavClick(item.toLowerCase())}
-                  sx={{
-                    color: 'text.secondary', 
-                    '&:hover': { color: 'primary.light', backgroundColor: 'transparent' },
-                    position: 'relative',
-                    '&::after': {
-                      content: '""', 
-                      position: 'absolute', 
-                      width: 0, 
-                      height: '2px', 
-                      bottom: '-4px', 
-                      left: 0,
-                      background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                      transition: 'width 0.3s ease',
-                    },
-                    '&:hover::after': { width: '100%' },
-                  }}
-                >
+                <Button key={item} onClick={() => handleNavClick(item.toLowerCase())}>
                   {item}
                 </Button>
               ))}
-              
-              {/* Auth Section - Desktop */}
-              {isLoggedIn ? (
+
+              {user ? (
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <IconButton
-                    onClick={() => console.log('Profile clicked')}
-                    sx={{
-                      color: 'primary.main',
-                      '&:hover': { 
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        transform: 'scale(1.1)'
-                      }
-                    }}
-                  >
-                    <ProfileIcon sx={{ fontSize: 32 }} />
-                  </IconButton>
+                  <ProfileIcon sx={{ color: 'primary.main', fontSize: 32 }} />
                   <Typography variant="body2" color="text.secondary">
-                    {userProfile?.name || 'User'}
+                    {user.name}
                   </Typography>
-                  <Button
-                    onClick={onLogoutClick}
-                    variant="outlined"
-                    size="small"
-                    startIcon={<LogoutIcon />}
-                    sx={{
-                      borderColor: 'error.main',
-                      color: 'error.main',
-                      '&:hover': {
-                        borderColor: 'error.light',
-                        backgroundColor: 'rgba(244, 67, 54, 0.1)'
-                      }
-                    }}
-                  >
+                  <Button onClick={handleLogout} variant="outlined" startIcon={<LogoutIcon />}>
                     Logout
                   </Button>
                 </Stack>
               ) : (
-                <Button
-                  onClick={onLoginClick}
-                  variant="outlined"
-                  startIcon={<LoginIcon />}
-                  sx={{
-                    px: 3, 
-                    py: 1.5,
-                    borderColor: 'primary.main',
-                    color: 'primary.main',
-                    '&:hover': { 
-                      borderColor: 'primary.light',
-                      backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                      transform: 'scale(1.05)'
-                    }
-                  }}
-                >
+                <Button onClick={() => navigate("/login")} variant="outlined" startIcon={<LoginIcon />}>
                   Login
                 </Button>
               )}
-              
-              <Button
-                onClick={onBookNowClick} 
-                variant="contained" 
-                startIcon={<CalendarIcon />}
-                sx={{
-                  px: 3, 
-                  py: 1.5, 
-                  background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                  transition: 'all 0.3s ease', 
-                  '&:hover': { 
-                    transform: 'scale(1.05)', 
-                    boxShadow: `0 8px 25px ${theme.palette.primary.dark}` 
-                  }
-                }}
-              >
+
+              <Button onClick={onBookNowClick} variant="contained" startIcon={<CalendarIcon />}>
                 Book Now
               </Button>
             </Stack>
 
-            {/* Mobile Menu Button */}
-            <IconButton
-              color="inherit" 
-              aria-label="open drawer" 
-              edge="end" 
-              onClick={toggleDrawer(true)}
-              sx={{ display: { md: 'none' } }}
-            >
+            {/* Mobile Drawer Button */}
+            <IconButton color="inherit" onClick={toggleDrawer(true)} sx={{ display: { md: 'none' } }}>
               <MenuIcon />
             </IconButton>
           </Toolbar>
         </Container>
       </AppBar>
-      
+
       <Drawer anchor="right" open={isMenuOpen} onClose={toggleDrawer(false)}>
         {drawerContent}
       </Drawer>

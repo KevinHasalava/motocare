@@ -7,6 +7,7 @@ import VehiclePage from "./pages/VehiclePage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Header from "./components/Header";
+import BookingPage from "./pages/BookingPage";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/Login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
         <Route path="/Header" element={<Header />} />
+        <Route path="/booking" element={<BookingPage />} />
       </Routes>
     </Router>
   );

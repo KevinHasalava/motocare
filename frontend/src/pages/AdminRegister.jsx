@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Button, Box, Typography, Container, Alert } from "@mui/material";
+import { TextField, Button, Box, Typography, Container, MenuItem, Alert } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -8,20 +8,20 @@ const Register = () => {
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    userType: "customer"
   });
 
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    // 🛑 Password match validation
+    // Validate passwords match
     if (form.password !== form.confirmPassword) {
       setError("❌ Passwords do not match");
       return;
@@ -32,7 +32,7 @@ const Register = () => {
         name: form.name,
         email: form.email,
         password: form.password,
-        userType: "customer" // 👈 Always force as customer
+        userType: form.userType || "customer"
       });
 
       alert("✅ Registered successfully!");
@@ -67,8 +67,8 @@ const Register = () => {
         <TextField
           fullWidth
           margin="normal"
-          type="email"
           label="Email"
+          type="email"
           name="email"
           value={form.email}
           onChange={handleChange}
@@ -95,7 +95,20 @@ const Register = () => {
           required
         />
 
-        {/* 🔒 No "User Type" input shown to user */}
+        <TextField
+          select
+          fullWidth
+          margin="normal"
+          label="User Type"
+          name="userType"
+          value={form.userType}
+          onChange={handleChange}
+          helperText="Select your role (default is Customer)"
+        >
+          <MenuItem value="customer">Customer</MenuItem>
+          <MenuItem value="admin">Admin</MenuItem>
+          <MenuItem value="mechanic">Mechanic</MenuItem>
+        </TextField>
 
         <Button
           type="submit"
