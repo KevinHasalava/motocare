@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Typography,
+} from "@mui/material";
 
 const InventoryList = ({ refresh }) => {
   const [items, setItems] = useState([]);
@@ -30,7 +41,7 @@ const InventoryList = ({ refresh }) => {
     try {
       await axios.put(`http://localhost:5001/api/inventory/${id}`, {
         name: newName,
-        quantity: Number(newQuantity), // ✅ cast to number
+        quantity: Number(newQuantity),
       });
       fetchItems();
     } catch (error) {
@@ -43,18 +54,53 @@ const InventoryList = ({ refresh }) => {
   }, [refresh]);
 
   return (
-    <div>
-      <h2>Inventory Items</h2>
-      <ul>
-        {items.map((item) => (
-          <li key={item._id}>
-            {item.name} - {item.quantity}  
-            <button onClick={() => updateItem(item._id)}>Update</button>
-            <button onClick={() => deleteItem(item._id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Paper elevation={3} sx={{ maxWidth: "90%", mx: "auto", mt: 4, p: 2, borderRadius: 3 }}>
+      <Typography variant="h5" align="center" gutterBottom>
+        📦 Inventory Items
+      </Typography>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow sx={{ bgcolor: "primary.light" }}>
+              <TableCell><b>Name</b></TableCell>
+              <TableCell><b>Quantity</b></TableCell>
+              <TableCell><b>Price</b></TableCell>
+              <TableCell><b>Category</b></TableCell>
+              <TableCell><b>Actions</b></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {items.map((item) => (
+              <TableRow key={item._id}>
+                <TableCell>{item.name}</TableCell>
+                <TableCell>{item.quantity}</TableCell>
+                <TableCell>{item.price}</TableCell>
+                <TableCell>{item.category}</TableCell>
+                <TableCell>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => updateItem(item._id)}
+                    sx={{ mr: 1 }}
+                  >
+                    Update
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color="error"
+                    onClick={() => deleteItem(item._id)}
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Paper>
   );
 };
 

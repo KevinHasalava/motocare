@@ -6,7 +6,7 @@ import App from './App';
 import Header from './components/Header';
 import Landing from './components/pages/Landing';
 import reportWebVitals from './reportWebVitals';
-
+import Inventory from './components/pages/Inventory.jsx';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -15,11 +15,9 @@ root.render(
       <Route path="/" element={<App />} />
       <Route path="/Header" element={<Header />} />
       <Route path="/home" element={<Landing/>} />
+      <Route path="/Inventory" element={<Inventory/>} />   {/* ✅ Now loads Inventory Dashboard */}
     </Routes>
   </BrowserRouter> 
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

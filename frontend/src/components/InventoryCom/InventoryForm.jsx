@@ -1,5 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+} from "@mui/material";
 
 const InventoryForm = ({ onAdd }) => {
   const [form, setForm] = useState({
@@ -10,7 +17,7 @@ const InventoryForm = ({ onAdd }) => {
     description: "",
     category: "",
     unit: "",
-    lowStockThreshold: ""
+    lowStockThreshold: "",
   });
 
   const handleChange = (e) => {
@@ -20,7 +27,6 @@ const InventoryForm = ({ onAdd }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // ✅ cast number fields to real numbers
       const payload = {
         ...form,
         quantity: Number(form.quantity),
@@ -31,7 +37,6 @@ const InventoryForm = ({ onAdd }) => {
       const res = await axios.post("http://localhost:5001/api/inventory", payload);
       onAdd(res.data);
 
-      // clear form after success
       setForm({
         partId: "",
         name: "",
@@ -40,7 +45,7 @@ const InventoryForm = ({ onAdd }) => {
         description: "",
         category: "",
         unit: "",
-        lowStockThreshold: ""
+        lowStockThreshold: "",
       });
     } catch (error) {
       console.error("Error adding item:", error);
@@ -48,17 +53,57 @@ const InventoryForm = ({ onAdd }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input name="partId" placeholder="Part ID" value={form.partId} onChange={handleChange} />
-      <input name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
-      <input name="quantity" type="number" placeholder="Quantity" value={form.quantity} onChange={handleChange} required />
-      <input name="price" type="number" placeholder="Price" value={form.price} onChange={handleChange} />
-      <input name="description" placeholder="Description" value={form.description} onChange={handleChange} />
-      <input name="category" placeholder="Category" value={form.category} onChange={handleChange} />
-      <input name="unit" placeholder="Unit" value={form.unit} onChange={handleChange} />
-      <input name="lowStockThreshold" type="number" placeholder="Low Stock Threshold" value={form.lowStockThreshold} onChange={handleChange} />
-      <button type="submit">Add Item</button>
-    </form>
+    <Paper
+      elevation={4}
+      sx={{ maxWidth: 450, mx: "auto", p: 3, mt: 4, borderRadius: 3 }}
+    >
+      <Typography variant="h5" align="center" gutterBottom>
+        ➕ Add Inventory Item
+      </Typography>
+      <Box component="form" onSubmit={handleSubmit} noValidate>
+        <TextField
+          fullWidth margin="normal" label="Part ID" name="partId"
+          value={form.partId} onChange={handleChange}
+        />
+        <TextField
+          fullWidth margin="normal" label="Name" name="name" required
+          value={form.name} onChange={handleChange}
+        />
+        <TextField
+          fullWidth margin="normal" type="number" label="Quantity" name="quantity" required
+          value={form.quantity} onChange={handleChange}
+        />
+        <TextField
+          fullWidth margin="normal" type="number" label="Price" name="price"
+          value={form.price} onChange={handleChange}
+        />
+        <TextField
+          fullWidth margin="normal" multiline minRows={2} label="Description" name="description"
+          value={form.description} onChange={handleChange}
+        />
+        <TextField
+          fullWidth margin="normal" label="Category" name="category"
+          value={form.category} onChange={handleChange}
+        />
+        <TextField
+          fullWidth margin="normal" label="Unit" name="unit"
+          value={form.unit} onChange={handleChange}
+        />
+        <TextField
+          fullWidth margin="normal" type="number" label="Low Stock Threshold" name="lowStockThreshold"
+          value={form.lowStockThreshold} onChange={handleChange}
+        />
+
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 2, bgcolor: "primary.main", borderRadius: 2 }}
+        >
+          Add Item
+        </Button>
+      </Box>
+    </Paper>
   );
 };
 
