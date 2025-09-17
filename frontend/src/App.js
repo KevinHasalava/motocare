@@ -1,29 +1,27 @@
-import { useNavigate } from "react-router-dom";
-import logo from './logo.svg';
+// src/App.js
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-import InventoryForm from "./components/InventoryCom/InventoryForm.jsx";
-import InventoryList from "./components/InventoryCom/InventoryList.jsx";
-import { useState } from "react";
+// Import other pages/components you might have
+import Landing from './components/pages/Landing';
+import Inventory from './components/pages/Inventory'; // Your Inventory Dashboard
+import Header from './components/Header'; // If you have a global header
 
 function App() {
-  const navigate = useNavigate();
-  const [refresh, setRefresh] = useState(false);
-
-  const handleAdd = () => setRefresh(!refresh);
-
   return (
-    <div className="App">
-      <h1 className='h1'>hello</h1>
-      <center>
-        <button onClick={() => navigate("/home")}>click</button>
-      </center>
-      <header/>
+    <Router>
+      <div className="App">
+        {/* You might want a persistent Header/Navbar here if it spans across routes */}
+        {/* <Header /> */}
 
-      {/* Inventory feature */}
-      <h2>Inventory Management</h2>
-      <InventoryForm onAdd={handleAdd} />
-      <InventoryList refresh={refresh} />
-    </div>
+        <Routes>
+          <Route path="/" element={<Landing />} /> {/* Or your main landing page */}
+          <Route path="/home" element={<Landing />} /> {/* Assuming /home also goes to Landing */}
+          <Route path="/Inventory" element={<Inventory />} /> {/* Your Inventory Dashboard */}
+          {/* Add other routes here */}
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
