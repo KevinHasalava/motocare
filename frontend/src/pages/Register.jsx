@@ -1,7 +1,18 @@
-import React, { useState } from "react";
-import { TextField, Button, Box, Typography, Container, Alert } from "@mui/material";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { Box, Container, Typography, GlobalStyles, CssBaseline, ThemeProvider, Alert , Button, TextField} from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { theme, backgroundKeyframes, gradientText, mockData } from '../utils/theme';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import handleBookServiceClick from '../pages/VehiclePage';
+    
+
+
+
+import axios from "axios";
+
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -43,70 +54,110 @@ const Register = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 10 }}>
-      <Typography variant="h4" gutterBottom align="center">
-        Register
-      </Typography>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
+    <ThemeProvider theme={theme}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <CssBaseline />
+        <GlobalStyles styles={backgroundKeyframes} />
 
-      <Box component="form" onSubmit={handleRegister}>
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Name"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          required
-        />
-        <TextField
-          fullWidth
-          margin="normal"
-          type="email"
-          label="Email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-        <TextField
-          fullWidth
-          margin="normal"
-          type="password"
-          label="Password"
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
-        <TextField
-          fullWidth
-          margin="normal"
-          type="password"
-          label="Confirm Password"
-          name="confirmPassword"
-          value={form.confirmPassword}
-          onChange={handleChange}
-          required
-        />
+        <Box sx={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: -1 }}>
+          <Box sx={{ position: 'absolute', top: '10%', left: '10%', width: 384, height: 384, bgcolor: 'primary.main', borderRadius: '50%', filter: 'blur(100px)', animation: 'pulse 8s infinite ease-in-out' }} />
+          <Box sx={{ position: 'absolute', bottom: '10%', right: '10%', width: 384, height: 384, bgcolor: 'secondary.main', borderRadius: '50%', filter: 'blur(100px)', animation: 'pulse 8s infinite 2s ease-in-out' }} />
+        </Box>
 
-        {/* 🔒 No "User Type" input shown to user */}
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh',
+          position: 'relative',
+          overflowX: 'hidden',
+        }}>
+          <Header
+            navItems={mockData.navItems}
+            onBookNowClick={handleBookServiceClick}
+            theme={theme}
+          />
 
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          sx={{ mt: 2 }}
-        >
-          Register
-        </Button>
-      </Box>
-    </Container>
+          <Box
+            component="main"
+            sx={{ flexGrow: 1, pt: '80px', pb: 8 }}
+          >
+
+
+            <Container maxWidth="sm" sx={{ mt: 10 }}>
+              <Typography variant="h4" gutterBottom align="center">
+                Register
+              </Typography>
+
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
+
+              <Box component="form" onSubmit={handleRegister}>
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  label="Name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  type="email"
+                  label="Email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  type="password"
+                  label="Password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  type="password"
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                  required
+                />
+
+                {/* 🔒 No "User Type" input shown to user */}
+
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 2 }}
+                >
+                  Register
+                </Button>
+              </Box>
+            </Container>
+
+
+
+
+          </Box>
+
+          <Footer />
+        </Box>
+      </LocalizationProvider>
+    </ThemeProvider>
   );
 };
 
