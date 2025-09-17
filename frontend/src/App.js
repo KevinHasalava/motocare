@@ -1,21 +1,29 @@
-import { useNavigate } from "react-router-dom";
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+// Import your pages
+import Landing from "./pages/Landing";
+import VehiclePage from "./pages/VehiclePage";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Header from "./components/Header";
+import BookingPage from "./pages/BookingPage";
 
-function App() {
-
-  const navigate = useNavigate();
-
+export default function App() {
   return (
-    <div className="App">
-      <h1 className='h1'>hello</h1>
-      <center><button onClick={() => navigate("/home")}>click1  </button></center>
-      <center><button onClick={() => navigate("/VehiclePage")}>click2  </button></center>
-      <header/>
+    <Router>
+      <Routes>
+        {/* 🏠 Default route → Landing page */}
+        <Route path="/" element={<Landing />} />
 
-    </div>
+        {/* Other routes */}
+        <Route path="/home" element={<Landing />} />
+        <Route path="/VehiclePage" element={<VehiclePage />} />
+        <Route path="/Login" element={<Login />} />
+        <Route path="/Register" element={<Register />} />
+        <Route path="/Header" element={<Header />} />
+        <Route path="/booking" element={<BookingPage />} />
+      </Routes>
+    </Router>
   );
 }
-
-export default App;
