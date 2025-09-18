@@ -1,25 +1,35 @@
-// src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import './App.css';
+import InventoryPage from './components/pages/InventoryPage';
+import SupplierPage from './components/pages/SupplierPage';
+import StockPage from './components/pages/StockPage';
 import Landing from './components/pages/Landing';
-import Inventory from './components/pages/Inventory';
-import Header from './components/Header'; // Assuming this is a global component
 
 function App() {
   return (
     <Router>
-      <div className="App">
-        {/* Optional: Place a persistent header here that shows on all pages */}
-        {/* <Header /> */}
+      <Box sx={{ flexGrow: 1 }}>
+        <AppBar position="static">
+          <Toolbar>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              MotoCare Inventory
+            </Typography>
+            <Button color="inherit" component={Link} to="/">Home</Button>
+            <Button color="inherit" component={Link} to="/inventory">Inventory</Button>
+            <Button color="inherit" component={Link} to="/suppliers">Suppliers</Button>
+            <Button color="inherit" component={Link} to="/stock">Stock</Button>
+          </Toolbar>
+        </AppBar>
+      </Box>
 
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/home" element={<Landing />} />
-          <Route path="/Inventory" element={<Inventory />} />
-          {/* Add more routes for other pages here */}
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/inventory" element={<InventoryPage />} />
+        <Route path="/suppliers" element={<SupplierPage />} />
+        <Route path="/stock" element={<StockPage />} />
+      </Routes>
     </Router>
   );
 }

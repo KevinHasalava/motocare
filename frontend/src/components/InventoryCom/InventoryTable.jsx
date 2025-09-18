@@ -1,86 +1,26 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React from 'react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  Typography,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Tooltip,
-  Box,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import WarningIcon from "@mui/icons-material/Warning";
-import InventoryIcon from '@mui/icons-material/Inventory'; // For restocking icon
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography,
+  Box, IconButton, Tooltip, TextField, InputAdornment
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
 
-const InventoryTable = ({ refresh, onEditItemDetails, onRestockItem, setStats }) => {
-  const [items, setItems] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const fetchItems = async () => {
-    try {
-      const res = await axios.get("http://localhost:5001/api/inventory");
-      const inventoryItems = res.data;
-      setItems(inventoryItems);
-
-      // Calculate stats for the dashboard
-      const totalItems = inventoryItems.length;
-      const lowStockCount = inventoryItems.filter(item => item.quantity <= item.lowStockThreshold).length;
-      // Ensure price and quantity are numbers before calculation
-      const totalValue = inventoryItems.reduce((acc, item) => acc + (Number(item.quantity || 0) * Number(item.price || 0)), 0);
-      
-      setStats({ totalItems, lowStockCount, totalValue });
-
-    } catch (error) {
-      console.error("Error fetching items:", error);
-      setStats({ totalItems: 0, lowStockCount: 0, totalValue: 0 }); // Reset stats on error
-    }
-  };
-
-  const deleteItem = async (id, partId) => {
-    // For now, we'll assume deleting an inventory item is a drastic action.
-    // In a real system, you might only want to disable it or handle restock history.
-    // For simplicity here, we'll make it a confirmation.
-    if (window.confirm(`Are you sure you want to delete the item with Part ID ${partId}? This action cannot be undone.`)) {
-      try {
-        await axios.delete(`http://localhost:5001/api/inventory/${id}`); // Assumes backend has a delete route
-        fetchItems(); // Refresh list
-      } catch (error) {
-        console.error("Error deleting item:", error);
-      }
-    }
-  };
-
-  useEffect(() => {
-    fetchItems();
-  }, [refresh]);
-
-  const filteredItems = items.filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.partId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+const InventoryTable = ({
+  inventory,
+  handleEditClick,
+  handleDeleteClick,
+  handleSearch,
+}) => {
   return (
-    <Paper elevation={3} sx={{ maxWidth: "90%", mx: "auto", mt: 4, p: 2, borderRadius: 3 }}>
-      <Typography variant="h5" align="center" gutterBottom>
-        📦 Inventory Items
-      </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+    <Paper elevation={3} sx={{ p: 2, borderRadius: 3, mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>Inventory Items</Typography>
         <TextField
           size="small"
           placeholder="Search items..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -91,53 +31,34 @@ const InventoryTable = ({ refresh, onEditItemDetails, onRestockItem, setStats })
         />
       </Box>
       <TableContainer>
-        <Table>
+        <Table stickyHeader>
           <TableHead>
-            <TableRow sx={{ bgcolor: "primary.light" }}>
-              <TableCell><b>Part ID</b></TableCell>
-              <TableCell><b>Name</b></TableCell>
-              <TableCell><b>Current Stock</b></TableCell>
-              <TableCell><b>Price (LKR)</b></TableCell>
-              <TableCell><b>Category</b></TableCell>
-              <TableCell><b>Actions</b></TableCell>
+            <TableRow sx={{ bgcolor: 'primary.light' }}>
+              <TableCell sx={{ fontWeight: 'bold' }}>Part ID</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Category</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }} align="right">Quantity</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }} align="right">Low Stock Threshold</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }} align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredItems.map((item) => (
-              <TableRow
-                key={item._id}
-                sx={{
-                  "&:hover": { bgcolor: "grey.200" },
-                  bgcolor: item.quantity <= item.lowStockThreshold ? "warning.light" : "transparent"
-                }}
-              >
+            {inventory.map((item) => (
+              <TableRow key={item._id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                 <TableCell>{item.partId}</TableCell>
-                <TableCell>
-                  {item.name}
-                  {item.quantity <= item.lowStockThreshold && (
-                    <Tooltip title="Low Stock">
-                      <WarningIcon color="error" sx={{ ml: 1, verticalAlign: 'middle' }} />
-                    </Tooltip>
-                  )}
-                </TableCell>
-                <TableCell>{item.quantity} {item.unit}</TableCell>
-                <TableCell>Rs. {Number(item.price).toFixed(2)}</TableCell>
+                <TableCell>{item.name}</TableCell>
                 <TableCell>{item.category}</TableCell>
-                <TableCell>
-                  <Tooltip title="Edit Item Details">
-                    <IconButton color="primary" onClick={() => onEditItemDetails(item)}>
-                      <EditIcon />
+                <TableCell align="right">{item.quantity}</TableCell>
+                <TableCell align="right">{item.lowStockThreshold}</TableCell>
+                <TableCell align="center">
+                  <Tooltip title="Edit">
+                    <IconButton onClick={() => handleEditClick(item)}>
+                      <EditIcon color="primary" />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Restock Item">
-                    <IconButton color="secondary" onClick={() => onRestockItem(item)}>
-                      <InventoryIcon />
-                    </IconButton>
-                  </Tooltip>
-                  {/* Delete button might be for removing the entire part record */}
-                  <Tooltip title="Delete Item Record">
-                    <IconButton color="error" onClick={() => deleteItem(item._id, item.partId)}>
-                      <DeleteIcon />
+                  <Tooltip title="Delete">
+                    <IconButton onClick={() => handleDeleteClick(item._id)}>
+                      <DeleteIcon color="error" />
                     </IconButton>
                   </Tooltip>
                 </TableCell>
