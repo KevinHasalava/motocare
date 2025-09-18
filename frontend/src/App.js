@@ -7,7 +7,7 @@ import VehiclePage from "./pages/VehiclePage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Header from "./components/Header";
-import BookingPage from "./pages/BookingPage";
+import BookingPage from "./components/Booking/BookingPage";
 
 export default function App() {
   return (
