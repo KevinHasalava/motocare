@@ -16,7 +16,7 @@ function App() {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               MotoCare Inventory
             </Typography>
-            <Button color="inherit" component={Link} to="/">Home</Button>
+            {/* <Button color="inherit" component={Link} to="/">Home</Button> */}
             <Button color="inherit" component={Link} to="/inventory">Inventory</Button>
             <Button color="inherit" component={Link} to="/suppliers">Suppliers</Button>
             <Button color="inherit" component={Link} to="/stock">Stock</Button>
@@ -25,7 +25,7 @@ function App() {
       </Box>
 
       <Routes>
-        <Route path="/" element={<Landing />} />
+        {/* <Route path="/" element={<Landing />} /> */}
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/suppliers" element={<SupplierPage />} />
         <Route path="/stock" element={<StockPage />} />
