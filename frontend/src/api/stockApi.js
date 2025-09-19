@@ -17,3 +17,7 @@ export const updateStockMovement = async (id, stockData) => {
 export const deleteStockMovement = async (id) => {
     return await axios.delete(`${API_URL}/${id}`);
 };
+
+export const deductStock = async (deductionData) => {
+    return await axios.post(`${API_URL}/deduct`, deductionData);
+};

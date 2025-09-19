@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Alert
+  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Alert, CircularProgress
 } from '@mui/material';
 import { createSupplier, updateSupplier } from '../../api/supplierApi';
 
@@ -15,9 +15,9 @@ const AddEditSupplierDialog = ({ open, handleClose, supplierToEdit, onSave }) =>
 
   useEffect(() => {
     if (supplierToEdit) {
-      // Set form data from the supplier to edit
       setFormData({
         ...supplierToEdit,
+        // Safely set nested contact properties
         contact: {
           phone: supplierToEdit.contact?.phone || '',
           email: supplierToEdit.contact?.email || '',
@@ -25,7 +25,6 @@ const AddEditSupplierDialog = ({ open, handleClose, supplierToEdit, onSave }) =>
         }
       });
     } else {
-      // Reset form for a new supplier
       setFormData({ name: '', supplierId: '', contact: { phone: '', email: '', address: '' } });
     }
     setError('');
@@ -33,7 +32,6 @@ const AddEditSupplierDialog = ({ open, handleClose, supplierToEdit, onSave }) =>
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Handle nested contact properties
     if (['phone', 'email', 'address'].includes(name)) {
       setFormData(prev => ({
         ...prev,

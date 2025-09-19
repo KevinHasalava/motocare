@@ -3,16 +3,18 @@ import {
   Container, Typography, Box, Button, CircularProgress, Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import AddStockForm from '../InventoryCom/AddStockForm';
-import { getStockMovements } from '../../api/stockApi';
+import { getStockMovements, deleteStockMovement } from '../../api/stockApi';
 import DataTable from '../DataTable';
+import AddStockInForm from '../InventoryCom/AddStockInForm';
+import AddStockOutForm from '../InventoryCom/AddStockOutForm';
 
 const StockPage = () => {
   const [stockMovements, setStockMovements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [openInDialog, setOpenInDialog] = useState(false);
+  const [openOutDialog, setOpenOutDialog] = useState(false);
 
   const fetchStockMovements = async () => {
     setLoading(true);
@@ -21,7 +23,7 @@ const StockPage = () => {
       const response = await getStockMovements();
       setStockMovements(response.data);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to fetch stock movements:", err);
       setError('Failed to fetch stock movements.');
     } finally {
       setLoading(false);
@@ -32,24 +34,47 @@ const StockPage = () => {
     fetchStockMovements();
   }, []);
 
-  const handleAddClick = () => {
-    setOpenDialog(true);
+  const handleOpenInDialog = () => setOpenInDialog(true);
+  const handleCloseInDialog = () => setOpenInDialog(false);
+  const handleOpenOutDialog = () => setOpenOutDialog(true);
+  const handleCloseOutDialog = () => setOpenOutDialog(false);
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this stock movement?')) {
+      try {
+        await deleteStockMovement(id);
+        fetchStockMovements();
+      } catch (err) {
+        console.error("Failed to delete stock movement:", err);
+        setError(err.response?.data?.message || 'Failed to delete stock movement.');
+      }
+    }
   };
 
   const columns = [
+    { id: 'partId', label: 'Part ID', render: (row) => row.partId || '-' },
+    { id: 'name', label: 'Item Name', render: (row) => row.inventory?.name || '-' },
+    { id: 'type', label: 'Type' },
+    { id: 'quantity', label: 'Quantity' },
+    { id: 'supplier', label: 'Supplier', render: (row) => row.supplier?.name || '-' },
+    { id: 'jobId', label: 'Job ID', render: (row) => row.jobId || '-' },
     { id: 'date', label: 'Date', render: (row) => new Date(row.date).toLocaleDateString() },
-    { id: 'partId', label: 'Part ID', render: (row) => row.inventory?.partId || 'N/A' },
-    { id: 'name', label: 'Item Name', render: (row) => row.inventory?.name || 'N/A' },
-    { id: 'type', label: 'Type', render: (row) => row.type },
-    { id: 'quantity', label: 'Quantity', render: (row) => row.quantity },
-    { id: 'supplierName', label: 'Supplier', render: (row) => row.supplier?.name || 'N/A' },
-    { id: 'notes', label: 'Notes', render: (row) => row.notes || '-' },
+    {
+      id: 'actions',
+      label: 'Actions',
+      render: (row) => (
+        <Box>
+          <Button size="small" color="error" onClick={() => handleDelete(row._id)}>Delete</Button>
+        </Box>
+      ),
+    },
   ];
-
-  const filteredMovements = stockMovements.filter(movement =>
-    (movement.inventory?.partId?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (movement.inventory?.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (movement.supplier?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+  
+  const filteredMovements = stockMovements.filter(m => 
+    // FIXED: Added optional chaining to prevent crash on undefined properties
+    (m.inventory?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (m.partId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (m.jobId || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -57,13 +82,22 @@ const StockPage = () => {
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
         Stock Movements
       </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mb: 2 }}>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={handleAddClick}
+          onClick={handleOpenInDialog}
+          color='success'
         >
-          Add Stock Movement
+          Add Stock
+        </Button>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleOpenOutDialog}
+          color='error'
+        >
+          Remove Stock
         </Button>
       </Box>
       {loading ? (
@@ -78,12 +112,17 @@ const StockPage = () => {
           columns={columns}
           data={filteredMovements}
           onSearchChange={setSearchTerm}
-          searchPlaceholder="Search by part or supplier..."
+          searchPlaceholder="Search by part name, ID, or job ID..."
         />
       )}
-      <AddStockForm
-        open={openDialog}
-        handleClose={() => setOpenDialog(false)}
+      <AddStockInForm
+        open={openInDialog}
+        handleClose={handleCloseInDialog}
+        onSave={fetchStockMovements}
+      />
+      <AddStockOutForm
+        open={openOutDialog}
+        handleClose={handleCloseOutDialog}
         onSave={fetchStockMovements}
       />
     </Container>

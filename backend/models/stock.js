@@ -7,6 +7,10 @@ const stockSchema = new mongoose.Schema({
         ref: 'Inventory',
         required: [true, 'Inventory item reference is required.'],
     },
+    partId: {
+        type: String,
+        required: true,
+    },
     supplier: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Supplier',
@@ -21,13 +25,22 @@ const stockSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['IN', 'OUT'],
-        required: [true, 'Stock type (IN or OUT) is required.'],
+        // The new "deduction" type is added here
+        enum: ['IN', 'OUT', 'deduction'],
+        required: [true, 'Stock type (IN, OUT, or deduction) is required.'],
     },
     quantity: {
         type: Number,
         required: [true, 'Quantity is required.'],
         min: [1, 'Quantity must be a positive number.'],
+    },
+    jobId: {
+        type: String,
+        trim: true,
+        required: [
+            function() { return this.type === 'deduction'; },
+            'Job ID is required for a deduction type.'
+        ],
     },
     buyingPrice: {
         type: Number,

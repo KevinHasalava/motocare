@@ -179,3 +179,83 @@ exports.deleteStockMovement = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 };
+
+// @desc    Deduct parts from inventory based on a completed job
+// @route   POST /api/stock/deduct
+// @access  Public (or update with appropriate auth)
+exports.deductParts = async (req, res) => {
+    // Get the job ID and the array of parts from the request body
+    const { jobId, parts } = req.body;
+
+    // Validate the input
+    if (!jobId || !parts || !Array.isArray(parts) || parts.length === 0) {
+        return res.status(400).json({ message: 'Invalid input. Please provide a jobId and an array of parts.' });
+    }
+
+    // Start a Mongoose session for a transaction to ensure data consistency
+    // This is crucial to prevent partial deductions if an error occurs mid-way
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const deductedParts = [];
+
+        // Iterate through each part in the request
+        for (const part of parts) {
+            const { partId, qty } = part;
+
+            // Find the inventory item by its partId
+            const inventoryItem = await Inventory.findOne({ partId: partId }).session(session);
+
+            // Check if the part exists
+            if (!inventoryItem) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(404).json({ message: `Part with ID '${partId}' not found.` });
+            }
+
+            // Check if there is enough stock
+            if (inventoryItem.quantity < qty) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ message: `Insufficient stock for part '${partId}'. Available: ${inventoryItem.quantity}, Requested: ${qty}` });
+            }
+
+            // Deduct the quantity from the inventory item
+            inventoryItem.quantity -= qty;
+            await inventoryItem.save({ session });
+
+            // Create a record in the StockMovement collection
+            const stockMovement = new Stock({
+                inventory: inventoryItem._id, // Use the MongoDB object ID
+                partId: inventoryItem.partId,
+                quantity: qty,
+                type: 'deduction',
+                jobId: jobId,
+                date: new Date(),
+                // updatedBy: req.user._id, // Uncomment this line if you have user authentication
+            });
+
+            await stockMovement.save({ session });
+            deductedParts.push({ partId, qty });
+        }
+
+        // If all operations were successful, commit the transaction
+        await session.commitTransaction();
+        session.endSession();
+
+        // Return a success response
+        res.status(200).json({
+            message: 'Stock deducted successfully.',
+            deductedParts: deductedParts,
+            jobId: jobId
+        });
+
+    } catch (error) {
+        // If an error occurred, abort the transaction and end the session
+        await session.abortTransaction();
+        session.endSession();
+        console.error('Error during stock deduction transaction:', error);
+        res.status(500).json({ message: 'Failed to deduct stock due to a server error.' });
+    }
+};
