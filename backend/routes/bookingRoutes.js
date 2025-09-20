@@ -6,7 +6,9 @@ const {
   getUserVehicles,
   getBookings,
   getBookingById,
-  getBookingsByUser
+  getBookingsByUser,
+  updateBookingAndJob,
+  deleteBookingAndJob
 } = require("../controllers/bookingController");
 
 // ✅ Create new booking
@@ -26,5 +28,9 @@ router.get("/available", getAvailableSlots);
 
 // ✅ Get vehicles of user
 router.get("/vehicles/:userId", getUserVehicles);
+
+router.put("/update-with-job/:bookingId", updateBookingAndJob);
+
+router.delete("/delete-with-job/:bookingId", deleteBookingAndJob);
 
 module.exports = router;

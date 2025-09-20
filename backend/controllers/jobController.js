@@ -74,7 +74,8 @@ const getJobs = async (req, res) => {
       .populate("user", "name email")
       .populate("vehicle", "vehicleNumber brand model")
       .populate("service", "name duration price")
-      .populate("mechanic", "name email");
+      .populate("mechanic", "name email")
+      .populate("booking", "_id");
     res.status(200).json(jobs);
   } catch (err) {
     res.status(500).json({ message: err.message });

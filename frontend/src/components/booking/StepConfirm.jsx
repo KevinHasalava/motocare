@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box, Button, Card, CardContent, Grid, Paper,
-  Stack, Typography, Chip, Fade, alpha, Avatar
+  Stack, Typography, Fade, alpha, Avatar, Checkbox, FormControlLabel
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import BuildIcon from '@mui/icons-material/Build';
@@ -10,14 +10,16 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 
 const StepConfirm = ({ vehicle, service, date, time, mechanic, onBack, onConfirm }) => {
+  const [agree, setAgree] = useState(false); // 👈 T&C accept state
+
   const getVehicleIcon = (type) => {
     const icons = {
-      'car': '🚗',
-      'motorcycle': '🏍️',
-      'truck': '🚛',
-      'bus': '🚌',
-      'van': '🚐',
-      'suv': '🚙'
+      car: '🚗',
+      motorcycle: '🏍️',
+      truck: '🚛',
+      bus: '🚌',
+      van: '🚐',
+      suv: '🚙',
     };
     return icons[type?.toLowerCase()] || '🚗';
   };
@@ -29,83 +31,39 @@ const StepConfirm = ({ vehicle, service, date, time, mechanic, onBack, onConfirm
           <Grid item xs={12} md={10}>
             <Card
               sx={{
-                background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)',
-                backdropFilter: 'blur(20px)',
+                background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95))',
                 borderRadius: 4,
                 border: '1px solid',
                 borderColor: alpha('#fff', 0.1),
-                overflow: 'hidden',
-                position: 'relative',
               }}
             >
               {/* Header */}
-              <Box
-                sx={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  p: 3,
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)',
-                  }
-                }}
-              >
+              <Box sx={{ background: 'linear-gradient(135deg, #667eea, #764ba2)', p: 3 }}>
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <Box
-                    sx={{
-                      width: 56,
-                      height: 56,
-                      borderRadius: '50%',
-                      background: alpha('#fff', 0.2),
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <CheckCircleIcon sx={{ color: 'white', fontSize: 32 }} />
-                  </Box>
+                  <CheckCircleIcon sx={{ color: 'white', fontSize: 32 }} />
                   <Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, color: 'white' }}>
                       Confirm Your Booking
                     </Typography>
                     <Typography variant="body2" sx={{ color: alpha('#fff', 0.9) }}>
-                      Please review your booking details
+                      Please review your booking details carefully.
                     </Typography>
                   </Box>
                 </Stack>
               </Box>
-              
+
               <CardContent sx={{ p: 4 }}>
                 <Grid container spacing={3}>
-                  {/* Left Column */}
+                  {/* Vehicle and Service left */}
                   <Grid item xs={12} md={6}>
                     <Stack spacing={3}>
-                      {/* Vehicle Details */}
-                      <Paper
-                        elevation={0}
-                        sx={{
-                          p: 2.5,
-                          background: alpha('#667eea', 0.05),
-                          borderRadius: 2,
-                          border: '1px solid',
-                          borderColor: alpha('#667eea', 0.2),
-                        }}
-                      >
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <Box sx={{ fontSize: 32 }}>
-                            {getVehicleIcon(vehicle?.type)}
-                          </Box>
-                          <Box flex={1}>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1 }}>
-                              Vehicle
-                            </Typography>
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
+                      {/* Vehicle */}
+                      <Paper sx={{ p: 2.5, background: alpha('#667eea', 0.05), borderRadius: 2, border: '1px solid', borderColor: alpha('#667eea', 0.2) }}>
+                        <Stack direction="row" spacing={2}>
+                          <Box sx={{ fontSize: 32 }}>{getVehicleIcon(vehicle?.type)}</Box>
+                          <Box>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>Vehicle</Typography>
+                            <Typography variant="h6" sx={{ color: 'white' }}>
                               {vehicle?.brand} {vehicle?.model}
                             </Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
@@ -114,86 +72,31 @@ const StepConfirm = ({ vehicle, service, date, time, mechanic, onBack, onConfirm
                           </Box>
                         </Stack>
                       </Paper>
-                      
-                      {/* Service Details */}
-                      <Paper
-                        elevation={0}
-                        sx={{
-                          p: 2.5,
-                          background: alpha('#a855f7', 0.05),
-                          borderRadius: 2,
-                          border: '1px solid',
-                          borderColor: alpha('#a855f7', 0.2),
-                        }}
-                      >
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <Box
-                            sx={{
-                              width: 48,
-                              height: 48,
-                              borderRadius: 2,
-                              background: alpha('#a855f7', 0.2),
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}
-                          >
-                            <BuildIcon sx={{ color: '#a855f7' }} />
-                          </Box>
-                          <Box flex={1}>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1 }}>
-                              Service
-                            </Typography>
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
-                              {service?.name}
-                            </Typography>
-                            <Chip
-                              label={`₹${service?.price}`}
-                              size="small"
-                              sx={{
-                                mt: 1,
-                                background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)',
-                                color: 'white',
-                                fontWeight: 600,
-                              }}
-                            />
+
+                      {/* Service */}
+                      <Paper sx={{ p: 2.5, background: alpha('#a855f7', 0.05), borderRadius: 2, border: '1px solid', borderColor: alpha('#a855f7', 0.2) }}>
+                        <Stack direction="row" spacing={2}>
+                          <BuildIcon sx={{ color: '#a855f7' }} />
+                          <Box>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>Service</Typography>
+                            <Typography variant="h6" sx={{ color: 'white' }}>{service?.name}</Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>Price: Rs.{service?.price}</Typography>
                           </Box>
                         </Stack>
                       </Paper>
                     </Stack>
                   </Grid>
 
-                  {/* Right Column */}
+                  {/* Mechanic and Date/Time */}
                   <Grid item xs={12} md={6}>
                     <Stack spacing={3}>
-                      {/* Mechanic Details */}
-                      <Paper
-                        elevation={0}
-                        sx={{
-                          p: 2.5,
-                          background: alpha('#10b981', 0.05),
-                          borderRadius: 2,
-                          border: '1px solid',
-                          borderColor: alpha('#10b981', 0.2),
-                        }}
-                      >
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <Avatar
-                            sx={{
-                              width: 48,
-                              height: 48,
-                              background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)',
-                            }}
-                          >
-                            {mechanic?.name?.charAt(0).toUpperCase()}
-                          </Avatar>
-                          <Box flex={1}>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1 }}>
-                              Mechanic
-                            </Typography>
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
-                              {mechanic?.name}
-                            </Typography>
+                      {/* Mechanic */}
+                      <Paper sx={{ p: 2.5, background: alpha('#10b981', 0.05), borderRadius: 2, border: '1px solid', borderColor: alpha('#10b981', 0.2) }}>
+                        <Stack direction="row" spacing={2}>
+                          <Avatar sx={{ bgcolor: '#10b981' }}>{mechanic?.name?.charAt(0).toUpperCase()}</Avatar>
+                          <Box>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>Mechanic</Typography>
+                            <Typography variant="h6" sx={{ color: 'white' }}>{mechanic?.name}</Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                               {mechanic?.specialization || 'General Mechanic'}
                             </Typography>
@@ -203,100 +106,63 @@ const StepConfirm = ({ vehicle, service, date, time, mechanic, onBack, onConfirm
 
                       {/* Date & Time */}
                       <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                          <Paper
-                            elevation={0}
-                            sx={{
-                              p: 2.5,
-                              background: alpha('#3b82f6', 0.05),
-                              borderRadius: 2,
-                              border: '1px solid',
-                              borderColor: alpha('#3b82f6', 0.2),
-                              height: '100%',
-                            }}
-                          >
-                            <Stack spacing={1} alignItems="center">
-                              <CalendarMonthIcon sx={{ color: '#3b82f6', fontSize: 28 }} />
-                              <Box textAlign="center">
-                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                  Date
-                                </Typography>
-                                <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
-                                  {date.format("DD MMM")}
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                  {date.format("YYYY")}
-                                </Typography>
-                              </Box>
-                            </Stack>
+                        <Grid item xs={6}>
+                          <Paper sx={{ p: 2.5, background: alpha('#3b82f6', 0.05), border: '1px solid', borderColor: alpha('#3b82f6', 0.2) }}>
+                            <CalendarMonthIcon sx={{ color: '#3b82f6' }} />
+                            <Typography variant="h6" sx={{ color: 'white' }}>{date.format("DD MMM")}</Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>{date.format("YYYY")}</Typography>
                           </Paper>
                         </Grid>
-                        
-                        <Grid item xs={12} sm={6}>
-                          <Paper
-                            elevation={0}
-                            sx={{
-                              p: 2.5,
-                              background: alpha('#ec4899', 0.05),
-                              borderRadius: 2,
-                              border: '1px solid',
-                              borderColor: alpha('#ec4899', 0.2),
-                              height: '100%',
-                            }}
-                          >
-                            <Stack spacing={1} alignItems="center">
-                              <AccessTimeIcon sx={{ color: '#ec4899', fontSize: 28 }} />
-                              <Box textAlign="center">
-                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                  Time
-                                </Typography>
-                                <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
-                                  {time?.format("HH:mm")}
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                  Duration: ~{service?.duration || '60'} min
-                                </Typography>
-                              </Box>
-                            </Stack>
+                        <Grid item xs={6}>
+                          <Paper sx={{ p: 2.5, background: alpha('#ec4899', 0.05), border: '1px solid', borderColor: alpha('#ec4899', 0.2) }}>
+                            <AccessTimeIcon sx={{ color: '#ec4899' }} />
+                            <Typography variant="h6" sx={{ color: 'white' }}>{time?.format("HH:mm")}</Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                              Duration: ~{service?.duration} mins
+                            </Typography>
                           </Paper>
                         </Grid>
                       </Grid>
                     </Stack>
                   </Grid>
                 </Grid>
-                
+
+                {/* Terms & Conditions section */}
+                <Box mt={4} sx={{ background: alpha('#000', 0.2), p: 2, borderRadius: 2 }}>
+                  <Typography variant="subtitle1" sx={{ color: 'white', mb: 1 }}>
+                    Terms & Conditions
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                    • Vehicle must arrive 10 minutes prior to booking time.<br />
+                    • Cancellation should be informed at least 2 hours in advance.<br />
+                    • Workshop is not responsible for left belongings in the vehicle.<br />
+                    • Payment should be settled after service completion.<br />
+                  </Typography>
+
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={agree}
+                        onChange={(e) => setAgree(e.target.checked)}
+                        sx={{ color: '#10b981', '&.Mui-checked': { color: '#10b981' } }}
+                      />
+                    }
+                    label={<Typography sx={{ color: 'white' }}>I accept the Terms & Conditions</Typography>}
+                  />
+                </Box>
+
                 {/* Action Buttons */}
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
-                  <Button 
-                    variant="outlined" 
-                    onClick={onBack}
-                    sx={{
-                      px: 4,
-                      py: 1.5,
-                      borderColor: alpha('#fff', 0.3),
-                      color: 'white',
-                      '&:hover': {
-                        borderColor: alpha('#fff', 0.5),
-                        background: alpha('#fff', 0.1),
-                      }
-                    }}
-                  >
+                  <Button variant="outlined" onClick={onBack} sx={{ color: 'white' }}>
                     Back
                   </Button>
-                  <Button 
-                    variant="contained" 
+                  <Button
+                    variant="contained"
                     onClick={onConfirm}
+                    disabled={!agree}   // 🔒 confirm only if ticked
                     sx={{
-                      background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)',
-                      px: 4,
-                      py: 1.5,
-                      fontSize: '1rem',
-                      fontWeight: 600,
-                      '&:hover': {
-                        background: 'linear-gradient(135deg, #14b8a6 0%, #10b981 100%)',
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 10px 20px rgba(16, 185, 129, 0.3)',
-                      }
+                      background: 'linear-gradient(135deg, #10b981, #14b8a6)',
+                      '&.Mui-disabled': { background: alpha('#fff', 0.2), color: alpha('#fff', 0.5) },
                     }}
                   >
                     Confirm Booking

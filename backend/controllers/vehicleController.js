@@ -12,7 +12,7 @@ const addVehicle = async (req, res) => {
     }
 
     // check enum validation
-    const allowedTypes = ['Car', 'Three Wheel', 'Bike', 'Van'];
+    const allowedTypes = ['Car', 'Three Wheel', 'Motorcycle', 'Van','SUV'];
     if (!allowedTypes.includes(type)) {
       return res.status(400).json({ message: `Invalid type. Allowed: ${allowedTypes.join(', ')}` });
     }

@@ -82,8 +82,10 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
   const vehicleTypes = [
     { value: 'Car', icon: '🚗', color: '#3b82f6' },
     { value: 'Three Wheel', icon: '🛺', color: '#f59e0b' },
-    { value: 'Bike', icon: '🏍️', color: '#ef4444' },
-    { value: 'Van', icon: '🚐', color: '#10b981' }
+    { value: 'Motorcycle', icon: '🏍️', color: '#ef4444' },
+    { value: 'Van', icon: '🚐', color: '#10b981' },
+    { value: 'SUV', icon: '🚙', color: '#b9b310ff' }
+
   ];
 
   return (
