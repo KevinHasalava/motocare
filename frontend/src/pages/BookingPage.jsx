@@ -22,17 +22,19 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import handleBookServiceClick from "../pages/VehiclePage";
 
-const steps = ["Select Vehicle", "Select Service", "Choose Date & Time", "Confirm"];
+const steps = ["Select Vehicle", "Select Service", "Choose Date, Time & Mechanic", "Confirm"];
 
 const BookingPage = () => {
   const [vehicles, setVehicles] = useState([]);
   const [services, setServices] = useState([]);
   const [mechanics, setMechanics] = useState([]);
+  const [bookings, setBookings] = useState([]); // To check mechanic availability
 
   const [vehicle, setVehicle] = useState(null);
   const [service, setService] = useState(null);
   const [date, setDate] = useState(dayjs());
   const [time, setTime] = useState(null);
+  const [mechanic, setMechanic] = useState(null);
 
   const [activeStep, setActiveStep] = useState(0);
 
@@ -57,7 +59,7 @@ const BookingPage = () => {
       .catch(() => setError("Failed to load services"));
   }, []);
 
-  // Load mechanics (optional)
+  // Load mechanics
   useEffect(() => {
     axios.get("http://localhost:5000/api/users")
       .then((res) => {
@@ -65,6 +67,13 @@ const BookingPage = () => {
         setMechanics(filtered);
       })
       .catch(() => setError("Failed to load mechanics"));
+  }, []);
+
+  // Load existing bookings to check availability
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/jobs")
+      .then((res) => setBookings(res.data))
+      .catch(() => console.error("Failed to load bookings"));
   }, []);
 
   const handleBooking = async () => {
@@ -75,7 +84,7 @@ const BookingPage = () => {
         service: service._id,
         date: date.format("YYYY-MM-DD"),
         time: time.format("HH:mm"),
-        mechanic: null
+        mechanic: mechanic._id
       });
       setSuccess("✅ Booking created successfully!");
       setActiveStep(0);
@@ -83,6 +92,7 @@ const BookingPage = () => {
       setService(null); 
       setDate(dayjs()); 
       setTime(null);
+      setMechanic(null);
     } catch (err) {
       setError(err.response?.data?.message || "Booking failed");
     }
@@ -194,6 +204,10 @@ const BookingPage = () => {
                   setDate={setDate}
                   time={time}
                   setTime={setTime}
+                  mechanic={mechanic}
+                  setMechanic={setMechanic}
+                  mechanics={mechanics}
+                  bookings={bookings}
                   onNext={handleNext}
                   onBack={handleBack}
                 />
@@ -205,6 +219,7 @@ const BookingPage = () => {
                   service={service}
                   date={date}
                   time={time}
+                  mechanic={mechanic}
                   onBack={handleBack}
                   onConfirm={handleBooking}
                 />

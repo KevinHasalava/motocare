@@ -1,14 +1,15 @@
 import React from 'react';
 import {
   Box, Button, Card, CardContent, Grid, Paper,
-  Stack, Typography, Chip, Fade, alpha
+  Stack, Typography, Chip, Fade, alpha, Avatar
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import BuildIcon from '@mui/icons-material/Build';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import EngineeringIcon from '@mui/icons-material/Engineering';
 
-const StepConfirm = ({ vehicle, service, date, time, onBack, onConfirm }) => {
+const StepConfirm = ({ vehicle, service, date, time, mechanic, onBack, onConfirm }) => {
   const getVehicleIcon = (type) => {
     const icons = {
       'car': '🚗',
@@ -25,7 +26,7 @@ const StepConfirm = ({ vehicle, service, date, time, onBack, onConfirm }) => {
     <Fade in timeout={600}>
       <Box>
         <Grid container justifyContent="center">
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={10}>
             <Card
               sx={{
                 background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)',
@@ -81,85 +82,91 @@ const StepConfirm = ({ vehicle, service, date, time, onBack, onConfirm }) => {
               </Box>
               
               <CardContent sx={{ p: 4 }}>
-                <Stack spacing={3}>
-                  {/* Vehicle Details */}
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 2.5,
-                      background: alpha('#667eea', 0.05),
-                      borderRadius: 2,
-                      border: '1px solid',
-                      borderColor: alpha('#667eea', 0.2),
-                    }}
-                  >
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Box sx={{ fontSize: 32 }}>
-                        {getVehicleIcon(vehicle?.type)}
-                      </Box>
-                      <Box flex={1}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1 }}>
-                          Vehicle
-                        </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
-                          {vehicle?.brand} {vehicle?.model}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                          {vehicle?.vehicleNumber}
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </Paper>
-                  
-                  {/* Service Details */}
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 2.5,
-                      background: alpha('#a855f7', 0.05),
-                      borderRadius: 2,
-                      border: '1px solid',
-                      borderColor: alpha('#a855f7', 0.2),
-                    }}
-                  >
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Box
+                <Grid container spacing={3}>
+                  {/* Left Column */}
+                  <Grid item xs={12} md={6}>
+                    <Stack spacing={3}>
+                      {/* Vehicle Details */}
+                      <Paper
+                        elevation={0}
                         sx={{
-                          width: 48,
-                          height: 48,
+                          p: 2.5,
+                          background: alpha('#667eea', 0.05),
                           borderRadius: 2,
-                          background: alpha('#a855f7', 0.2),
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
+                          border: '1px solid',
+                          borderColor: alpha('#667eea', 0.2),
                         }}
                       >
-                        <BuildIcon sx={{ color: '#a855f7' }} />
-                      </Box>
-                      <Box flex={1}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1 }}>
-                          Service
-                        </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
-                          {service?.name}
-                        </Typography>
-                        <Chip
-                          label={`₹${service?.price}`}
-                          size="small"
-                          sx={{
-                            mt: 1,
-                            background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)',
-                            color: 'white',
-                            fontWeight: 600,
-                          }}
-                        />
-                      </Box>
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Box sx={{ fontSize: 32 }}>
+                            {getVehicleIcon(vehicle?.type)}
+                          </Box>
+                          <Box flex={1}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1 }}>
+                              Vehicle
+                            </Typography>
+                            <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
+                              {vehicle?.brand} {vehicle?.model}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                              {vehicle?.vehicleNumber}
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </Paper>
+                      
+                      {/* Service Details */}
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          p: 2.5,
+                          background: alpha('#a855f7', 0.05),
+                          borderRadius: 2,
+                          border: '1px solid',
+                          borderColor: alpha('#a855f7', 0.2),
+                        }}
+                      >
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Box
+                            sx={{
+                              width: 48,
+                              height: 48,
+                              borderRadius: 2,
+                              background: alpha('#a855f7', 0.2),
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <BuildIcon sx={{ color: '#a855f7' }} />
+                          </Box>
+                          <Box flex={1}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1 }}>
+                              Service
+                            </Typography>
+                            <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
+                              {service?.name}
+                            </Typography>
+                            <Chip
+                              label={`₹${service?.price}`}
+                              size="small"
+                              sx={{
+                                mt: 1,
+                                background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)',
+                                color: 'white',
+                                fontWeight: 600,
+                              }}
+                            />
+                          </Box>
+                        </Stack>
+                      </Paper>
                     </Stack>
-                  </Paper>
-                  
-                  {/* Date & Time */}
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
+                  </Grid>
+
+                  {/* Right Column */}
+                  <Grid item xs={12} md={6}>
+                    <Stack spacing={3}>
+                      {/* Mechanic Details */}
                       <Paper
                         elevation={0}
                         sx={{
@@ -168,50 +175,95 @@ const StepConfirm = ({ vehicle, service, date, time, onBack, onConfirm }) => {
                           borderRadius: 2,
                           border: '1px solid',
                           borderColor: alpha('#10b981', 0.2),
-                          height: '100%',
                         }}
                       >
                         <Stack direction="row" spacing={2} alignItems="center">
-                          <CalendarMonthIcon sx={{ color: '#10b981', fontSize: 28 }} />
-                          <Box>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                              Date
+                          <Avatar
+                            sx={{
+                              width: 48,
+                              height: 48,
+                              background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)',
+                            }}
+                          >
+                            {mechanic?.name?.charAt(0).toUpperCase()}
+                          </Avatar>
+                          <Box flex={1}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1 }}>
+                              Mechanic
                             </Typography>
                             <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
-                              {date.format("DD MMM YYYY")}
+                              {mechanic?.name}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                              {mechanic?.specialization || 'General Mechanic'}
                             </Typography>
                           </Box>
                         </Stack>
                       </Paper>
-                    </Grid>
-                    
-                    <Grid item xs={12} sm={6}>
-                      <Paper
-                        elevation={0}
-                        sx={{
-                          p: 2.5,
-                          background: alpha('#3b82f6', 0.05),
-                          borderRadius: 2,
-                          border: '1px solid',
-                          borderColor: alpha('#3b82f6', 0.2),
-                          height: '100%',
-                        }}
-                      >
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <AccessTimeIcon sx={{ color: '#3b82f6', fontSize: 28 }} />
-                          <Box>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                              Time
-                            </Typography>
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
-                              {time?.format("HH:mm")}
-                            </Typography>
-                          </Box>
-                        </Stack>
-                      </Paper>
-                    </Grid>
+
+                      {/* Date & Time */}
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                          <Paper
+                            elevation={0}
+                            sx={{
+                              p: 2.5,
+                              background: alpha('#3b82f6', 0.05),
+                              borderRadius: 2,
+                              border: '1px solid',
+                              borderColor: alpha('#3b82f6', 0.2),
+                              height: '100%',
+                            }}
+                          >
+                            <Stack spacing={1} alignItems="center">
+                              <CalendarMonthIcon sx={{ color: '#3b82f6', fontSize: 28 }} />
+                              <Box textAlign="center">
+                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                  Date
+                                </Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
+                                  {date.format("DD MMM")}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                  {date.format("YYYY")}
+                                </Typography>
+                              </Box>
+                            </Stack>
+                          </Paper>
+                        </Grid>
+                        
+                        <Grid item xs={12} sm={6}>
+                          <Paper
+                            elevation={0}
+                            sx={{
+                              p: 2.5,
+                              background: alpha('#ec4899', 0.05),
+                              borderRadius: 2,
+                              border: '1px solid',
+                              borderColor: alpha('#ec4899', 0.2),
+                              height: '100%',
+                            }}
+                          >
+                            <Stack spacing={1} alignItems="center">
+                              <AccessTimeIcon sx={{ color: '#ec4899', fontSize: 28 }} />
+                              <Box textAlign="center">
+                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                  Time
+                                </Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
+                                  {time?.format("HH:mm")}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                  Duration: ~{service?.duration || '60'} min
+                                </Typography>
+                              </Box>
+                            </Stack>
+                          </Paper>
+                        </Grid>
+                      </Grid>
+                    </Stack>
                   </Grid>
-                </Stack>
+                </Grid>
                 
                 {/* Action Buttons */}
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>

@@ -3,8 +3,7 @@ const mongoose = require("mongoose");
 const jobSchema = new mongoose.Schema({
   jobId: {
     type: String,
-    unique: true,
-    required: false
+    unique: true
   },
   booking: {
     type: mongoose.Schema.Types.ObjectId,
@@ -50,7 +49,7 @@ const jobSchema = new mongoose.Schema({
   }
 });
 
-// 👇 Auto-generate jobId
+// Auto generate jobId
 jobSchema.pre("save", async function (next) {
   if (!this.jobId) {
     const count = await mongoose.models.Job.countDocuments();

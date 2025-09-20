@@ -70,7 +70,7 @@ const createJob = async (req, res) => {
 // Get all jobs
 const getJobs = async (req, res) => {
   try {
-    const jobs = await Job.find()
+    const jobs = await Job.find({}, "jobId user vehicle service mechanic startTime endTime status")
       .populate("user", "name email")
       .populate("vehicle", "vehicleNumber brand model")
       .populate("service", "name duration price")

@@ -10,12 +10,12 @@ const {
 const auth = require("../middleware/authMiddleware");
 
 // All jobs (for Admin)
-router.get("/", auth, getJobs);
+router.get("/",getJobs);
 
 // Mechanic-specific jobs
-router.get("/mechanic/:mechanicId", auth, getJobsByMechanic);
+router.get("/mechanic/:mechanicId", getJobsByMechanic);
 
 // Update job → status change Complete/Ongoing
-router.put("/:id/status", auth, updateJobStatus);
+router.put("/:id/status", updateJobStatus);
 
 module.exports = router;

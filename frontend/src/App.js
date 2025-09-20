@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Header from "./components/Header";
 import BookingPage from "./pages/BookingPage";
+import AdminJobView from "./pages/admin/AdminJobView";
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/Register" element={<Register />} />
         <Route path="/Header" element={<Header />} />
         <Route path="/booking" element={<BookingPage />} />
+        <Route path="/admin-job-view" element={<AdminJobView />} />
       </Routes>
     </Router>
   );
