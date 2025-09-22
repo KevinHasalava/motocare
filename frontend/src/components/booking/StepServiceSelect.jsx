@@ -77,6 +77,7 @@ const StepServiceSelect = ({ services, service, setService, onNext, onBack, sele
                         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2, minHeight: '40px' }}>
                           {s.description}
                         </Typography>
+                        
                       )}
                       <Chip label={`Rs. ${s.price.toFixed(2)}`} sx={{ background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)', color: 'white', fontWeight: 700, fontSize: '1rem' }} />
                     </CardContent>
