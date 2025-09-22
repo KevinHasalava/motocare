@@ -34,7 +34,7 @@ const Login = () => {
       localStorage.setItem("user", JSON.stringify(user));
 
       if (user.userType === "admin") navigate("/admin/dashboard");
-      else if (user.userType === "mechanic") navigate("/mechanic/jobs");
+      else if (user.userType === "mechanic") navigate("/admin-job-view");
       else navigate("/home");
 
     } catch (err) {

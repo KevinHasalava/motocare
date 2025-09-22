@@ -131,8 +131,8 @@ const BookingPage = () => {
                 ))}
               </Stepper>
 
-              {activeStep === 0 && <StepVehicleSelect vehicles={vehicles} vehicle={vehicle} setVehicle={setVehicle} onNext={handleNext} />}
-              {activeStep === 1 && <StepServiceSelect services={services} service={service} setService={setService} onNext={handleNext} onBack={handleBack} />}
+              {activeStep === 0 && <StepVehicleSelect vehicles={vehicles} vehicle={vehicle} setVehicle={setVehicle} onNext={handleNext}  />}
+              {activeStep === 1 && <StepServiceSelect services={services} service={service} setService={setService} onNext={handleNext} onBack={handleBack} selectedVehicle={vehicle}/>}
               {activeStep === 2 && <StepDateTime date={date} setDate={setDate} time={time} setTime={setTime} mechanic={mechanic} setMechanic={setMechanic} mechanics={mechanics} bookings={bookings} onNext={handleNext} onBack={handleBack}/>}
               {activeStep === 3 && <StepConfirm vehicle={vehicle} service={service} date={date} time={time} mechanic={mechanic} onBack={handleBack} onConfirm={handleBooking} />}
             </Container>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
-  Container, Typography, Alert, Box, Paper, Grid, Button,
-  Dialog, DialogTitle, DialogContent, CircularProgress, Stack, Chip, alpha, Stepper, Step, StepLabel
+    Container, Typography, Alert, Box, Paper, Grid, Button,
+    Dialog, DialogTitle, DialogContent, CircularProgress, Stack, Chip, alpha, Stepper, Step, StepLabel
 } from "@mui/material";
 import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -32,7 +32,7 @@ const MyBookingsPage = () => {
     const [mechanics, setMechanics] = useState([]);
     const [services, setServices] = useState([]);
     const [vehicles, setVehicles] = useState([]); // User's vehicle list for Step 1
-    
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -40,7 +40,7 @@ const MyBookingsPage = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [activeEditStep, setActiveEditStep] = useState(0);
     const [selectedBooking, setSelectedBooking] = useState(null);
-    
+
     // A complete state for the editing form, mirroring the main booking flow
     const [editVehicle, setEditVehicle] = useState(null);
     const [editService, setEditService] = useState(null);
@@ -68,7 +68,7 @@ const MyBookingsPage = () => {
                 axios.get("http://localhost:5000/api/services"),
                 axios.get(`http://localhost:5000/api/bookings/vehicles/${user._id}`)
             ]);
-            
+
             setMyBookings(bookingsRes.data);
             setAllJobs(jobsRes.data);
             setMechanics(mechanicsRes.data.filter(u => u.userType === "mechanic"));
@@ -99,7 +99,7 @@ const MyBookingsPage = () => {
         setActiveEditStep(0); // Start the stepper from the first step
         setIsEditModalOpen(true);
     };
-    
+
     const handleEditModalClose = () => {
         setIsEditModalOpen(false);
         setSelectedBooking(null);
@@ -140,7 +140,7 @@ const MyBookingsPage = () => {
 
     // This logic correctly filters out the job being edited so its own time slot doesn't block itself.
     // This now works because of the backend fix.
-    const jobsForAvailabilityCheck = allJobs.filter(job => 
+    const jobsForAvailabilityCheck = allJobs.filter(job =>
         job.booking?._id !== selectedBooking?._id
     );
 
@@ -149,7 +149,9 @@ const MyBookingsPage = () => {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#0f172a' }}>
                     <Header />
-                    <Container component="main" maxWidth="lg" sx={{ mt: 12, mb: 4, flexGrow: 1 }}>
+
+
+                         <Container component="main" maxWidth="lg" sx={{ mt: 12, mb: 4, flexGrow: 1 }}>
                         <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, color: 'white' }}>My Bookings</Typography>
                         {loading && <CircularProgress />}
                         {error && <Alert severity="error">{error}</Alert>}
@@ -181,7 +183,7 @@ const MyBookingsPage = () => {
                                 </Grid>
                             )
                         )}
-                    </Container>
+                         </Container>
                     <Footer />
                 </Box>
 
@@ -192,7 +194,7 @@ const MyBookingsPage = () => {
                         <Stepper activeStep={activeEditStep} sx={{ my: 3 }}>
                             {editSteps.map(label => <Step key={label}><StepLabel>{label}</StepLabel></Step>)}
                         </Stepper>
-                        
+
                         <Box sx={{ mt: 4 }}>
                             {activeEditStep === 0 && (
                                 <StepVehicleSelect
@@ -209,7 +211,7 @@ const MyBookingsPage = () => {
                                     setService={setEditService}
                                     onNext={() => setActiveEditStep(2)}
                                     onBack={() => setActiveEditStep(0)}
-                                />
+                                    selectedVehicle={editVehicle} />
                             )}
                             {activeEditStep === 2 && (
                                 <StepDateTime
