@@ -56,6 +56,10 @@ const StockPage = () => {
     { id: 'name', label: 'Item Name', render: (row) => row.inventory?.name || '-' },
     { id: 'type', label: 'Type' },
     { id: 'quantity', label: 'Quantity' },
+    // New column for buying price
+    { id: 'buyingPrice', label: 'Buying Price', render: (row) => `LKR ${row.buyingPrice ? row.buyingPrice.toFixed(2) : '0.00'}` },
+    // New column for sales price
+    { id: 'salesPrice', label: 'Sales Price', render: (row) => `LKR ${row.salesPrice ? row.salesPrice.toFixed(2) : '0.00'}` },
     { id: 'supplier', label: 'Supplier', render: (row) => row.supplier?.name || '-' },
     { id: 'jobId', label: 'Job ID', render: (row) => row.jobId || '-' },
     { id: 'date', label: 'Date', render: (row) => new Date(row.date).toLocaleDateString() },

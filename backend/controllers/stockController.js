@@ -1,7 +1,19 @@
-// controllers/stockController.js
 const mongoose = require('mongoose');
 const Stock = require('../models/stock');
 const Inventory = require('../models/inventory');
+
+// Helper function to find the latest buying and sales price for an inventory item
+const getLatestPrices = async (inventoryId, session) => {
+    const lastStockIn = await Stock.findOne({
+        inventory: inventoryId,
+        type: 'IN'
+    }).sort({ date: -1 }).session(session).select('buyingPrice salesPrice');
+
+    return {
+        buyingPrice: lastStockIn ? lastStockIn.buyingPrice : 0,
+        salesPrice: lastStockIn ? lastStockIn.salesPrice : 0,
+    };
+};
 
 // Get all stock movements
 exports.getStockMovements = async (req, res) => {
@@ -29,7 +41,7 @@ exports.createStockMovement = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-        const { inventory, supplier, type, quantity } = req.body;
+        const { inventory, supplier, type, quantity, buyingPrice, salesPrice } = req.body;
         
         const inv = await Inventory.findById(inventory).session(session);
         if (!inv) {
@@ -38,14 +50,24 @@ exports.createStockMovement = async (req, res) => {
             return res.status(404).json({ message: 'Inventory item not found.' });
         }
 
+        const stockData = { ...req.body };
         if (type === 'IN') {
-            if (!supplier) {
+            if (buyingPrice === undefined || salesPrice === undefined) {
                 await session.abortTransaction();
                 session.endSession();
-                return res.status(400).json({ message: 'Supplier is required for a stock-in transaction.' });
+                return res.status(400).json({ message: 'Buying price and sales price are required for a stock-in transaction.' });
             }
-            inv.quantity += quantity;
+            // --- FIX: Convert quantity to a number before adding it ---
+            inv.quantity += Number(quantity);
+            // --- The original logic below is correct ---
+            inv.buyingPrice = buyingPrice;
+            inv.salesPrice = salesPrice;
+
         } else if (type === 'OUT') {
+            const prices = await getLatestPrices(inventory, session);
+            stockData.buyingPrice = prices.buyingPrice;
+            stockData.salesPrice = prices.salesPrice;
+            
             if (inv.quantity < quantity) {
                 await session.abortTransaction();
                 session.endSession();
@@ -58,7 +80,7 @@ exports.createStockMovement = async (req, res) => {
             return res.status(400).json({ message: 'Invalid stock type. Must be IN or OUT.' });
         }
         
-        const newStockMovement = new Stock(req.body);
+        const newStockMovement = new Stock(stockData);
         await newStockMovement.save({ session });
         await inv.save({ session });
         
@@ -100,14 +122,14 @@ exports.updateStockMovement = async (req, res) => {
         // Revert old quantity
         if (oldMovement.type === 'IN') {
             inv.quantity -= oldMovement.quantity;
-        } else { // 'OUT'
+        } else {
             inv.quantity += oldMovement.quantity;
         }
 
         // Apply new quantity
         if (type === 'IN') {
             inv.quantity += quantity;
-        } else { // 'OUT'
+        } else {
             inv.quantity -= quantity;
         }
 
@@ -156,7 +178,7 @@ exports.deleteStockMovement = async (req, res) => {
 
         if (deletedMovement.type === 'IN') {
             inv.quantity -= deletedMovement.quantity;
-        } else { // 'OUT'
+        } else {
             inv.quantity += deletedMovement.quantity;
         }
 
@@ -184,67 +206,56 @@ exports.deleteStockMovement = async (req, res) => {
 // @route   POST /api/stock/deduct
 // @access  Public (or update with appropriate auth)
 exports.deductParts = async (req, res) => {
-    // Get the job ID and the array of parts from the request body
     const { jobId, parts } = req.body;
-
-    // Validate the input
     if (!jobId || !parts || !Array.isArray(parts) || parts.length === 0) {
         return res.status(400).json({ message: 'Invalid input. Please provide a jobId and an array of parts.' });
     }
 
-    // Start a Mongoose session for a transaction to ensure data consistency
-    // This is crucial to prevent partial deductions if an error occurs mid-way
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
         const deductedParts = [];
 
-        // Iterate through each part in the request
         for (const part of parts) {
             const { partId, qty } = part;
-
-            // Find the inventory item by its partId
             const inventoryItem = await Inventory.findOne({ partId: partId }).session(session);
 
-            // Check if the part exists
             if (!inventoryItem) {
                 await session.abortTransaction();
                 session.endSession();
                 return res.status(404).json({ message: `Part with ID '${partId}' not found.` });
             }
 
-            // Check if there is enough stock
             if (inventoryItem.quantity < qty) {
                 await session.abortTransaction();
                 session.endSession();
                 return res.status(400).json({ message: `Insufficient stock for part '${partId}'. Available: ${inventoryItem.quantity}, Requested: ${qty}` });
             }
 
-            // Deduct the quantity from the inventory item
             inventoryItem.quantity -= qty;
             await inventoryItem.save({ session });
+            
+            const prices = await getLatestPrices(inventoryItem._id, session);
 
-            // Create a record in the StockMovement collection
             const stockMovement = new Stock({
-                inventory: inventoryItem._id, // Use the MongoDB object ID
+                inventory: inventoryItem._id,
                 partId: inventoryItem.partId,
                 quantity: qty,
                 type: 'deduction',
                 jobId: jobId,
                 date: new Date(),
-                // updatedBy: req.user._id, // Uncomment this line if you have user authentication
+                buyingPrice: prices.buyingPrice,
+                salesPrice: prices.salesPrice,
             });
 
             await stockMovement.save({ session });
             deductedParts.push({ partId, qty });
         }
 
-        // If all operations were successful, commit the transaction
         await session.commitTransaction();
         session.endSession();
 
-        // Return a success response
         res.status(200).json({
             message: 'Stock deducted successfully.',
             deductedParts: deductedParts,
@@ -252,7 +263,6 @@ exports.deductParts = async (req, res) => {
         });
 
     } catch (error) {
-        // If an error occurred, abort the transaction and end the session
         await session.abortTransaction();
         session.endSession();
         console.error('Error during stock deduction transaction:', error);

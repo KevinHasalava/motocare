@@ -1,4 +1,3 @@
-// controllers/inventoryController.js
 const Inventory = require('../models/inventory');
 
 // Get all inventory items with optional search and sort
@@ -52,10 +51,11 @@ exports.createInventoryItem = async (req, res) => {
     }
 };
 
-// Update an inventory item (excluding quantity)
+// Update an inventory item
 exports.updateInventoryItem = async (req, res) => {
     try {
-        const { quantity, ...updateData } = req.body;
+        // Exclude quantity, buyingPrice, and salesPrice from being updated directly
+        const { quantity, buyingPrice, ...updateData } = req.body;
         const updatedItem = await Inventory.findByIdAndUpdate(
             req.params.id, 
             updateData, 
@@ -76,7 +76,6 @@ exports.updateInventoryItem = async (req, res) => {
 // Delete an inventory item
 exports.deleteInventoryItem = async (req, res) => {
     try {
-        // You may want to check for associated stock records before deleting
         const deletedItem = await Inventory.findByIdAndDelete(req.params.id);
         if (!deletedItem) {
             return res.status(404).json({ message: 'Inventory item not found.' });

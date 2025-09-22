@@ -15,6 +15,7 @@ const AddStockInForm = ({ open, handleClose, onSave }) => {
     type: 'IN',
     quantity: 1,
     buyingPrice: '',
+    salesPrice: '', // Added new state for salesPrice
     notes: '',
   });
   const [inventoryList, setInventoryList] = useState([]);
@@ -137,12 +138,27 @@ const AddStockInForm = ({ open, handleClose, onSave }) => {
             <TextField
               fullWidth
               margin="dense"
-              label="Buying Price (Optional)"
+              label="Buying Price"
               name="buyingPrice"
               type="number"
               value={formData.buyingPrice}
               onChange={handleChange}
+              // Added required prop
+              required
             />
+            
+            {/* New field for sales price */}
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Sales Price"
+              name="salesPrice"
+              type="number"
+              value={formData.salesPrice}
+              onChange={handleChange}
+              required
+            />
+
             <TextField
               fullWidth
               margin="dense"

@@ -62,7 +62,9 @@ const InventoryPage = () => {
 
     const totalItems = inventory.length;
     const lowStockCount = inventory.filter(item => item.quantity <= item.lowStockThreshold).length;
-    const totalInventoryValue = inventory.reduce((sum, item) => sum + (item.quantity * (item.price || 0)), 0);
+    
+    // Updated calculation to use buyingPrice
+    const totalInventoryValue = inventory.reduce((sum, item) => sum + (item.quantity * (item.buyingPrice || 0)), 0);
 
     return { totalItems, lowStockCount, totalInventoryValue };
   }, [inventory]);

@@ -37,6 +37,9 @@ const InventoryTable = ({
               <TableCell sx={{ fontWeight: 'bold' }}>Part ID</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>Category</TableCell>
+              {/* New Table Headers for prices */}
+              <TableCell sx={{ fontWeight: 'bold' }} align="right">Buying Price (LKR)</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }} align="right">Sales Price (LKR)</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }} align="right">Quantity</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }} align="right">Low Stock Threshold</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }} align="center">Actions</TableCell>
@@ -48,6 +51,9 @@ const InventoryTable = ({
                 <TableCell>{item.partId}</TableCell>
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.category}</TableCell>
+                {/* New Table Cells for prices */}
+                <TableCell align="right">{item.buyingPrice ? item.buyingPrice.toFixed(2) : '0.00'}</TableCell>
+                <TableCell align="right">{item.salesPrice ? item.salesPrice.toFixed(2) : '0.00'}</TableCell>
                 <TableCell align="right">{item.quantity}</TableCell>
                 <TableCell align="right">{item.lowStockThreshold}</TableCell>
                 <TableCell align="center">

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, TextField,
-  MenuItem, Select, InputLabel, FormControl, RadioGroup, FormControlLabel, Radio, Alert,
-  FormLabel, CircularProgress
+  MenuItem, Select, InputLabel, FormControl, Alert, CircularProgress
 } from '@mui/material';
-import { createStockMovement } from '../../api/stockApi';
+import { createStockMovement, getStockMovements } from '../../api/stockApi';
 import { getInventoryItems } from '../../api/inventoryApi';
 
 const AddStockOutForm = ({ open, handleClose, onSave }) => {
@@ -13,7 +12,8 @@ const AddStockOutForm = ({ open, handleClose, onSave }) => {
     partId: '',
     type: 'OUT',
     quantity: 1,
-    jobId: '',
+    buyingPrice: '',
+    salesPrice: '',
     notes: '',
   });
   const [inventoryList, setInventoryList] = useState([]);
@@ -36,15 +36,36 @@ const AddStockOutForm = ({ open, handleClose, onSave }) => {
     }
   }, [open]);
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value } = e.target;
     if (name === 'inventory') {
       const selectedItem = inventoryList.find(item => item._id === value);
-      setFormData(prevData => ({
-        ...prevData,
-        inventory: value,
-        partId: selectedItem ? selectedItem.partId : '',
-      }));
+      
+      // Fetch prices from last 'IN' stock movement for this part
+      try {
+        const stockMovements = await getStockMovements();
+        const lastInMovement = stockMovements.data
+          .filter(movement => movement.inventory._id === value && movement.type === 'IN')
+          .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+        setFormData(prevData => ({
+          ...prevData,
+          inventory: value,
+          partId: selectedItem ? selectedItem.partId : '',
+          buyingPrice: lastInMovement ? lastInMovement.buyingPrice : '',
+          salesPrice: lastInMovement ? lastInMovement.salesPrice : '',
+        }));
+      } catch (err) {
+        console.error("Failed to fetch last stock price:", err);
+        setFormData(prevData => ({
+            ...prevData,
+            inventory: value,
+            partId: selectedItem ? selectedItem.partId : '',
+            buyingPrice: '',
+            salesPrice: '',
+        }));
+      }
+
     } else {
       setFormData(prevData => ({ ...prevData, [name]: value }));
     }
@@ -54,13 +75,8 @@ const AddStockOutForm = ({ open, handleClose, onSave }) => {
     setError('');
     setLoading(true);
     try {
-      if (!formData.inventory || !formData.type || formData.quantity <= 0) {
+      if (!formData.inventory || formData.quantity <= 0) {
         setError('Please fill in all required fields.');
-        setLoading(false);
-        return;
-      }
-      if (formData.type === 'deduction' && !formData.jobId) {
-        setError('Job ID is required for deduction type.');
         setLoading(false);
         return;
       }
@@ -102,19 +118,6 @@ const AddStockOutForm = ({ open, handleClose, onSave }) => {
                 ))}
               </Select>
             </FormControl>
-            
-            <FormControl fullWidth margin="dense" sx={{ mt: 2 }} required>
-              <FormLabel>Movement Type</FormLabel>
-              <RadioGroup
-                row
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-              >
-                <FormControlLabel value="OUT" control={<Radio />} label="Manual Out" />
-                <FormControlLabel value="deduction" control={<Radio />} label="Deduction" />
-              </RadioGroup>
-            </FormControl>
 
             <TextField
               fullWidth
@@ -129,19 +132,29 @@ const AddStockOutForm = ({ open, handleClose, onSave }) => {
                 inputProps: { min: 1 },
               }}
             />
-
-            {formData.type === 'deduction' && (
-              <TextField
-                fullWidth
-                margin="dense"
-                label="Job ID"
-                name="jobId"
-                value={formData.jobId}
-                onChange={handleChange}
-                required
-              />
-            )}
             
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Buying Price"
+              name="buyingPrice"
+              type="number"
+              value={formData.buyingPrice}
+              // This is a read-only field
+              disabled
+            />
+            
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Sales Price"
+              name="salesPrice"
+              type="number"
+              value={formData.salesPrice}
+              // This is a read-only field
+              disabled
+            />
+
             <TextField
               fullWidth
               margin="dense"

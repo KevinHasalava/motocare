@@ -1,4 +1,3 @@
-// models/inventory.js
 const mongoose = require('mongoose');
 
 const inventorySchema = new mongoose.Schema({
@@ -29,10 +28,16 @@ const inventorySchema = new mongoose.Schema({
         default: 0,
         min: [0, 'Quantity cannot be negative.'],
     },
-    price: {
+    // Updated fields for buying and selling prices
+    buyingPrice: {
         type: Number,
         default: 0,
-        min: [0, 'Price cannot be negative.'],
+        min: [0, 'Buying price cannot be negative.'],
+    },
+    salesPrice: {
+        type: Number,
+        default: 0,
+        min: [0, 'Sales price cannot be negative.'],
     },
     createdAt: {
         type: Date,
@@ -44,7 +49,6 @@ const inventorySchema = new mongoose.Schema({
     },
 });
 
-// Update the updatedAt field on every save
 inventorySchema.pre('save', function(next) {
     this.updatedAt = Date.now();
     next();
