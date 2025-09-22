@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Container, Typography, Box, Button, CircularProgress, Alert,
+  Container, Typography, Box, Button, CircularProgress, Alert, IconButton,
+  createTheme, ThemeProvider
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 import StatsCards from '../InventoryCom/StatsCards';
 import InventoryTable from '../InventoryCom/InventoryTable';
 import AddEditInventoryDialog from '../InventoryCom/AddEditInventoryDialog';
@@ -15,6 +18,33 @@ const InventoryPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [itemToEdit, setItemToEdit] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [mode, setMode] = useState('light'); // මේක අලුතින් එකතු කරනවා
+
+  // StockPage එකේ වගේම theme එක හදනවා
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode,
+          ...(mode === 'light'
+            ? {
+                // Palette for light mode
+                background: {
+                  default: '#f5f5f5',
+                  paper: '#fff',
+                },
+              }
+            : {
+                // Palette for dark mode
+                background: {
+                  default: '#121212',
+                  paper: '#1d1d1d',
+                },
+              }),
+        },
+      }),
+    [mode],
+  );
 
   const fetchItems = async () => {
     setLoading(true);
@@ -62,9 +92,7 @@ const InventoryPage = () => {
 
     const totalItems = inventory.length;
     const lowStockCount = inventory.filter(item => item.quantity <= item.lowStockThreshold).length;
-    
-    // Updated calculation to use buyingPrice
-    const totalInventoryValue = inventory.reduce((sum, item) => sum + (item.quantity * (item.buyingPrice || 0)), 0);
+    const totalInventoryValue = inventory.reduce((sum, item) => sum + (item.quantity * (item.price || 0)), 0);
 
     return { totalItems, lowStockCount, totalInventoryValue };
   }, [inventory]);
@@ -74,45 +102,61 @@ const InventoryPage = () => {
     item.partId.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
+  // මේක අලුතින් එකතු කරනවා
+  const toggleMode = () => {
+    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+  };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
-        Inventory Dashboard
-      </Typography>
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : error ? (
-        <Alert severity="error">{error}</Alert>
-      ) : (
-        <>
-          <StatsCards stats={stats} />
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2, mt: 4 }}>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAddClick}
-            >
-              Add New Item
-            </Button>
+    // මුළු component එකම ThemeProvider එකෙන් wrap කරනවා
+    <ThemeProvider theme={theme}>
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 4, color: 'text.primary' }}>
+        <Container maxWidth="xl">
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+              Inventory Dashboard
+            </Typography>
+            {/* Dark/Light mode switch button එක එකතු කරනවා */}
+            <IconButton onClick={toggleMode} color="inherit">
+              {mode === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
+            </IconButton>
           </Box>
-          <InventoryTable
-            inventory={filteredItems}
-            handleEditClick={handleEditClick}
-            handleDeleteClick={handleDeleteClick}
-            handleSearch={setSearchTerm}
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Alert severity="error">{error}</Alert>
+          ) : (
+            <>
+              <StatsCards stats={stats} />
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2, mt: 4 }}>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddClick}
+                >
+                  Add New Item
+                </Button>
+              </Box>
+              <InventoryTable
+                inventory={filteredItems}
+                handleEditClick={handleEditClick}
+                handleDeleteClick={handleDeleteClick}
+                handleSearch={setSearchTerm}
+              />
+            </>
+          )}
+          <AddEditInventoryDialog
+            open={openDialog}
+            handleClose={() => setOpenDialog(false)}
+            itemToEdit={itemToEdit}
+            onSave={fetchItems}
           />
-        </>
-      )}
-      <AddEditInventoryDialog
-        open={openDialog}
-        handleClose={() => setOpenDialog(false)}
-        itemToEdit={itemToEdit}
-        onSave={fetchItems}
-      />
-    </Container>
+        </Container>
+      </Box>
+    </ThemeProvider>
   );
 };
 
