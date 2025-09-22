@@ -3,7 +3,7 @@ import { TextField, Button, Box, Typography, Container, MenuItem, Alert } from "
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Register = () => {
+const AdminRegister = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -123,4 +123,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default AdminRegister;

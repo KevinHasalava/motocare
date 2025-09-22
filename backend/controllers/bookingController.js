@@ -75,7 +75,7 @@ const createBooking = async (req, res) => {
 
     // Save booking
     const booking = new Booking({
-      user, vehicle, service, date:startTime,
+      user, vehicle, service, date: startTime,
       timeSlot: `${date} ${time}`,
       mechanic: assignedMechanic
     });
@@ -131,8 +131,8 @@ const getBookingById = async (req, res) => {
 const getBookingsByUser = async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.params.userId })
-      .populate("vehicle", "vehicleNumber brand model")
-      .populate("service", "name price")
+      .populate("vehicle", "vehicleNumber brand model type") // 👈 'type' මෙතනට එකතු කරන්න
+      .populate("service", "name price duration vehicleType")
       .populate("mechanic", "name email");
     res.status(200).json(bookings);
   } catch (err) {
@@ -183,75 +183,75 @@ const getUserVehicles = async (req, res) => {
 
 // 1. UPDATE BOOKING AND ASSOCIATED JOB
 const updateBookingAndJob = async (req, res) => {
-    try {
-        const { bookingId } = req.params;
-        const { date, time, service, mechanic } = req.body;
+  try {
+    const { bookingId } = req.params;
+    const { date, time, service, mechanic } = req.body;
 
-        if (!date || !time || !service) {
-            return res.status(400).json({ message: "Date, time, and service are required" });
-        }
-
-        const associatedJob = await Job.findOne({ booking: bookingId });
-        if (!associatedJob) {
-            return res.status(404).json({ message: "Associated job not found for this booking" });
-        }
-
-        const serviceObj = await Service.findById(service);
-        if (!serviceObj) return res.status(400).json({ message: "Invalid service type" });
-
-        const duration = serviceObj.duration || 60;
-        const newStartTime = new Date(`${date}T${time}:00`);
-        const newEndTime = new Date(newStartTime.getTime() + duration * 60000);
-
-        const mechanicToAssign = mechanic;
-        if (mechanicToAssign) {
-            const overlap = await Job.findOne({
-                _id: { $ne: associatedJob._id },
-                mechanic: mechanicToAssign,
-                startTime: { $lt: newEndTime },
-                endTime: { $gt: newStartTime },
-                status: { $in: ["Booked", "Ongoing"] }
-            });
-
-            if (overlap) {
-                return res.status(400).json({ message: "The selected mechanic is not available at this new time." });
-            }
-        }
-
-        await Booking.findByIdAndUpdate(bookingId, {
-            service,
-            date: newStartTime,
-            timeSlot: `${date} ${time}`,
-            mechanic: mechanicToAssign,
-        });
-
-        await Job.findByIdAndUpdate(associatedJob._id, {
-            service,
-            mechanic: mechanicToAssign,
-            startTime: newStartTime,
-            endTime: newEndTime,
-        });
-
-        res.status(200).json({ message: "✅ Booking and Job updated successfully" });
-    } catch (err) {
-        res.status(500).json({ message: "Server error during update: " + err.message });
+    if (!date || !time || !service) {
+      return res.status(400).json({ message: "Date, time, and service are required" });
     }
+
+    const associatedJob = await Job.findOne({ booking: bookingId });
+    if (!associatedJob) {
+      return res.status(404).json({ message: "Associated job not found for this booking" });
+    }
+
+    const serviceObj = await Service.findById(service);
+    if (!serviceObj) return res.status(400).json({ message: "Invalid service type" });
+
+    const duration = serviceObj.duration || 60;
+    const newStartTime = new Date(`${date}T${time}:00`);
+    const newEndTime = new Date(newStartTime.getTime() + duration * 60000);
+
+    const mechanicToAssign = mechanic;
+    if (mechanicToAssign) {
+      const overlap = await Job.findOne({
+        _id: { $ne: associatedJob._id },
+        mechanic: mechanicToAssign,
+        startTime: { $lt: newEndTime },
+        endTime: { $gt: newStartTime },
+        status: { $in: ["Booked", "Ongoing"] }
+      });
+
+      if (overlap) {
+        return res.status(400).json({ message: "The selected mechanic is not available at this new time." });
+      }
+    }
+
+    await Booking.findByIdAndUpdate(bookingId, {
+      service,
+      date: newStartTime,
+      timeSlot: `${date} ${time}`,
+      mechanic: mechanicToAssign,
+    });
+
+    await Job.findByIdAndUpdate(associatedJob._id, {
+      service,
+      mechanic: mechanicToAssign,
+      startTime: newStartTime,
+      endTime: newEndTime,
+    });
+
+    res.status(200).json({ message: "✅ Booking and Job updated successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error during update: " + err.message });
+  }
 };
 
 // 2. DELETE BOOKING AND ASSOCIATED JOB
 const deleteBookingAndJob = async (req, res) => {
-    try {
-        const { bookingId } = req.params;
-        const booking = await Booking.findById(bookingId);
-        if (!booking) {
-            return res.status(404).json({ message: "Booking not found" });
-        }
-        await Job.findOneAndDelete({ booking: bookingId });
-        await Booking.findByIdAndDelete(bookingId);
-        res.status(200).json({ message: "🗑️ Booking and associated job deleted." });
-    } catch (err) {
-        res.status(500).json({ message: "Server error during deletion: " + err.message });
+  try {
+    const { bookingId } = req.params;
+    const booking = await Booking.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
     }
+    await Job.findOneAndDelete({ booking: bookingId });
+    await Booking.findByIdAndDelete(bookingId);
+    res.status(200).json({ message: "🗑️ Booking and associated job deleted." });
+  } catch (err) {
+    res.status(500).json({ message: "Server error during deletion: " + err.message });
+  }
 };
 
 
