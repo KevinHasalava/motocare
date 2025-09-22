@@ -50,7 +50,6 @@ const StatsCards = ({ stats }) => {
         <Card sx={cardSx('warning')}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              {/* Icon color එක theme එක අනුව වෙනස් කරන්න වෙනස් කරනවා */}
               <WarningAmberIcon color="warning" sx={{ fontSize: 40, mr: 2 }} />
               <Box>
                 <Typography variant="h6" color="text.secondary">Low Stock</Typography>
