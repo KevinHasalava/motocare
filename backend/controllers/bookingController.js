@@ -1,8 +1,11 @@
+
 const Booking = require("../models/Booking");
 const Vehicle = require("../models/Vehicle");
 const Service = require("../models/Service");
 const User = require("../models/User"); // important to get mechanics
 const Job = require("../models/Job");
+const { sendBookingConfirmationEmail } = require('../utils/emailService');
+
 
 // ----------------- CREATE -----------------
 const createBooking = async (req, res) => {
@@ -90,6 +93,28 @@ const createBooking = async (req, res) => {
       status: "Booked"
     });
     await job.save();
+
+    try {
+    // Email එකට අවශ්‍ය සම්පූර්ණ user සහ vehicle විස්තර ලබාගැනීම
+    const bookingUser = await User.findById(user).select('name email');
+    const bookingVehicle = await Vehicle.findById(vehicle).select('brand model vehicleNumber');
+
+    // serviceObj එක අප සතුව දැනටමත් තිබේ.
+    
+    // Email යැවීමේ function එකට අවශ්‍ය සියලු දත්ත ලබා දීම
+    // මෙහිදී 'job' object එක ලබා දෙන නිසා, Job ID එක email එකට ඇතුළත් වේ.
+    await sendBookingConfirmationEmail({
+        user: bookingUser,
+        vehicle: bookingVehicle,
+        service: serviceObj, // We already have the full service object from the top of the function
+        bookingDetails: booking, // Pass the original booking document for date/time
+        jobDetails: job // Pass the job document which contains the new jobId
+    });
+
+} catch (emailError) {
+    // Log if the email fails, but don't fail the entire booking request
+    console.error("Could not send confirmation email:", emailError);
+}
 
     res.status(201).json({ message: "✅ Booking + Job created", booking, job });
   } catch (err) {
