@@ -1,17 +1,17 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { addVehicle, getVehicles, updateVehicle, deleteVehicle } = require('../controllers/vehicleController');
+const { addVehicle, updateVehicle, deleteVehicle, getVehicles, getMyVehicles } = require("../controllers/vehicleController");
+const auth = require("../middleware/authMiddleware");
 
-// Add vehicle
-router.post('/', addVehicle);
+// Only logged-in users can add/update/delete
+router.post("/", auth, addVehicle);
+router.put("/:id", auth, updateVehicle);
+router.delete("/:id", auth, deleteVehicle);
 
-// Get all vehicles
-router.get('/', getVehicles);
 
-// Update vehicle
-router.put('/:id', updateVehicle);
+// Everyone (or protected if needed)
+router.get("/", auth, getVehicles);
+router.get("/my", auth, getMyVehicles);
 
-// Delete vehicle
-router.delete('/:id', deleteVehicle);
 
 module.exports = router;

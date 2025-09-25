@@ -12,7 +12,7 @@ const addVehicle = async (req, res) => {
     }
 
     // check enum validation
-    const allowedTypes = ['Car', 'Three Wheel', 'Bike', 'Van'];
+    const allowedTypes = ['Car', 'Three Wheel', 'Motorcycle', 'Van','SUV'];
     if (!allowedTypes.includes(type)) {
       return res.status(400).json({ message: `Invalid type. Allowed: ${allowedTypes.join(', ')}` });
     }
@@ -24,7 +24,8 @@ const addVehicle = async (req, res) => {
     }
 
     const newVehicle = new Vehicle({
-      ownerName,
+      owner: req.user.id,              // 👈 logged user ID assign
+      ownerName: req.body.ownerName,   // can pass optional frontend display
       vehicleNumber,
       type,
       brand,
@@ -43,6 +44,17 @@ const addVehicle = async (req, res) => {
 const getVehicles = async (req, res) => {
   try {
     const vehicles = await Vehicle.find();
+    res.status(200).json(vehicles);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+// 🟢 Get ONLY logged-in user's vehicles
+const getMyVehicles = async (req, res) => {
+  try {
+    const vehicles = await Vehicle.find({ owner: req.user.id });  // 👈 filter by owner
     res.status(200).json(vehicles);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -90,4 +102,4 @@ const deleteVehicle = async (req, res) => {
   }
 };
 
-module.exports = { addVehicle, getVehicles, updateVehicle, deleteVehicle };
+module.exports = { addVehicle, getVehicles, updateVehicle, deleteVehicle, getMyVehicles };

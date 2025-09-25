@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const vehicleSchema = new mongoose.Schema({
+  owner: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  required: true,
+  },
+  
   ownerName: {
     type: String,
     required: true
@@ -12,7 +18,7 @@ const vehicleSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['Car', 'Three Wheel' , 'Bike', 'Van'],
+    enum: ['Car', 'Three Wheel' , 'Motorcycle', 'Van','SUV'],
     required: true
   },
   brand: {
