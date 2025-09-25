@@ -12,6 +12,8 @@ import AdminJobView from "./pages/admin/AdminJobView";
 import ServicesPage from "./pages/admin/ServicePage";
 import MyBookings from "./pages/MyBooking";
 import AdminRegister from "./pages/AdminRegister";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserManagement from "./pages/admin/UserManagement";
 
 export default function App() {
   return (
@@ -33,6 +35,8 @@ export default function App() {
         {/* admin page walata adala ewa */}
         <Route path="/admin-job-view" element={<AdminJobView />} />
         <Route path="/admin-service" element={< ServicesPage/>} />
+        <Route path="/admin-dashboard" element={< AdminDashboard/>} />
+        <Route path="/admin-users" element={< UserManagement/>} />
       </Routes>
     </Router>
   );

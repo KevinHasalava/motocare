@@ -9,8 +9,8 @@ import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import axios from "axios";
 
 // ✅ Import Header and Footer
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
