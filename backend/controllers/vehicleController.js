@@ -1,5 +1,5 @@
+// backend/controllers/vehicleController.js
 const Vehicle = require('../models/Vehicle');
-
 
 // Add new vehicle
 const addVehicle = async (req, res) => {
@@ -49,6 +49,21 @@ const getVehicles = async (req, res) => {
   }
 };
 
+// Get single vehicle by ID (MISSING PART ADDED)
+const getVehicleById = async (req, res) => {
+  try {
+    const vehicle = await Vehicle.findById(req.params.id);
+
+    if (!vehicle) {
+      return res.status(404).json({ message: "Vehicle not found" });
+    }
+
+    res.status(200).json(vehicle);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Update vehicle
 const updateVehicle = async (req, res) => {
   try {
@@ -90,4 +105,26 @@ const deleteVehicle = async (req, res) => {
   }
 };
 
-module.exports = { addVehicle, getVehicles, updateVehicle, deleteVehicle };
+const getVehicleStats = async (req, res) => {
+  try {
+    const stats = await Vehicle.aggregate([
+      {
+        $group: {
+          _id: '$type',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+    const labels = ['Car', 'Three Wheel', 'Bike', 'Van'];
+    const data = Array(labels.length).fill(0);
+    stats.forEach((s) => {
+      const index = labels.indexOf(s._id);
+      if (index !== -1) data[index] = s.count;
+    });
+    res.status(200).json({ labels, data });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { addVehicle, getVehicles, getVehicleById, updateVehicle, deleteVehicle, getVehicleStats };
