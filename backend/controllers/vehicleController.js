@@ -12,7 +12,7 @@ const addVehicle = async (req, res) => {
     }
 
     // check enum validation
-    const allowedTypes = ['Car', 'Three Wheel', 'Bike', 'Van'];
+    const allowedTypes = ['Car', 'Three Wheel', 'Motorcycle', 'Van','SUV'];
     if (!allowedTypes.includes(type)) {
       return res.status(400).json({ message: `Invalid type. Allowed: ${allowedTypes.join(', ')}` });
     }
@@ -24,7 +24,8 @@ const addVehicle = async (req, res) => {
     }
 
     const newVehicle = new Vehicle({
-      ownerName,
+      owner: req.user.id,              // 👈 logged user ID assign
+      ownerName: req.body.ownerName,   // can pass optional frontend display
       vehicleNumber,
       type,
       brand,
@@ -49,16 +50,12 @@ const getVehicles = async (req, res) => {
   }
 };
 
-// Get single vehicle by ID (MISSING PART ADDED)
-const getVehicleById = async (req, res) => {
+
+// 🟢 Get ONLY logged-in user's vehicles
+const getMyVehicles = async (req, res) => {
   try {
-    const vehicle = await Vehicle.findById(req.params.id);
-
-    if (!vehicle) {
-      return res.status(404).json({ message: "Vehicle not found" });
-    }
-
-    res.status(200).json(vehicle);
+    const vehicles = await Vehicle.find({ owner: req.user.id });  // 👈 filter by owner
+    res.status(200).json(vehicles);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -105,26 +102,4 @@ const deleteVehicle = async (req, res) => {
   }
 };
 
-const getVehicleStats = async (req, res) => {
-  try {
-    const stats = await Vehicle.aggregate([
-      {
-        $group: {
-          _id: '$type',
-          count: { $sum: 1 },
-        },
-      },
-    ]);
-    const labels = ['Car', 'Three Wheel', 'Bike', 'Van'];
-    const data = Array(labels.length).fill(0);
-    stats.forEach((s) => {
-      const index = labels.indexOf(s._id);
-      if (index !== -1) data[index] = s.count;
-    });
-    res.status(200).json({ labels, data });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-module.exports = { addVehicle, getVehicles, getVehicleById, updateVehicle, deleteVehicle, getVehicleStats };
+module.exports = { addVehicle, getVehicles, updateVehicle, deleteVehicle, getMyVehicles };

@@ -2,17 +2,17 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+
+
+
 const registerUser = async (req, res) => {
   const { name, email, password, userType } = req.body;
 
-  // Restrict admin registration
-  if (userType === "admin" && (!req.user || req.user.type !== "admin")) {
-    return res.status(403).json({ message: "Cannot register as admin" });
-  }
-
+  // Email duplicate check
   const exists = await User.findOne({ email });
   if (exists) return res.status(400).json({ message: "User already exists" });
 
+  // Password hash
   const salt = await bcrypt.genSalt(10);
   const hashedPw = await bcrypt.hash(password, salt);
 
@@ -21,6 +21,17 @@ const registerUser = async (req, res) => {
 
   res.status(201).json({ message: "✅ Registered", user });
 };
+
+// get all users (for testing)
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -31,9 +42,10 @@ const loginUser = async (req, res) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
 
+  // create token
   const token = jwt.sign(
-    { id: user._id, type: user.userType },
-    process.env.JWT_SECRET,
+    { id: user._id, type: user.userType }, 
+    process.env.JWT_SECRET, 
     { expiresIn: "1d" }
   );
 
@@ -44,14 +56,6 @@ const loginUser = async (req, res) => {
   });
 };
 
-const getUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-    res.status(200).json(users);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
 
 const deleteUser = async (req, res) => {
   try {

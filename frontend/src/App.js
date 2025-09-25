@@ -1,38 +1,39 @@
-// frontend/src/App.jsx
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, CssBaseline } from '@mui/material';
-import Landing from './pages/Landing';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import UserProfile from './pages/UserProfile';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import UserManagement from './pages/UserManagement';
-import { theme } from './utils/theme';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
-  return token ? children : <Navigate to="/Login" />;
-};
+// Import your pages
+import Landing from "./pages/Landing";
+import VehiclePage from "./pages/VehiclePage";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Header from "./components/Header";
+import BookingPage from "./pages/BookingPage";
+import AdminJobView from "./pages/admin/AdminJobView";
+import ServicesPage from "./pages/admin/ServicePage";
+import MyBookings from "./pages/MyBooking";
+import AdminRegister from "./pages/AdminRegister";
 
-const App = () => {
+export default function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/home" element={<ProtectedRoute><Landing /></ProtectedRoute>} />
-          <Route path="/Login" element={<Login />} />
-          <Route path="/Register" element={<Register />} />
-          <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
-          <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/admin/users" element={<UserManagement />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </Router>
-    </ThemeProvider>
-  );
-};
+    <Router>
+      <Routes>
+        {/* 🏠 Default route → Landing page */}
+        <Route path="/" element={<Landing />} />
 
-export default App;
+        {/* Other routes */}
+        <Route path="/home" element={<Landing />} />
+        <Route path="/VehiclePage" element={<VehiclePage />} />
+        <Route path="/Login" element={<Login />} />
+        <Route path="/Register" element={<Register />} />
+        <Route path="/Header" element={<Header />} />
+        <Route path="/booking" element={<BookingPage />} />
+        <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/admin-register" element={<AdminRegister />} />
+
+        {/* admin page walata adala ewa */}
+        <Route path="/admin-job-view" element={<AdminJobView />} />
+        <Route path="/admin-service" element={< ServicesPage/>} />
+      </Routes>
+    </Router>
+  );
+}

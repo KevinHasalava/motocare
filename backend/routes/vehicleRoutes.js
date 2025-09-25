@@ -1,32 +1,17 @@
-// backend/routes/vehicleRoutes.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const {
-  addVehicle,
-  getVehicles,
-  getVehicleById,
-  updateVehicle,
-  deleteVehicle,
-  getVehicleStats,
-} = require('../controllers/vehicleController');
-const { auth, adminAuth } = require('../middleware/authMiddleware'); // Use auth and adminAuth
+const { addVehicle, updateVehicle, deleteVehicle, getVehicles, getMyVehicles } = require("../controllers/vehicleController");
+const auth = require("../middleware/authMiddleware");
 
-// Create new vehicle (admin-only)
-router.post('/', auth, adminAuth, addVehicle);
+// Only logged-in users can add/update/delete
+router.post("/", auth, addVehicle);
+router.put("/:id", auth, updateVehicle);
+router.delete("/:id", auth, deleteVehicle);
 
-// Get all vehicles
-router.get('/', getVehicles);
 
-// Get single vehicle
-router.get('/:id', getVehicleById);
+// Everyone (or protected if needed)
+router.get("/", auth, getVehicles);
+router.get("/my", auth, getMyVehicles);
 
-// Update vehicle (admin-only)
-router.put('/:id', auth, adminAuth, updateVehicle);
-
-// Delete vehicle (admin-only)
-router.delete('/:id', auth, adminAuth, deleteVehicle);
-
-// Get vehicle stats (admin-only)
-router.get('/stats', auth, adminAuth, getVehicleStats);
 
 module.exports = router;

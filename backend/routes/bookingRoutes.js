@@ -7,9 +7,9 @@ const {
   getBookings,
   getBookingById,
   getBookingsByUser,
-  getBookingStats,
+  updateBookingAndJob,
+  deleteBookingAndJob
 } = require("../controllers/bookingController");
-const { auth, adminAuth } = require("../middleware/authMiddleware");
 
 // ✅ Create new booking
 router.post("/", createBooking);
@@ -29,6 +29,8 @@ router.get("/available", getAvailableSlots);
 // ✅ Get vehicles of user
 router.get("/vehicles/:userId", getUserVehicles);
 
-router.get('/stats', auth, adminAuth, getBookingStats);
+router.put("/update-with-job/:bookingId", updateBookingAndJob);
+
+router.delete("/delete-with-job/:bookingId", deleteBookingAndJob);
 
 module.exports = router;
