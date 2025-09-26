@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const JobsPage = () => {
+const AdminJobView = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -105,4 +105,4 @@ const JobsPage = () => {
   );
 };
 
-export default JobsPage;
+export default AdminJobView;
