@@ -2,9 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import './App.css';
-import InventoryPage from './components/pages/InventoryPage';
-import SupplierPage from './components/pages/SupplierPage';
-import StockPage from './components/pages/StockPage';
+import InventoryPage from './components/InventoryCom/InventoryPage';
+import SupplierPage from './components/InventoryCom/SupplierPage';
+import StockPage from './components/InventoryCom/StockPage';
 import Landing from './components/pages/Landing';
 
 function App() {

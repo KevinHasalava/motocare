@@ -11,8 +11,8 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { getStockMovements, deleteStockMovement } from '../../api/stockApi';
-import AddStockInForm from '../InventoryCom/AddStockInForm';
-import AddStockOutForm from '../InventoryCom/AddStockOutForm';
+import AddStockInForm from './AddStockInForm';
+import AddStockOutForm from './AddStockOutForm';
 
 const StockPage = () => {
   const [stockMovements, setStockMovements] = useState([]);

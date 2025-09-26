@@ -6,9 +6,9 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import StatsCards from '../InventoryCom/StatsCards';
-import InventoryTable from '../InventoryCom/InventoryTable';
-import AddEditInventoryDialog from '../InventoryCom/AddEditInventoryDialog';
+import StatsCards from './StatsCards';
+import InventoryTable from './InventoryTable';
+import AddEditInventoryDialog from './AddEditInventoryDialog';
 import { getInventoryItems, deleteInventoryItem } from '../../api/inventoryApi';
 
 const InventoryPage = () => {
@@ -102,14 +102,12 @@ const InventoryPage = () => {
     item.partId.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
-  // මේක අලුතින් එකතු කරනවා
+
   const toggleMode = () => {
     setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
   };
 
   return (
-    // මුළු component එකම ThemeProvider එකෙන් wrap කරනවා
     <ThemeProvider theme={theme}>
       <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 4, color: 'text.primary' }}>
         <Container maxWidth="xl">
@@ -117,7 +115,6 @@ const InventoryPage = () => {
             <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
               Inventory Dashboard
             </Typography>
-            {/* Dark/Light mode switch button එක එකතු කරනවා */}
             <IconButton onClick={toggleMode} color="inherit">
               {mode === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
             </IconButton>
