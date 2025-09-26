@@ -18,9 +18,8 @@ const InventoryPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [itemToEdit, setItemToEdit] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [mode, setMode] = useState('light'); // මේක අලුතින් එකතු කරනවා
+  const [mode, setMode] = useState('light');
 
-  // StockPage එකේ වගේම theme එක හදනවා
   const theme = useMemo(
     () =>
       createTheme({
@@ -92,7 +91,7 @@ const InventoryPage = () => {
 
     const totalItems = inventory.length;
     const lowStockCount = inventory.filter(item => item.quantity <= item.lowStockThreshold).length;
-    const totalInventoryValue = inventory.reduce((sum, item) => sum + (item.quantity * (item.price || 0)), 0);
+    const totalInventoryValue = inventory.reduce((sum, item) => sum + (item.quantity * (item.buyingPrice || 0)), 0);
 
     return { totalItems, lowStockCount, totalInventoryValue };
   }, [inventory]);

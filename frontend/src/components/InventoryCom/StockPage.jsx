@@ -256,7 +256,7 @@ const StockPage = () => {
                   {filteredMovements.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={columns.length} align="center">
-                        කිසිදු තොරතුරක් හමු නොවීය.
+                        No transactions.
                       </TableCell>
                     </TableRow>
                   ) : (
