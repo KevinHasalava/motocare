@@ -7,11 +7,7 @@ import VehiclePage from "./pages/VehiclePage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Header from "./components/Header";
-import BookingPage from "./pages/BookingPage";
-import AdminJobView from "./pages/admin/AdminJobView";
-import ServicesPage from "./pages/admin/ServicePage";
-import MyBookings from "./pages/MyBooking";
-import AdminRegister from "./pages/AdminRegister";
+import BookingPage from "./components/Booking/BookingPage";
 
 export default function App() {
   return (
@@ -27,12 +23,6 @@ export default function App() {
         <Route path="/Register" element={<Register />} />
         <Route path="/Header" element={<Header />} />
         <Route path="/booking" element={<BookingPage />} />
-        <Route path="/my-bookings" element={<MyBookings />} />
-        <Route path="/admin-register" element={<AdminRegister />} />
-
-        {/* admin page walata adala ewa */}
-        <Route path="/admin-job-view" element={<AdminJobView />} />
-        <Route path="/admin-service" element={< ServicesPage/>} />
       </Routes>
     </Router>
   );
