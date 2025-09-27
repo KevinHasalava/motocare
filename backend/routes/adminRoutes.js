@@ -1,34 +1,39 @@
-// backend/routes/adminRoutes.js
 const express = require("express");
 const router = express.Router();
+
 const User = require("../models/User");
 const Booking = require("../models/Booking");
 const Vehicle = require("../models/Vehicle");
 const Service = require("../models/Service");
-const { adminAuth } = require("../middleware/authMiddleware");
+const auth = require("../middleware/authMiddleware"); // ✅ import matches
 
 // 📊 Dashboard stats endpoint
-router.get("/stats", adminAuth, async (req, res) => {
+router.get("/stats", auth, async (req, res) => {
   try {
+    // Count documents in collections
     const users = await User.countDocuments();
     const bookings = await Booking.countDocuments();
     const vehicles = await Vehicle.countDocuments();
     const services = await Service.countDocuments();
 
-    // Optional: extend later
+    // Placeholders until Task/Payment models exist
     const tasks = 0;
     const payments = 0;
 
     res.json({
-      users,
-      bookings,
-      vehicles,
-      services,
-      tasks,
-      payments,
+      success: true,
+      data: {
+        users,
+        bookings,
+        vehicles,
+        services,
+        tasks,
+        payments,
+      },
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("❌ Error fetching admin stats:", err.message);
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 

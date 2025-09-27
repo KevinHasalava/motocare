@@ -1,4 +1,3 @@
-// frontend/src/pages/AdminDashboard.jsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -31,50 +30,62 @@ import {
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import { gradientText } from "../../utils/theme";
 
-// ChartJS setup
+// Register Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
+// Default fallback stats before API loads
+const mockAdminStats = {
+  users: 0,
+  bookings: 0,
+  payments: 0,
+  vehicles: 0,
+  services: 0,
+  tasks: 0,
+};
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/getUserCount", {
-          withCredentials: true,
-        });
-        setStats(response.data);
-      } catch (error) {
-        console.error("Error fetching stats:", error);
-      }
-    };
-    fetchStats();
-  }, []);
+const chartColors = [
+  "rgba(54, 162, 235, 0.7)",
+  "rgba(255, 99, 132, 0.7)",
+  "rgba(255, 206, 86, 0.7)",
+  "rgba(75, 192, 192, 0.7)",
+  "rgba(153, 102, 255, 0.7)",
+  "rgba(255, 159, 64, 0.7)",
+];
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-
-  const [stats, setStats] = useState({
-    users: userCount.getUserCount,
-    bookings: 0,
-    payments: 0,
-    inventory: 0,
-    tasks: 0,
-    vehicles: 0,
-    services: 0,
-  });
+  const [stats, setStats] = useState(mockAdminStats);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        // 🔑 Get JWT token (must be saved in localStorage at login)
+        const token = localStorage.getItem("token");
+
         const response = await axios.get("http://localhost:5000/api/admin/stats", {
-          withCredentials: true,
+          headers: {
+            "x-auth-token": token, // ✅ send token with request
+          },
         });
-        setStats(response.data);
+
+        console.log("📊 API Response:", response.data);
+
+        if (response.data.success && response.data.data) {
+          setStats(response.data.data);
+        } else {
+          setStats(response.data);
+        }
       } catch (error) {
-        console.error("Error fetching stats:", error);
+        console.error("Error fetching stats:", error.response?.data || error.message);
       }
     };
+
     fetchStats();
+    // Poll every 5s for live-ish updates
+    const interval = setInterval(fetchStats, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   // Chart data
@@ -91,14 +102,7 @@ const AdminDashboard = () => {
           stats.tasks,
           stats.payments,
         ],
-        backgroundColor: [
-          "rgba(54, 162, 235, 0.7)",
-          "rgba(255, 99, 132, 0.7)",
-          "rgba(255, 206, 86, 0.7)",
-          "rgba(75, 192, 192, 0.7)",
-          "rgba(153, 102, 255, 0.7)",
-          "rgba(255, 159, 64, 0.7)",
-        ],
+        backgroundColor: chartColors,
       },
     ],
   };
@@ -111,7 +115,7 @@ const AdminDashboard = () => {
     },
   };
 
-  // StatCard Component
+  // Small reusable StatCard component
   const StatCard = ({ title, value, description, icon, path }) => (
     <Card
       sx={{
@@ -136,16 +140,12 @@ const AdminDashboard = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      {/* Header */}
-      <Header 
-      navItems={['Features', 'Process', 'About', 'Contact']}
-       
-       />
+      <Header navItems={["Features", "Process", "About", "Contact"]} />
 
-      {/* Main content */}
       <Box component="main" sx={{ flexGrow: 1, pt: 10, pb: 4 }}>
         <Container maxWidth="xl">
-          <Typography variant="h4" gutterBottom align="center">
+          {/* Gradient heading */}
+          <Typography variant="h4" gutterBottom align="center" sx={gradientText}>
             🚗 Admin Dashboard
           </Typography>
 
@@ -218,7 +218,6 @@ const AdminDashboard = () => {
         </Container>
       </Box>
 
-      {/* Footer */}
       <Footer />
     </Box>
   );

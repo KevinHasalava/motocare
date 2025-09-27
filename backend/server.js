@@ -28,7 +28,7 @@ app.use("/api/services", require("./routes/serviceRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/jobs", require("./routes/jobRoutes"));   // 👈 මේක add කරන්න
 app.use("/api/availability", require("./routes/availabilityRoutes")); // optional if you made it
-
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 
 

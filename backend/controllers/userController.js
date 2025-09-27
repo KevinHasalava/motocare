@@ -43,12 +43,16 @@ const loginUser = async (req, res) => {
   if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
 
   // create token
-  const token = jwt.sign(
-    { id: user._id, type: user.userType }, 
+   const token = jwt.sign(
+    { 
+      user: {           // ← Added 'user' wrapper
+        id: user._id,   // ← Changed from just 'id'
+        userType: user.userType  // ← Changed from 'type'
+      }
+    }, 
     process.env.JWT_SECRET, 
     { expiresIn: "1d" }
   );
-
   res.json({
     message: "✅ Login success",
     token,
@@ -109,5 +113,6 @@ const getUserStats = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 module.exports = { registerUser, getUsers, loginUser, deleteUser, updateUser, getUserStats, };
