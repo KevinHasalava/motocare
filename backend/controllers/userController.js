@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 
 const registerUser = async (req, res) => {
-  const { name, email, password, userType } = req.body;
+  const { name, email, phone, password, userType } = req.body;
 
   // Email duplicate check
   const exists = await User.findOne({ email });
@@ -16,7 +16,7 @@ const registerUser = async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPw = await bcrypt.hash(password, salt);
 
-  const user = new User({ name, email, password: hashedPw, userType });
+  const user = new User({ name, email, phone, password: hashedPw, userType });
   await user.save();
 
   res.status(201).json({ message: "✅ Registered", user });

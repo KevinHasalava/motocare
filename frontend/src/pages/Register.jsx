@@ -18,6 +18,7 @@ const Register = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: ""
   });
@@ -32,6 +33,34 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
 
+// 🛑 All fields required
+    if (!form.name || !form.email || !form.phone || !form.password || !form.confirmPassword) {
+      setError("❌ All fields are required");
+      return;
+    }
+
+    // 📧 Email Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setError("❌ Invalid email address");
+      return;
+    }
+
+    // 📞 Phone Validation (exact 10 digits, adjust as needed)
+    if (!/^[0-9]{10}$/.test(form.phone)) {
+      setError("❌ Phone number must be exactly 10 digits");
+      return;
+    }
+
+    // 🔑 Strong Password Check
+    const strongPasswordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!strongPasswordRegex.test(form.password)) {
+      setError("❌ Password must be at least 8 characters, include upper & lower case letters, a number, and a special character");
+      return;
+    }
+
+
     // 🛑 Password match validation
     if (form.password !== form.confirmPassword) {
       setError("❌ Passwords do not match");
@@ -42,6 +71,7 @@ const Register = () => {
       await axios.post("http://localhost:5000/api/users/register", {
         name: form.name,
         email: form.email,
+        phone: form.phone,
         password: form.password,
         userType: "customer" // 👈 Always force as customer
       });
@@ -118,12 +148,23 @@ const Register = () => {
                 <TextField
                   fullWidth
                   margin="normal"
+                  type="tel"
+                  label="Phone Number"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  margin="normal"
                   type="password"
                   label="Password"
                   name="password"
                   value={form.password}
                   onChange={handleChange}
                   required
+                  helperText="Must include uppercase, lowercase, number, special char, 8+ chars"
                 />
                 <TextField
                   fullWidth

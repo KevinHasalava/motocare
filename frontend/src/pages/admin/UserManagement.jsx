@@ -1,9 +1,26 @@
 // pages/UserManagement.jsx
 import React, { useState, useEffect } from "react";
 import {
-  Box, Container, Paper, Typography, TextField, Button, Alert, CircularProgress,
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton,
-  Stack, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem
+  Box,
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  MenuItem,
 } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import axios from "axios";
@@ -22,6 +39,7 @@ const UserManagement = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
     userType: "customer",
   });
@@ -92,6 +110,7 @@ const UserManagement = () => {
     setFormData({
       name: user.name,
       email: user.email,
+      phone: user.phone,
       password: "",
       userType: user.userType,
     });
@@ -110,14 +129,24 @@ const UserManagement = () => {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       {/* Header */}
-      <Header navItems={['Features', 'Process', 'About', 'Contact']} />
+      <Header navItems={["Features", "Process", "About", "Contact"]} />
 
       <Box component="main" sx={{ flexGrow: 1, pt: 10, pb: 4 }}>
         <Container sx={{ mt: 2 }}>
-          <Typography variant="h4" gutterBottom>👥 User Management</Typography>
+          <Typography variant="h4" gutterBottom>
+            👥 User Management
+          </Typography>
 
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-          {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {success}
+            </Alert>
+          )}
 
           <Button
             variant="contained"
@@ -134,6 +163,7 @@ const UserManagement = () => {
                   <TableRow>
                     <TableCell>Name</TableCell>
                     <TableCell>Email</TableCell>
+                    <TableCell>Phone</TableCell> {/* 🆕 Added */}
                     <TableCell>User Type</TableCell>
                     <TableCell>Joined</TableCell>
                     <TableCell>Actions</TableCell>
@@ -145,8 +175,11 @@ const UserManagement = () => {
                       <TableRow key={u._id}>
                         <TableCell>{u.name}</TableCell>
                         <TableCell>{u.email}</TableCell>
+                        <TableCell>{u.phone}</TableCell> {/* 🆕 Show phone */}
                         <TableCell>{u.userType}</TableCell>
-                        <TableCell>{new Date(u.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          {new Date(u.createdAt).toLocaleDateString()}
+                        </TableCell>
                         <TableCell>
                           <IconButton onClick={() => handleOpenEditDialog(u)}>
                             <EditIcon color="primary" />
@@ -159,7 +192,9 @@ const UserManagement = () => {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={5} align="center">No users found</TableCell>
+                      <TableCell colSpan={6} align="center">
+                        No users found
+                      </TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -167,8 +202,132 @@ const UserManagement = () => {
             </TableContainer>
           </Paper>
 
-          {/* Add & Edit Dialogs */}
-          {/* ...existing dialog code... */}
+          {/* Add User Dialog */}
+          <Dialog open={openAddDialog} onClose={() => setOpenAddDialog(false)}>
+            <DialogTitle>Add User</DialogTitle>
+            <DialogContent>
+              <TextField
+                margin="dense"
+                label="Name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                fullWidth
+                required
+              />
+              <TextField
+                margin="dense"
+                label="Email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                fullWidth
+                required
+              />
+              <TextField
+                margin="dense"
+                label="Phone Number"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                fullWidth
+                required
+              />
+              <TextField
+                margin="dense"
+                label="Password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                fullWidth
+                required
+              />
+              <TextField
+                select
+                margin="dense"
+                label="User Type"
+                name="userType"
+                value={formData.userType}
+                onChange={handleChange}
+                fullWidth
+              >
+                <MenuItem value="customer">Customer</MenuItem>
+                <MenuItem value="admin">Admin</MenuItem>
+                <MenuItem value="mechanic">Mechanic</MenuItem>
+              </TextField>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenAddDialog(false)}>Cancel</Button>
+              <Button onClick={handleAddUser} variant="contained">
+                Add
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          {/* Edit User Dialog */}
+          <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogContent>
+              <TextField
+                margin="dense"
+                label="Name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                fullWidth
+                required
+              />
+              <TextField
+                margin="dense"
+                label="Email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                fullWidth
+                required
+              />
+              <TextField
+                margin="dense"
+                label="Phone Number"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                fullWidth
+                required
+              />
+              <TextField
+                margin="dense"
+                label="Password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                fullWidth
+              />
+              <TextField
+                select
+                margin="dense"
+                label="User Type"
+                name="userType"
+                value={formData.userType}
+                onChange={handleChange}
+                fullWidth
+              >
+                <MenuItem value="customer">Customer</MenuItem>
+                <MenuItem value="admin">Admin</MenuItem>
+                <MenuItem value="mechanic">Mechanic</MenuItem>
+              </TextField>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
+              <Button onClick={handleEditUser} variant="contained">
+                Update
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Container>
       </Box>
 
