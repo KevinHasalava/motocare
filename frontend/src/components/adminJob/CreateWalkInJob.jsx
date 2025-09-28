@@ -1,26 +1,67 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
     Box, Paper, Typography, TextField, Button, Grid, MenuItem, Alert, CircularProgress, 
-    FormControl, InputLabel, Select, Autocomplete 
+    FormControl, InputLabel, Select, Autocomplete, Chip, InputAdornment, FormHelperText
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { 
+    PersonOutline, EmailOutlined, PhoneOutlined, DirectionsCarOutlined,
+    BuildOutlined, AccessTimeOutlined, CheckCircle, ErrorOutline,
+    AddCircleOutline, SearchOutlined, CalendarTodayOutlined,
+    EngineeringOutlined
+} from '@mui/icons-material';
 import { createWalkInJob } from '../../api/job'; 
 import { fetchServices, fetchMechanics, fetchVehiclesByEmail } from '../../api/data'; 
 
-// --- Constants (Defined in Component Scope for inputProps access) ---
-const currentYear = new Date().getFullYear();
+// --- Styled Components ---
+const AdminContainer = styled(Box)(({ theme }) => ({
+    backgroundColor: '#f5f5f5',
+    minHeight: '100vh',
+    padding: theme.spacing(2),
+}));
 
+const AdminPaper = styled(Paper)(({ theme }) => ({
+    maxWidth: 1200,
+    margin: '0 auto',
+    borderRadius: '4px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+    overflow: 'hidden',
+}));
+
+const AdminHeader = styled(Box)(({ theme }) => ({
+    backgroundColor: '#2c3e50',
+    color: '#ffffff',
+    padding: theme.spacing(2.5),
+    borderBottom: '3px solid #3498db',
+}));
+
+const SectionHeader = styled(Box)(({ theme }) => ({
+    backgroundColor: '#f8f9fa',
+    padding: theme.spacing(1.5, 2),
+    borderBottom: '1px solid #dee2e6',
+    display: 'flex',
+    alignItems: 'center',
+    marginTop: theme.spacing(2),
+    '&:first-of-type': {
+        marginTop: 0,
+    }
+}));
+
+const FormSection = styled(Box)(({ theme }) => ({
+    padding: theme.spacing(3),
+}));
+
+// --- Constants ---
+const currentYear = new Date().getFullYear();
 const initialState = {
-    // Customer Details
     customerName: '',
     customerEmail: '',
     customerPhoneNumber: '',
-    // Vehicle Details
     vehicleNumber: '',
     type: '',
     brand: '',
     model: '',
     year: '',
-    // Job Details
     serviceId: '', 
     serviceName: '', 
     date: '',
@@ -28,10 +69,8 @@ const initialState = {
     mechanic: 'AUTO_ASSIGN', 
 };
 
-// ... other constants (vehicleTypes, phonePrefixes) remain the same ...
 const vehicleTypes = ['Car', 'Van', 'SUV', 'Motorcycle', 'Three Wheel'];
 const phonePrefixes = ['070', '071', '072', '074', '075', '076', '077', '078', '011', '021', '023', '024', '025', '026', '027', '031', '032', '033', '034', '035', '036', '037', '038', '041', '045', '047', '051', '052', '054', '055', '057', '063', '065', '066'];
-
 
 const CreateWalkInJob = () => {
     const [formData, setFormData] = useState(initialState);
@@ -39,19 +78,13 @@ const CreateWalkInJob = () => {
     const [loading, setLoading] = useState(false);
     const [successMsg, setSuccessMsg] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
-    
-    // API Data States
     const [services, setServices] = useState([]);
     const [mechanics, setMechanics] = useState([]);
     const [userVehicles, setUserVehicles] = useState([]); 
-    
-    // 💡 NEW STATE: To disable vehicle fields when an existing vehicle is selected
     const [isVehicleFound, setIsVehicleFound] = useState(false); 
-
-    // Ref to hold the form element for Autofill check
     const formRef = useRef(null); 
 
-    // --- Data Fetching: Services and Mechanics ---
+    // Data Fetching: Services and Mechanics
     useEffect(() => {
         const loadInitialData = async () => {
             try {
@@ -68,20 +101,16 @@ const CreateWalkInJob = () => {
         loadInitialData();
     }, []);
     
-    // --- 💡 NEW: Autofill Check Effect ---
-    // This runs once after mount to check for browser-autofilled values and force validation
+    // Autofill Check Effect
     useEffect(() => {
-        // Simple setTimeout to wait for the browser to finish its autofill process
         setTimeout(() => {
-            // We only need to force validation on fields that might be autofilled (Customer details)
             validate('customerName');
             validate('customerEmail');
             validate('customerPhoneNumber');
         }, 100); 
     }, []);
 
-
-    // --- Vehicle Fetching Effect (Triggers on Email change) ---
+    // Vehicle Fetching Effect
     const handleEmailSearch = useCallback(async (email) => {
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             setUserVehicles([]);
@@ -100,7 +129,7 @@ const CreateWalkInJob = () => {
         }
     }, []);
 
-    // Debounced email search (waits for user to stop typing)
+    // Debounced email search
     useEffect(() => {
         const handler = setTimeout(() => {
             if (formData.customerEmail && !errors.customerEmail) {
@@ -110,8 +139,7 @@ const CreateWalkInJob = () => {
         return () => clearTimeout(handler);
     }, [formData.customerEmail, errors.customerEmail, handleEmailSearch]);
 
-
-    // --- Strict Frontend Validation Logic (No Changes to actual rules) ---
+    // Validation Logic
     const validate = (field = null) => {
         let tempErrors = { ...errors };
         let isValid = true;
@@ -128,7 +156,7 @@ const CreateWalkInJob = () => {
             }
         };
 
-        // 1. Customer Name Validation
+        // Customer Name Validation
         if (field === 'customerName' || field === null) {
             if (checkRequired('customerName', 'Customer Name is required.')) {
                 if (formData.customerName && !/^[A-Za-z0-9]+(?: [A-Za-z0-9]+)*$/.test(formData.customerName)) {
@@ -138,7 +166,7 @@ const CreateWalkInJob = () => {
             } else { isValid = false; }
         }
 
-        // 2. Email Validation
+        // Email Validation
         if (field === 'customerEmail' || field === null) {
             if (checkRequired('customerEmail', 'Email is required.')) {
                 if (formData.customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customerEmail)) {
@@ -148,7 +176,7 @@ const CreateWalkInJob = () => {
             } else { isValid = false; }
         }
         
-        // 3. Phone Number Validation
+        // Phone Number Validation
         if (field === 'customerPhoneNumber' || field === null) {
             const phone = formData.customerPhoneNumber;
             if (phone) {
@@ -166,7 +194,7 @@ const CreateWalkInJob = () => {
             }
         }
 
-        // 4. Vehicle Number Validation
+        // Vehicle Number Validation
         if (field === 'vehicleNumber' || field === null) {
             if (checkRequired('vehicleNumber', 'Vehicle Number is required.')) {
                 if (formData.vehicleNumber && !/^([A-Za-z]{2,3}-\d{4})$/.test(formData.vehicleNumber)) {
@@ -176,12 +204,12 @@ const CreateWalkInJob = () => {
             } else { isValid = false; }
         }
         
-        // 5. Vehicle Type, Brand, Model Validation
+        // Vehicle Type, Brand, Model Validation
         if (field === 'type' || field === null) { if (!checkRequired('type', 'Vehicle Type is required.')) { isValid = false; } }
         if (field === 'brand' || field === null) { if (!checkRequired('brand', 'Brand is required.')) { isValid = false; } }
         if (field === 'model' || field === null) { if (!checkRequired('model', 'Model is required.')) { isValid = false; } }
 
-        // 6. Year Validation
+        // Year Validation
         if (field === 'year' || field === null) {
             if (checkRequired('year', 'Year is required.')) {
                 if (formData.year && (formData.year.length !== 4 || parseInt(formData.year) > currentYear || parseInt(formData.year) < 1980)) {
@@ -191,10 +219,10 @@ const CreateWalkInJob = () => {
             } else { isValid = false; }
         }
         
-        // 7. Service ID Validation
+        // Service ID Validation
         if (field === 'serviceId' || field === null) { if (!checkRequired('serviceId', 'Service Type is required.')) { isValid = false; } }
 
-        // 8. Date/Time Validation
+        // Date/Time Validation
         if (field === 'date' || field === 'time' || field === null) {
             if (!checkRequired('date', 'Date is required.')) { isValid = false; }
             if (!checkRequired('time', 'Time is required.')) { isValid = false; }
@@ -212,22 +240,22 @@ const CreateWalkInJob = () => {
         return isValid;
     };
 
-    // --- Input Change Handler with Formatting ---
+    // Input Change Handler
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         let newValue = value;
 
-        // Reset vehicle found state if cashier is manually editing vehicle details
+        // Reset vehicle found state if editing
         if (isVehicleFound && ['vehicleNumber', 'type', 'brand', 'model', 'year'].includes(name)) {
             setIsVehicleFound(false);
         }
 
-        // 1. Phone Number Formatting
+        // Phone Number Formatting
         if (name === 'customerPhoneNumber') {
             newValue = value.replace(/[^0-9]/g, '').slice(0, 10);
         }
         
-        // 2. Vehicle Number Formatting
+        // Vehicle Number Formatting
         if (name === 'vehicleNumber') {
             newValue = value.replace(/[^A-Za-z0-9-]/g, '').toUpperCase();
             
@@ -255,13 +283,12 @@ const CreateWalkInJob = () => {
         validate(name); 
     };
 
-    // --- Vehicle Selector Handler (UX Enhancement) ---
+    // Vehicle Selector Handler
     const handleVehicleSelect = (e) => {
         const selectedNum = e.target.value;
         const selectedVehicle = userVehicles.find(v => v.vehicleNumber === selectedNum);
         
         if(selectedVehicle) {
-            // 💡 Set isVehicleFound to true to disable editing
             setIsVehicleFound(true); 
             setFormData(prev => ({
                 ...prev,
@@ -271,13 +298,11 @@ const CreateWalkInJob = () => {
                 model: selectedVehicle.model,
                 year: String(selectedVehicle.year)
             }));
-            // Clear vehicle-related errors as the data is from the database
             setErrors(prev => ({
                 ...prev,
                 vehicleNumber: '', type: '', brand: '', model: '', year: ''
             }));
         } else {
-            // Reset to manual entry mode
             setIsVehicleFound(false); 
             setFormData(prev => ({
                 ...prev,
@@ -285,7 +310,6 @@ const CreateWalkInJob = () => {
             }));
         }
     }
-
 
     const handleServiceChange = (event, value) => {
         if (value) {
@@ -300,7 +324,7 @@ const CreateWalkInJob = () => {
         }
     };
     
-    // --- Submission Handler ---
+    // Submission Handler
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSuccessMsg('');
@@ -325,7 +349,7 @@ const CreateWalkInJob = () => {
             setSuccessMsg(response.message || 'Job created successfully!');
             setFormData(initialState); 
             setUserVehicles([]); 
-            setIsVehicleFound(false); // Reset
+            setIsVehicleFound(false);
         } catch (err) {
             console.error(err);
             setErrorMsg(err.message || 'Failed to create job due to a server error.');
@@ -335,279 +359,330 @@ const CreateWalkInJob = () => {
     };
 
     const today = new Date().toISOString().split('T')[0];
-    
+    const filteredServices = formData.type
+        ? services.filter(s => s.vehicleType === formData.type)
+        : [];
+
     return (
-        <Paper 
-            elevation={6} 
-            sx={{ 
-                p: 4, 
-                maxWidth: 900, 
-                margin: '2rem auto',
-                borderRadius: '20px', 
-                backgroundColor: '#f5f5f5' 
-            }}
-        >
-            <Typography variant="h4" gutterBottom align="center" color="primary" sx={{ fontWeight: 'bold' }}>
-                Manual Walk-In Job Creation 🛠️
-            </Typography>
-            <Typography variant="subtitle1" align="center" sx={{ mb: 3 }}>
-                Admin/Cashier interface for new customers and vehicles.
-            </Typography>
+        <AdminContainer>
+            <AdminPaper>
+                <AdminHeader>
+                    <Typography variant="h5" fontWeight={600}>
+                        Walk-In Job Creation
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 0.5, opacity: 0.9 }}>
+                        Create service jobs for walk-in customers
+                    </Typography>
+                </AdminHeader>
 
-            {successMsg && <Alert severity="success" sx={{ mb: 2 }}>{successMsg}</Alert>}
-            {errorMsg && <Alert severity="error" sx={{ mb: 2 }}>{errorMsg}</Alert>}
+                <Box sx={{ p: 3 }}>
+                    {successMsg && (
+                        <Alert severity="success" onClose={() => setSuccessMsg('')} sx={{ mb: 2 }}>
+                            {successMsg}
+                        </Alert>
+                    )}
+                    
+                    {errorMsg && (
+                        <Alert severity="error" onClose={() => setErrorMsg('')} sx={{ mb: 2 }}>
+                            {errorMsg}
+                        </Alert>
+                    )}
 
-            {/* 💡 Set ref for the Autofill check */}
-            <Box component="form" onSubmit={handleSubmit} ref={formRef}>
-                
-                {/* --- Section 1: Customer Details --- */}
-                <Typography variant="h6" sx={{ mt: 2, mb: 1, borderBottom: '2px solid #ccc', pb: 0.5 }}>1. Customer Details (Find or Create)</Typography>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            fullWidth
-                            label="Customer Name"
-                            name="customerName"
-                            value={formData.customerName}
-                            onChange={handleInputChange}
-                            error={!!errors.customerName}
-                            helperText={errors.customerName}
-                            variant="outlined"
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            fullWidth
-                            label="Customer Email"
-                            name="customerEmail"
-                            value={formData.customerEmail}
-                            onChange={handleInputChange}
-                            error={!!errors.customerEmail}
-                            helperText={errors.customerEmail || "Used to check for existing records."}
-                            variant="outlined"
-                            type="email"
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4}> 
-                        <TextField
-                            fullWidth
-                            label="Phone Number"
-                            name="customerPhoneNumber"
-                            value={formData.customerPhoneNumber}
-                            onChange={handleInputChange}
-                            error={!!errors.customerPhoneNumber}
-                            helperText={errors.customerPhoneNumber || "10 digits, starting with 0."}
-                            variant="outlined"
-                            type="tel"
-                            inputProps={{ maxLength: 10 }}
-                        />
-                    </Grid>
-                </Grid>
+                    <Box component="form" onSubmit={handleSubmit} ref={formRef}>
+                        {/* Customer Information Section */}
+                        <SectionHeader>
+                            <PersonOutline sx={{ mr: 1, color: '#6c757d' }} />
+                            <Typography variant="subtitle1" fontWeight={600}>
+                                Customer Information
+                            </Typography>
+                        </SectionHeader>
+                        <FormSection>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        label="Customer Name"
+                                        name="customerName"
+                                        value={formData.customerName}
+                                        onChange={handleInputChange}
+                                        error={!!errors.customerName}
+                                        helperText={errors.customerName}
+                                        required
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        label="Email Address"
+                                        name="customerEmail"
+                                        value={formData.customerEmail}
+                                        onChange={handleInputChange}
+                                        error={!!errors.customerEmail}
+                                        helperText={errors.customerEmail || "Auto-searches existing records"}
+                                        type="email"
+                                        required
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        label="Phone Number (Optional)"
+                                        name="customerPhoneNumber"
+                                        value={formData.customerPhoneNumber}
+                                        onChange={handleInputChange}
+                                        error={!!errors.customerPhoneNumber}
+                                        helperText={errors.customerPhoneNumber}
+                                        type="tel"
+                                        inputProps={{ maxLength: 10 }}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </FormSection>
 
-                {/* --- Section 2: Vehicle Details --- */}
-                <Typography variant="h6" sx={{ mt: 4, mb: 1, borderBottom: '2px solid #ccc', pb: 0.5 }}>2. Vehicle Details (Find or Create)</Typography>
-                
-                {/* Existing Vehicles Alert and Selector */}
-                {userVehicles.length > 0 && (
-                    <Alert severity="info" sx={{ mb: 2 }}>
-                        Customer **already has {userVehicles.length} registered vehicle(s)**. Use the selector to auto-fill details.
-                    </Alert>
-                )}
-                
-                {userVehicles.length > 0 && (
-                    <Box sx={{ mb: 3 }}>
-                        <FormControl fullWidth>
-                            <InputLabel>Select Existing Vehicle</InputLabel>
-                            <Select
-                                label="Select Existing Vehicle"
-                                value={isVehicleFound ? formData.vehicleNumber : ""} // Show selected number if found, otherwise show blank for manual entry
-                                onChange={handleVehicleSelect}
-                            >
-                                <MenuItem value="">*Enter New/Different Vehicle*</MenuItem>
-                                {userVehicles.map((v) => (
-                                    <MenuItem key={v._id} value={v.vehicleNumber}>
-                                        {v.vehicleNumber} ({v.brand} {v.model})
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
-                )}
-                
-                {/* New/Manual Vehicle Entry Fields */}
-                {isVehicleFound && (
-                    <Alert severity="success" sx={{ mb: 2 }}>
-                        Vehicle details are **auto-filled and locked** from the system.
-                    </Alert>
-                )}
-                
-                <Grid container spacing={3}>
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            fullWidth
-                            label="Vehicle Number"
-                            name="vehicleNumber"
-                            value={formData.vehicleNumber}
-                            onChange={handleInputChange}
-                            error={!!errors.vehicleNumber}
-                            helperText={errors.vehicleNumber || "Format: LL-NNNN or LLL-NNNN. Hyphen is automatic."}
-                            variant="outlined"
-                            // 💡 Disabled if found
-                            disabled={isVehicleFound} 
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth error={!!errors.type} disabled={isVehicleFound}>
-                            <InputLabel>Vehicle Type</InputLabel>
-                            <Select
-                                label="Vehicle Type"
-                                name="type"
-                                value={formData.type}
-                                onChange={handleInputChange}
-                            >
-                                {vehicleTypes.map((type) => (
-                                    <MenuItem key={type} value={type}>{type}</MenuItem>
-                                ))}
-                            </Select>
-                            <Typography variant="caption" color="error">{errors.type}</Typography>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            fullWidth
-                            label="Brand"
-                            name="brand"
-                            value={formData.brand}
-                            onChange={handleInputChange}
-                            error={!!errors.brand}
-                            helperText={errors.brand}
-                            variant="outlined"
-                            disabled={isVehicleFound}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            fullWidth
-                            label="Model"
-                            name="model"
-                            value={formData.model}
-                            onChange={handleInputChange}
-                            error={!!errors.model}
-                            helperText={errors.model}
-                            variant="outlined"
-                            disabled={isVehicleFound}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            fullWidth
-                            label="Year"
-                            name="year"
-                            value={formData.year}
-                            onChange={handleInputChange}
-                            error={!!errors.year}
-                            helperText={errors.year}
-                            variant="outlined"
-                            type="number"
-                            InputLabelProps={{ shrink: true }}
-                            inputProps={{ 
-                                maxLength: 4, 
-                                min: 1980, 
-                                max: currentYear 
-                            }}
-                            disabled={isVehicleFound}
-                        />
-                    </Grid>
-                </Grid>
-
-                {/* --- Section 3: Job Details --- */}
-                <Typography variant="h6" sx={{ mt: 4, mb: 1, borderBottom: '2px solid #ccc', pb: 0.5 }}>3. Service and Time Slot</Typography>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                        <Autocomplete
-                            options={services}
-                            getOptionLabel={(option) => option.name || ""}
-                            isOptionEqualToValue={(option, value) => option._id === value._id}
-                            value={services.find(s => s._id === formData.serviceId) || null}
-                            onChange={handleServiceChange}
-                            inputValue={formData.serviceName}
-                            onInputChange={(event, newInputValue) => {
-                                setFormData(prev => ({ ...prev, serviceName: newInputValue }));
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label="Service Type (Type to filter)"
-                                    error={!!errors.serviceId}
-                                    helperText={errors.serviceId}
-                                    required
+                        {/* Vehicle Details Section */}
+                        <SectionHeader>
+                            <DirectionsCarOutlined sx={{ mr: 1, color: '#6c757d' }} />
+                            <Typography variant="subtitle1" fontWeight={600}>
+                                Vehicle Details
+                            </Typography>
+                            {isVehicleFound && (
+                                <Chip 
+                                    label="Auto-filled" 
+                                    size="small" 
+                                    color="info"
+                                    sx={{ ml: 'auto' }}
                                 />
                             )}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <FormControl fullWidth error={!!errors.mechanic}>
-                            <InputLabel>Assign Mechanic</InputLabel>
-                            <Select
-                                label="Assign Mechanic"
-                                name="mechanic"
-                                value={formData.mechanic}
-                                onChange={handleInputChange}
+                        </SectionHeader>
+                        <FormSection>
+                            {userVehicles.length > 0 && (
+                                <>
+                                    <Alert severity="info" sx={{ mb: 2 }}>
+                                        Found {userVehicles.length} registered vehicle(s) for this customer
+                                    </Alert>
+                                    <FormControl fullWidth size="small" sx={{ mb: 3 }}>
+                                        <InputLabel>Select Existing Vehicle</InputLabel>
+                                        <Select
+                                            label="Select Existing Vehicle"
+                                            value={isVehicleFound ? formData.vehicleNumber : ""}
+                                            onChange={handleVehicleSelect}
+                                        >
+                                            <MenuItem value="">
+                                                <em>Enter New Vehicle</em>
+                                            </MenuItem>
+                                            {userVehicles.map((v) => (
+                                                <MenuItem key={v._id} value={v.vehicleNumber}>
+                                                    {v.vehicleNumber} - {v.brand} {v.model} ({v.year})
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </>
+                            )}
+
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        label="Vehicle Number"
+                                        name="vehicleNumber"
+                                        value={formData.vehicleNumber}
+                                        onChange={handleInputChange}
+                                        error={!!errors.vehicleNumber}
+                                        helperText={errors.vehicleNumber}
+                                        disabled={isVehicleFound}
+                                        required
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <FormControl fullWidth size="small" error={!!errors.type} disabled={isVehicleFound} required>
+                                        <InputLabel>Vehicle Type</InputLabel>
+                                        <Select
+                                            label="Vehicle Type"
+                                            name="type"
+                                            value={formData.type}
+                                            onChange={handleInputChange}
+                                        >
+                                            {vehicleTypes.map((type) => (
+                                                <MenuItem key={type} value={type}>{type}</MenuItem>
+                                            ))}
+                                        </Select>
+                                        {errors.type && (
+                                            <FormHelperText>{errors.type}</FormHelperText>
+                                        )}
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        label="Brand"
+                                        name="brand"
+                                        value={formData.brand}
+                                        onChange={handleInputChange}
+                                        error={!!errors.brand}
+                                        helperText={errors.brand}
+                                        disabled={isVehicleFound}
+                                        required
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        label="Model"
+                                        name="model"
+                                        value={formData.model}
+                                        onChange={handleInputChange}
+                                        error={!!errors.model}
+                                        helperText={errors.model}
+                                        disabled={isVehicleFound}
+                                        required
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        label="Year"
+                                        name="year"
+                                        value={formData.year}
+                                        onChange={handleInputChange}
+                                        error={!!errors.year}
+                                        helperText={errors.year}
+                                        type="number"
+                                        disabled={isVehicleFound}
+                                        required
+                                        InputProps={{
+                                            inputProps: { 
+                                                min: 1980, 
+                                                max: currentYear 
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </FormSection>
+
+                        {/* Service & Schedule Section */}
+                        <SectionHeader>
+                            <BuildOutlined sx={{ mr: 1, color: '#6c757d' }} />
+                            <Typography variant="subtitle1" fontWeight={600}>
+                                Service & Schedule
+                            </Typography>
+                        </SectionHeader>
+                        <FormSection>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} md={6}>
+                                    <Autocomplete
+                                        size="small"
+                                        options={filteredServices}
+                                        getOptionLabel={(option) => option.name || ""}
+                                        isOptionEqualToValue={(option, value) => option._id === value._id}
+                                        value={filteredServices.find(s => s._id === formData.serviceId) || null}
+                                        onChange={handleServiceChange}
+                                        inputValue={formData.serviceName}
+                                        onInputChange={(event, newInputValue) => {
+                                            setFormData(prev => ({ ...prev, serviceName: newInputValue }));
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label={formData.type ? `Service for ${formData.type}` : "Select Vehicle Type first"}
+                                                error={!!errors.serviceId}
+                                                helperText={errors.serviceId}
+                                                required
+                                            />
+                                        )}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <FormControl fullWidth size="small">
+                                        <InputLabel>Assign Mechanic</InputLabel>
+                                        <Select
+                                            label="Assign Mechanic"
+                                            name="mechanic"
+                                            value={formData.mechanic}
+                                            onChange={handleInputChange}
+                                        >
+                                            {mechanics.map((m) => (
+                                                <MenuItem key={m._id || 'AUTO_ASSIGN'} value={m._id || 'AUTO_ASSIGN'}>
+                                                    {m.name}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        label="Date"
+                                        name="date"
+                                        type="date"
+                                        value={formData.date}
+                                        onChange={handleInputChange}
+                                        error={!!errors.date}
+                                        helperText={errors.date}
+                                        InputLabelProps={{ shrink: true }}
+                                        inputProps={{ min: today }}
+                                        required
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        label="Time"
+                                        name="time"
+                                        type="time"
+                                        value={formData.time}
+                                        onChange={handleInputChange}
+                                        error={!!errors.time}
+                                        helperText={errors.time}
+                                        InputLabelProps={{ shrink: true }}
+                                        required
+                                    />
+                                </Grid>
+                            </Grid>
+                        </FormSection>
+
+                        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                            <Button
+                                variant="outlined"
+                                onClick={() => {
+                                    setFormData(initialState);
+                                    setUserVehicles([]);
+                                    setIsVehicleFound(false);
+                                    setErrors({});
+                                }}
+                                disabled={loading}
                             >
-                                {mechanics.map((m) => (
-                                    <MenuItem key={m._id || 'AUTO_ASSIGN'} value={m._id || 'AUTO_ASSIGN'}>
-                                        {m.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                            <Typography variant="caption" color="error">{errors.mechanic}</Typography>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            fullWidth
-                            label="Date"
-                            name="date"
-                            type="date"
-                            value={formData.date}
-                            onChange={handleInputChange}
-                            error={!!errors.date}
-                            helperText={errors.date}
-                            variant="outlined"
-                            InputLabelProps={{ shrink: true }}
-                            inputProps={{ min: today }}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            fullWidth
-                            label="Time Slot"
-                            name="time"
-                            type="time"
-                            value={formData.time}
-                            onChange={handleInputChange}
-                            error={!!errors.time}
-                            helperText={errors.time}
-                            variant="outlined"
-                            InputLabelProps={{ shrink: true }}
-                        />
-                    </Grid>
-                </Grid>
-
-                <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    sx={{ mt: 5, py: 1.5, borderRadius: '15px' }} 
-                    disabled={loading}
-                    startIcon={loading && <CircularProgress size={20} color="inherit" />}
-                >
-                    {loading ? 'Creating Job...' : 'Create Walk-In Job'}
-                </Button>
-
-            </Box>
-        </Paper>
+                                Clear Form
+                            </Button>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                disabled={loading}
+                                startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <AddCircleOutline />}
+                                sx={{
+                                    backgroundColor: '#3498db',
+                                    '&:hover': {
+                                        backgroundColor: '#2980b9',
+                                    }
+                                }}
+                            >
+                                {loading ? 'Creating...' : 'Create Job'}
+                            </Button>
+                        </Box>
+                    </Box>
+                </Box>
+            </AdminPaper>
+        </AdminContainer>
     );
 };
 
