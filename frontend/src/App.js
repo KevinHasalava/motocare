@@ -13,6 +13,9 @@ import ServicesPage from "./pages/admin/ServicePage";
 import MyBookings from "./pages/MyBooking";
 import AdminRegister from "./pages/AdminRegister";
 
+// 🛠️ NEW IMPORT: Component for manual job creation (Cashier/Admin)
+import CreateWalkInJob from "./components/adminJob/CreateWalkInJob"; 
+
 export default function App() {
   return (
     <Router>
@@ -20,7 +23,7 @@ export default function App() {
         {/* 🏠 Default route → Landing page */}
         <Route path="/" element={<Landing />} />
 
-        {/* Other routes */}
+        {/* --- Public/Customer Routes --- */}
         <Route path="/home" element={<Landing />} />
         <Route path="/VehiclePage" element={<VehiclePage />} />
         <Route path="/Login" element={<Login />} />
@@ -28,11 +31,17 @@ export default function App() {
         <Route path="/Header" element={<Header />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/my-bookings" element={<MyBookings />} />
+        
+        {/* --- Admin/Staff Specific Routes --- */}
         <Route path="/admin-register" element={<AdminRegister />} />
 
-        {/* admin page walata adala ewa */}
+        {/* Admin/Staff Views */}
         <Route path="/admin-job-view" element={<AdminJobView />} />
-        <Route path="/admin-service" element={< ServicesPage/>} />
+        <Route path="/admin-service" element={<ServicesPage />} />
+        
+        {/* 🛠️ NEW ROUTE: Manual Walk-In Job Creation (for Cashier) */}
+        <Route path="/admin/walkinjob" element={<CreateWalkInJob />} />
+
       </Routes>
     </Router>
   );

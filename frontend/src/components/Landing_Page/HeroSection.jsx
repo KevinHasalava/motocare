@@ -71,7 +71,7 @@ const HeroSection = ({ isVisible, onBookNowClick, stats, theme }) => (
               fontSize: '1.1rem',
               background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
               color: 'white', 
-              '&:hover': { 
+              'r&:hover': { 
                 transform: 'scale(1.05)', 
                 boxShadow: `0 8px 25px ${theme.palette.primary.dark}` 
               }

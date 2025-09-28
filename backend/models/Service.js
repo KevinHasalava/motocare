@@ -1,9 +1,7 @@
 const mongoose = require("mongoose");
 
 const serviceSchema = new mongoose.Schema({
-  s_ID:{
-    
-  },
+  
   name: {
     type: String,
     required: true,
@@ -20,7 +18,7 @@ const serviceSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  vehicleType: { // 👈 අලුතින් එකතු වූ වාහන වර්ගය
+  vehicleType: { 
         type: String,
         required: true,
         enum: ['Car', 'Van', 'SUV', 'Motorcycle', 'Three Wheel']
