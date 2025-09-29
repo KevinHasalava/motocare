@@ -12,6 +12,8 @@ import AdminJobView from "./pages/admin/AdminJobView";
 import ServicesPage from "./pages/admin/ServicePage";
 import MyBookings from "./pages/MyBooking";
 import AdminRegister from "./pages/AdminRegister";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserManagement from "./pages/admin/UserManagement";
 
 // 🛠️ NEW IMPORT: Component for manual job creation (Cashier/Admin)
 import CreateWalkInJob from "./components/adminJob/CreateWalkInJob"; 
@@ -37,10 +39,16 @@ export default function App() {
 
         {/* Admin/Staff Views */}
         <Route path="/admin-job-view" element={<AdminJobView />} />
-        <Route path="/admin-service" element={<ServicesPage />} />
+
+
         
         {/* 🛠️ NEW ROUTE: Manual Walk-In Job Creation (for Cashier) */}
         <Route path="/admin/walkinjob" element={<CreateWalkInJob />} />
+
+
+        <Route path="/admin-service" element={< ServicesPage/>} />
+        <Route path="/admin-dashboard" element={< AdminDashboard/>} />
+        <Route path="/admin-users" element={< UserManagement/>} />
 
       </Routes>
     </Router>

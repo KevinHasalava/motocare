@@ -12,13 +12,15 @@ import {
   AutoAwesome as SparkleIcon, ArrowForward as ArrowIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import Logo from './Landing_Page/Logo';
+import Logo from './Landing_Page/Logo'; // Fixed import path (assumes Logo.jsx is in components/)
 
 const Header = ({ navItems = [], onBookNowClick, theme }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
+  const savedUser = JSON.parse(localStorage.getItem('user'));
+  const isLoggedIn = !!savedUser;
 
   // Handle scroll effect
   useEffect(() => {

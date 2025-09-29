@@ -11,7 +11,6 @@ import { theme, backgroundKeyframes, gradientText, mockData } from '../utils/the
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-
 const VehiclePage = () => {
   const [vehicles, setVehicles] = useState([]); 
   const [editingVehicle, setEditingVehicle] = useState(null);

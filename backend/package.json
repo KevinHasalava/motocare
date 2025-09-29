@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "vehicle-booking-backend",
   "version": "1.0.0",
   "description": "",
   "keywords": [],
@@ -11,6 +11,9 @@
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
