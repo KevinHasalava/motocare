@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom'; // 👈 Import useNavigate
 import { 
     Box, Paper, Typography, CircularProgress, Alert, 
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
@@ -56,6 +57,8 @@ const JobDashboard = () => {
     const [statusUpdatingId, setStatusUpdatingId] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
 
+    const navigate = useNavigate(); // 👈 Initialize useNavigate
+
     // --- Data Fetching ---
     const fetchJobs = useCallback(async () => {
         setLoading(true);
@@ -79,7 +82,9 @@ const JobDashboard = () => {
 
     // --- Status Update Handler ---
     const handleStatusChange = async (jobId, newStatus) => {
-        if (!window.confirm(`Are you sure you want to change the status of JOB-${jobId} to ${newStatus}?`)) {
+        // Find job ID for confirmation message
+        const job = jobs.find(j => j._id === jobId);
+        if (!window.confirm(`Are you sure you want to change the status of ${job?.jobId || jobId} to ${newStatus}?`)) {
             return;
         }
 
@@ -155,11 +160,10 @@ const JobDashboard = () => {
                                 <RefreshOutlined />
                             </IconButton>
                         </Tooltip>
-                        {/* Assuming you have a route set up for job creation */}
                         <Button 
                             variant="contained" 
                             size="small"
-                            // onClick={() => navigate('/admin/create-job')} 
+                            onClick={() => navigate('/admin/walkinjob')} // 👈 Navigate to Create Walk-In Job
                             sx={{ ml: 2, backgroundColor: '#3498db', '&:hover': { backgroundColor: '#2980b9' } }}
                         >
                             + New Walk-In Job
@@ -233,7 +237,7 @@ const JobDashboard = () => {
                                             <TableCell align="center">
                                                 <Tooltip title="View/Edit Details">
                                                     <IconButton 
-                                                        // onClick={() => navigate(`/admin/jobs/${job._id}`)}
+                                                        onClick={() => navigate(`/admin/jobs/edit/${job._id}`)} // 👈 Navigation added to view page
                                                         color="info"
                                                         size="small"
                                                     >

@@ -10,7 +10,6 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Function එකට දත්ත ලැබෙන ආකාරය සරල කර ඇත
 const sendBookingConfirmationEmail = async (data) => {
     const { user, vehicle, service, bookingDetails, jobDetails } = data;
 

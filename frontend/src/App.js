@@ -16,7 +16,8 @@ import AdminRegister from "./pages/AdminRegister";
 // --- CURRENT JOB COMPONENT IMPORTS ---
 // We keep the two working components: JobDashboard and CreateWalkInJob
 import CreateWalkInJob from "./components/adminJob/CreateWalkInJob"; 
-import JobDashboard from "./components/adminJob/JobDashboard"; 
+import JobDashboard from "./components/adminJob/JobDashboard";
+import EditJob from "./components/adminJob/EditJob"; 
 // ----------------------------------
 
 export default function App() {
@@ -50,11 +51,11 @@ export default function App() {
         {/* 2. Create Job - Manual Walk-In Job Creation (for Cashier) */}
         <Route path="/admin/walkinjob" element={<CreateWalkInJob />} />
 
-        {/* 3. View/Edit Routes - TEMPORARILY REMOVED to avoid build errors. 
+        {/* 3. View/Edit Routes - TEMPORARILY REMOVED to avoid build errors.         */}
            We will add these back once the EditJob.js file is created. 
         <Route path="/admin/jobs/view/:id" element={<EditJob isViewMode={true} />} />
         <Route path="/admin/jobs/edit/:id" element={<EditJob />} />
-        */}
+
       </Routes>
     </Router>
   );

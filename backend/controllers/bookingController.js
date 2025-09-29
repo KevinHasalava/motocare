@@ -99,16 +99,12 @@ const createBooking = async (req, res) => {
     const bookingUser = await User.findById(user).select('name email');
     const bookingVehicle = await Vehicle.findById(vehicle).select('brand model vehicleNumber');
 
-    // serviceObj එක අප සතුව දැනටමත් තිබේ.
-    
-    // Email යැවීමේ function එකට අවශ්‍ය සියලු දත්ත ලබා දීම
-    // මෙහිදී 'job' object එක ලබා දෙන නිසා, Job ID එක email එකට ඇතුළත් වේ.
     await sendBookingConfirmationEmail({
         user: bookingUser,
         vehicle: bookingVehicle,
-        service: serviceObj, // We already have the full service object from the top of the function
-        bookingDetails: booking, // Pass the original booking document for date/time
-        jobDetails: job // Pass the job document which contains the new jobId
+        service: serviceObj, 
+        bookingDetails: booking, 
+        jobDetails: job 
     });
 
 } catch (emailError) {
@@ -156,7 +152,7 @@ const getBookingById = async (req, res) => {
 const getBookingsByUser = async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.params.userId })
-      .populate("vehicle", "vehicleNumber brand model type") // 👈 'type' මෙතනට එකතු කරන්න
+      .populate("vehicle", "vehicleNumber brand model type") 
       .populate("service", "name price duration vehicleType")
       .populate("mechanic", "name email");
     res.status(200).json(bookings);
