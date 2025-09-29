@@ -2,27 +2,22 @@ const Job = require("../models/Job");
 const Service = require("../models/Service");
 const Booking = require("../models/Booking");
 const User = require("../models/User");
-const Vehicle = require('../models/Vehicle'); // Vehicle Model is required for walk-in flow
+const Vehicle = require("../models/Vehicle");
 
-// ------------------- STANDARD JOB MANAGEMENT (Original Functions) -------------------
+// ------------------- STANDARD JOB MANAGEMENT -------------------
 
 // 1. Create Job from booking
 const createJob = async (req, res) => {
   try {
     const { bookingId, mechanic } = req.body;
 
-    // Find booking
     const booking = await Booking.findById(bookingId)
       .populate("service")
       .populate("vehicle")
       .populate("user");
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
+    if (!booking) return res.status(404).json({ message: "Booking not found" });
 
-    // Service duration
     const duration = booking.service.duration;
-
     let assignedMechanic = null;
 
     if (mechanic) {
@@ -31,25 +26,21 @@ const createJob = async (req, res) => {
         return res.status(400).json({ message: "Invalid mechanic selected" });
       }
 
-      // Mechanic availability check
       const overlapJob = await Job.findOne({
         mechanic: mech._id,
         date: booking.date,
         status: { $in: ["Booked", "Ongoing"] },
-        timeSlot: booking.timeSlot
+        timeSlot: booking.timeSlot,
       });
-
       if (overlapJob) {
         return res.status(400).json({ message: "Mechanic not available at this time" });
       }
 
       assignedMechanic = mech._id;
     } else {
-      // AUTO ASSIGN mechanic (first free mechanic)
+      // If no mechanic given, leave null instead of breaking
       const freeMech = await User.findOne({ userType: "mechanic" });
-      if (freeMech) {
-        assignedMechanic = freeMech._id;
-      }
+      if (freeMech) assignedMechanic = freeMech._id;
     }
 
     const job = new Job({
@@ -60,7 +51,7 @@ const createJob = async (req, res) => {
       date: booking.date,
       timeSlot: booking.timeSlot,
       duration,
-      mechanic: assignedMechanic
+      mechanic: assignedMechanic || null, // ✅ safe default
     });
 
     await job.save();
@@ -73,19 +64,20 @@ const createJob = async (req, res) => {
 // 2. Get all jobs
 const getJobs = async (req, res) => {
   try {
-    const jobs = await Job.find({}, "jobId user vehicle service mechanic startTime endTime status")
+    const jobs = await Job.find()
       .populate("user", "name email")
       .populate("vehicle", "vehicleNumber brand model")
       .populate("service", "name duration price")
       .populate("mechanic", "name email")
       .populate("booking", "_id");
+
     res.status(200).json(jobs);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// 3. Update job status (Complete, Ongoing, Booked)
+// 3. Update job status
 const updateJobStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -97,9 +89,7 @@ const updateJobStatus = async (req, res) => {
       .populate("service")
       .populate("mechanic");
 
-    if (!job) {
-      return res.status(404).json({ message: "Job not found" });
-    }
+    if (!job) return res.status(404).json({ message: "Job not found" });
 
     res.status(200).json({ message: "✅ Status updated", job });
   } catch (err) {
@@ -114,176 +104,205 @@ const getJobsByMechanic = async (req, res) => {
       .populate("user", "name")
       .populate("vehicle", "vehicleNumber")
       .populate("service", "name duration");
+
     res.status(200).json(jobs);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// ------------------- MANUAL WALK-IN JOB FUNCTIONS (NEW LOGIC ADDED) -------------------
+// ------------------- WALK-IN JOB MANAGEMENT -------------------
 
-// 5. NEW FUNCTION: Handles manual job creation (Find/Create User & Vehicle)
 const createWalkInJob = async (req, res) => {
   try {
-    const { 
-      customerName,    
-      customerEmail,   
-      customerPhoneNumber, 
+    const {
+      customerName,
+      customerEmail,
+      customerPhoneNumber,
       vehicleNumber,
       type,
       brand,
       model,
       year,
-      service,         
-      date,            
-      time,            
-      mechanic         
+      service,
+      date,
+      time,
+      mechanic,
     } = req.body;
 
-    // Combined validation check
-    if (!customerEmail || !customerName || !service || !date || !time || !vehicleNumber || !type || !brand || !model || !year) {
-      return res.status(400).json({ message: "All required fields are missing. Please provide customer, vehicle, service, date, and time details." });
+    if (
+      !customerEmail ||
+      !customerName ||
+      !service ||
+      !date ||
+      !time ||
+      !vehicleNumber ||
+      !type ||
+      !brand ||
+      !model ||
+      !year
+    ) {
+      return res.status(400).json({ message: "Missing required fields." });
     }
-    
-    // --- Phase 1: FIND OR CREATE USER ---
-    let customer = await User.findOne({ email: customerEmail });
-    let userId;
 
-    if (customer) {
-      userId = customer._id;
-    } else {
-      // Create new user (password auto-hashed by User model's pre-save hook)
-      const newCustomer = new User({
+    // --- User ---
+    let customer = await User.findOne({ email: customerEmail });
+    if (!customer) {
+      customer = new User({
         name: customerName,
         email: customerEmail,
-        phoneNumber: customerPhoneNumber, 
-        password: "WalkInUser_Temp" + Date.now(),
-        userType: "customer"
+        phoneNumber: customerPhoneNumber,
+        password: "WalkInUser_" + Date.now(),
+        userType: "customer",
       });
-      await newCustomer.save();
-      userId = newCustomer._id;
-    }
-    
-    // --- Phase 2: FIND OR CREATE VEHICLE ---
-    let vehicleRecord = await Vehicle.findOne({ vehicleNumber });
-    let vehicleId;
-    
-    if (vehicleRecord) {
-        // Vehicle already exists, use its ID
-        vehicleId = vehicleRecord._id;
-    } else {
-        // Vehicle Type validation 
-        const allowedTypes = ['Car', 'Three Wheel', 'Motorcycle', 'Van','SUV'];
-        if (!allowedTypes.includes(type)) {
-            return res.status(400).json({ message: `Invalid vehicle type. Allowed: ${allowedTypes.join(', ')}` });
-        }
-
-        // Create a new vehicle linked to the resolved userId
-        const newVehicle = new Vehicle({
-            owner: userId,
-            ownerName: customerName, 
-            vehicleNumber,
-            type,
-            brand,
-            model,
-            year
-        });
-        await newVehicle.save();
-        vehicleId = newVehicle._id;
+      await customer.save();
     }
 
-    // --- Phase 3: ASSIGN MECHANIC AND CREATE JOB ---
+    // --- Vehicle ---
+    let vehicle = await Vehicle.findOne({ vehicleNumber });
+    if (!vehicle) {
+      vehicle = new Vehicle({
+        owner: customer._id,
+        ownerName: customerName,
+        vehicleNumber,
+        type,
+        brand,
+        model,
+        year,
+      });
+      await vehicle.save();
+    }
 
-    // 1. Time Calculation and Service Validation
-    const serviceObj = await Service.findById(service); 
-    if (!serviceObj) return res.status(400).json({ message: "Invalid service ID provided." });
+    // --- Service + Time ---
+    const serviceObj = await Service.findById(service);
+    if (!serviceObj) return res.status(400).json({ message: "Invalid service ID" });
 
-    const duration = serviceObj.duration || 60; 
+    const duration = serviceObj.duration || 60;
     const startTime = new Date(`${date}T${time}:00`);
     const endTime = new Date(startTime.getTime() + duration * 60000);
-    
-    // Simple check to ensure time is not in the past
+
     if (startTime < new Date()) {
-        return res.status(400).json({ message: "Cannot schedule a job in the past." });
+      return res.status(400).json({ message: "Cannot schedule in the past" });
     }
 
-    // 2. Mechanic Assignment and Availability Check
-    let assignedMechanic = mechanic; 
-
-    if (assignedMechanic === 'AUTO_ASSIGN' || assignedMechanic === null) {
-        // If AUTO_ASSIGN is selected or mechanic is null, we set the mechanic to null 
-        // in the database and expect manual assignment later.
-        assignedMechanic = null; 
-        
-    } else {
-        // If a specific mechanic is chosen, check their availability (overlap check)
-        const overlapJob = await Job.findOne({
-            mechanic: assignedMechanic,
-            status: { $in: ['Booked', 'In Progress'] },
-            $or: [
-                { startTime: { $lt: endTime, $gte: startTime } }, 
-                { endTime: { $gt: startTime, $lte: endTime } },  
-                { startTime: { $lte: startTime }, endTime: { $gte: endTime } } 
-            ]
-        });
-
-        if (overlapJob) {
-            return res.status(400).json({ message: "The selected mechanic is busy during this time slot." });
-        }
+    // --- Mechanic ---
+    let assignedMechanic = null;
+    if (mechanic && mechanic !== "AUTO_ASSIGN") {
+      const overlap = await Job.findOne({
+        mechanic,
+        status: { $in: ["Booked", "In Progress"] },
+        $or: [{ startTime: { $lt: endTime }, endTime: { $gt: startTime } }],
+      });
+      if (overlap) {
+        return res.status(400).json({ message: "Mechanic busy during this slot" });
+      }
+      assignedMechanic = mechanic;
     }
 
-
-    // 3. Create Dummy Booking & Job
+    // --- Dummy Booking ---
     const dummyBooking = new Booking({
-        user: userId,
-        vehicle: vehicleId,
-        service,
-        date: startTime, 
-        timeSlot: `${date} ${time}`,
-        mechanic: assignedMechanic 
+      user: customer._id,
+      vehicle: vehicle._id,
+      service,
+      date: startTime,
+      timeSlot: `${date} ${time}`,
+      mechanic: assignedMechanic,
     });
     await dummyBooking.save();
 
+    // --- Job ---
     const job = new Job({
-      booking: dummyBooking._id, 
-      user: userId, 
-      vehicle: vehicleId, 
+      booking: dummyBooking._id,
+      user: customer._id,
+      vehicle: vehicle._id,
       service,
-      date: startTime, 
+      date: startTime,
       timeSlot: `${date} ${time}`,
       duration,
-      mechanic: assignedMechanic,
-      startTime, 
+      mechanic: assignedMechanic || null,
+      startTime,
       endTime,
-      status: "Booked"
+      status: "Booked",
     });
 
     await job.save();
 
-    res.status(201).json({ message: "✅ Walk-In Job created successfully", job });
+    res.status(201).json({ message: "✅ Walk-in job created", job });
   } catch (err) {
-    console.error("Walk-In Job Creation Error:", err);
     res.status(500).json({ message: "Error creating walk-in job: " + err.message });
   }
 };
 
-// 6. NEW FUNCTION: Deletes a manual job and its associated dummy booking
+// Delete job + dummy booking
 const deleteJobOnly = async (req, res) => {
   try {
-    const { id } = req.params; // Job ID
-
+    const { id } = req.params;
     const job = await Job.findById(id);
-    if (!job) {
-      return res.status(404).json({ message: "Job not found" });
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    if (job.booking) await Booking.findByIdAndDelete(job.booking);
+    await Job.findByIdAndDelete(id);
+
+    res.status(200).json({ message: "🗑️ Job + booking deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ------------------- VIEW/EDIT -------------------
+
+const getJobDetails = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id)
+      .populate("service", "name duration price")
+      .populate("mechanic", "name email")
+      .populate("user", "name email phoneNumber")
+      .populate("vehicle", "vehicleNumber type brand model year");
+
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    res.status(200).json(job);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const updateJob = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+    const { customerName, customerEmail, customerPhoneNumber, service, date, time, mechanic, status } = req.body;
+
+    const job = await Job.findById(jobId);
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    job.service = service || job.service;
+    job.date = date || job.date;
+    job.timeSlot = date && time ? `${date} ${time}` : job.timeSlot;
+    job.mechanic = mechanic === "AUTO_ASSIGN" ? null : mechanic || job.mechanic;
+    job.status = status || job.status;
+
+    await job.save();
+
+    if (job.user) {
+      await User.findByIdAndUpdate(job.user, {
+        name: customerName,
+        email: customerEmail,
+        phoneNumber: customerPhoneNumber,
+      });
     }
 
-    const bookingId = job.booking; 
-    await Job.findByIdAndDelete(id);
-    await Booking.findByIdAndDelete(bookingId); 
+    if (job.booking) {
+      await Booking.findByIdAndUpdate(job.booking, {
+        service,
+        date,
+        timeSlot: date && time ? `${date} ${time}` : job.timeSlot,
+        mechanic: job.mechanic,
+      });
+    }
 
-    res.status(200).json({ message: "🗑️ Job and associated booking deleted." });
+    res.status(200).json({ message: "✅ Job updated", job });
   } catch (err) {
-    res.status(500).json({ message: "Server error during deletion: " + err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -292,6 +311,8 @@ module.exports = {
   getJobs,
   updateJobStatus,
   getJobsByMechanic,
-  createWalkInJob, 
-  deleteJobOnly 
+  createWalkInJob,
+  deleteJobOnly,
+  getJobDetails,
+  updateJob,
 };

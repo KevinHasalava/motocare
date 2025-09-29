@@ -5,31 +5,40 @@ const {
   getJobs,
   updateJobStatus,
   getJobsByMechanic,
-  // Import the new functions
+  // Existing Imports
   createWalkInJob, 
-  deleteJobOnly
+  deleteJobOnly,
+  
+  // 🚀 NEW IMPORTS REQUIRED FOR VIEW/EDIT FUNCTIONALITY
+  getJobDetails, // Handles GET /api/jobs/:id
+  updateJob      // Handles PUT /api/jobs/:id
 } = require("../controllers/jobController");
 
 const auth = require("../middleware/authMiddleware");
 
-// All jobs (for Admin)
+// All jobs (for Admin) - GET /api/jobs
 router.get("/", getJobs);
 
-// Mechanic-specific jobs
+// Mechanic-specific jobs - GET /api/jobs/mechanic/:mechanicId
 router.get("/mechanic/:mechanicId", getJobsByMechanic);
 
 // ------------------- NEW ADMIN/CASHIER ROUTES (CRUD) -------------------
 
-// ✅ Create (Manual) - Manually create a Walk-In Job
-// POST /api/jobs/walkin
+// ✅ Create (Manual) - POST /api/jobs/walkin
 router.post("/walkin", createWalkInJob); 
 
-// 🗑️ Delete - Delete a Job (and its associated dummy booking)
-// DELETE /api/jobs/:id
+// 🗑️ Delete - DELETE /api/jobs/:id
 router.delete("/:id", deleteJobOnly); 
 
-// Update (Status) - Update job → status change (Used for Admin/Cashier to mark Ongoing/Complete/Cancel)
-// PUT /api/jobs/:id/status (Existing Update functionality)
+// Update (Status) - PUT /api/jobs/:id/status
 router.put("/:id/status", updateJobStatus);
+
+// ------------------- JOB DETAILS & FULL EDIT (THE MISSING ROUTES) -------------------
+
+// 👁️ Get Job Details - GET /api/jobs/:id (FIXED)
+router.get("/:id", getJobDetails); 
+
+// ✏️ Update Job (Full Edit) - PUT /api/jobs/:id (FIXED)
+router.put("/:id", updateJob);
 
 module.exports = router;

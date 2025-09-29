@@ -68,3 +68,35 @@ export const getJobsByMechanic = async (mechanicId) => {
         throw error.response.data;
     }
 };
+
+// ---------------------------------------------------------------------
+// 🚀 NEW FUNCTIONS FOR EDIT/VIEW JOB (Fixes the missing exports error)
+// ---------------------------------------------------------------------
+
+/**
+ * 6. Fetch Single Job Details (For View/Edit)
+ * GET /api/jobs/:id
+ */
+export const fetchJobDetails = async (jobId) => {
+    try {
+        // This hits the backend controller function getJobDetails
+        const response = await axios.get(`${API_URL}/${jobId}`);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+};
+
+/**
+ * 7. Update Job Details (Full Edit)
+ * PUT /api/jobs/:id
+ */
+export const updateJob = async (jobId, updateData) => {
+    try {
+        // This hits the backend controller function updateJob
+        const response = await axios.put(`${API_URL}/${jobId}`, updateData);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+};

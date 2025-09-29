@@ -13,8 +13,11 @@ import ServicesPage from "./pages/admin/ServicePage";
 import MyBookings from "./pages/MyBooking";
 import AdminRegister from "./pages/AdminRegister";
 
-// 🛠️ NEW IMPORT: Component for manual job creation (Cashier/Admin)
+// --- CURRENT JOB COMPONENT IMPORTS ---
+// We keep the two working components: JobDashboard and CreateWalkInJob
 import CreateWalkInJob from "./components/adminJob/CreateWalkInJob"; 
+import JobDashboard from "./components/adminJob/JobDashboard"; 
+// ----------------------------------
 
 export default function App() {
   return (
@@ -35,13 +38,23 @@ export default function App() {
         {/* --- Admin/Staff Specific Routes --- */}
         <Route path="/admin-register" element={<AdminRegister />} />
 
-        {/* Admin/Staff Views */}
+        {/* Admin/Staff Views (Existing legacy routes) */}
         <Route path="/admin-job-view" element={<AdminJobView />} />
         <Route path="/admin-service" element={<ServicesPage />} />
         
-        {/* 🛠️ NEW ROUTE: Manual Walk-In Job Creation (for Cashier) */}
+        {/* --- JOB MANAGEMENT ROUTES (WORKING ONLY) --- */}
+        
+        {/* 1. Job List - Displays the DataGrid with all jobs */}
+        <Route path="/admin/jobs" element={<JobDashboard />} />
+
+        {/* 2. Create Job - Manual Walk-In Job Creation (for Cashier) */}
         <Route path="/admin/walkinjob" element={<CreateWalkInJob />} />
 
+        {/* 3. View/Edit Routes - TEMPORARILY REMOVED to avoid build errors. 
+           We will add these back once the EditJob.js file is created. 
+        <Route path="/admin/jobs/view/:id" element={<EditJob isViewMode={true} />} />
+        <Route path="/admin/jobs/edit/:id" element={<EditJob />} />
+        */}
       </Routes>
     </Router>
   );
