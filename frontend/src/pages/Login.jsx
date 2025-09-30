@@ -33,8 +33,8 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      if (user.userType === "admin") navigate("/admin-dashboard");
-      else if (user.userType === "mechanic") navigate("/admin-job-view");
+      /*if (user.userType === "admin") navigate("/admin-dashboard");
+      else*/ if (user.userType === "mechanic") navigate("/admin-job-view");
       else navigate("/home");
 
     } catch (err) {

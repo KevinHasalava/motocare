@@ -1,4 +1,3 @@
-// pages/UserManagement.jsx
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -21,13 +20,22 @@ import {
   DialogContent,
   DialogActions,
   MenuItem,
+  InputAdornment,
 } from "@mui/material";
-import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import { Edit as EditIcon, Delete as DeleteIcon, PersonAdd, Search } from "@mui/icons-material";
 import axios from "axios";
 
-// ✅ Import Header and Footer
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
+// Import Header and Footer
+import AdminHeader from "../../components/AdminHeader";
+import AdminFooter from "../../components/AdminFooter";
+
+const defaultFormState = {
+  name: "",
+  email: "",
+  phone: "",
+  password: "",
+  userType: "customer",
+};
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -36,13 +44,8 @@ const UserManagement = () => {
   const [success, setSuccess] = useState("");
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    password: "",
-    userType: "customer",
-  });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [formData, setFormData] = useState(defaultFormState);
   const [editUserId, setEditUserId] = useState(null);
 
   useEffect(() => {
@@ -71,6 +74,7 @@ const UserManagement = () => {
       });
       setSuccess("User added successfully!");
       setOpenAddDialog(false);
+      setFormData(defaultFormState); // reset
       fetchUsers();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add user");
@@ -85,6 +89,7 @@ const UserManagement = () => {
       });
       setSuccess("User updated successfully!");
       setOpenEditDialog(false);
+      setFormData(defaultFormState); // reset
       fetchUsers();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update user");
@@ -124,76 +129,159 @@ const UserManagement = () => {
     setSuccess("");
   };
 
-  if (loading) return <CircularProgress sx={{ mt: 5 }} />;
+  if (loading)
+    return (
+      <CircularProgress
+        sx={{ mt: 10, display: "block", margin: "auto", color: "#6366f1" }}
+        size={60}
+      />
+    );
+
+  // filter logic
+  const filteredUsers = users.filter((u) =>
+    [u.name, u.email, u.phone, u.userType]
+      .join(" ")
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      {/* Header */}
-      <Header navItems={["Features", "Process", "About", "Contact"]} />
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#111827" }}>
+      <AdminHeader />
 
       <Box component="main" sx={{ flexGrow: 1, pt: 10, pb: 4 }}>
-        <Container sx={{ mt: 2 }}>
-          <Typography variant="h4" gutterBottom>
-            👥 User Management
-          </Typography>
-
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-          {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              {success}
-            </Alert>
-          )}
-
-          <Button
-            variant="contained"
-            onClick={() => setOpenAddDialog(true)}
-            sx={{ mb: 2 }}
+        <Container maxWidth="xl">
+          <Paper
+            sx={{
+              p: 4,
+              borderRadius: 4,
+              background: "radial-gradient(circle at top, #1e3a8a 0%, #111827 70%)",
+              boxShadow: "0 10px 30px rgba(99,102,241,0.25)",
+            }}
           >
-            Add New User
-          </Button>
+            {/* Heading */}
+            <Typography
+              variant="h4"
+              gutterBottom
+              sx={{
+                fontWeight: 800,
+                mb: 3,
+                background: "linear-gradient(90deg,#6366f1,#a855f7)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              👥 Manage Users
+            </Typography>
 
-          <Paper>
-            <TableContainer>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+                {error}
+              </Alert>
+            )}
+            {success && (
+              <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>
+                {success}
+              </Alert>
+            )}
+
+            {/* Action Buttons */}
+            <Box sx={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 2, mb: 2 }}>
+              <Button
+                startIcon={<PersonAdd />}
+                onClick={() => {
+                  setFormData(defaultFormState); // 👈 reset BEFORE opening
+                  setOpenAddDialog(true);
+                }}
+                sx={{
+                  background: "linear-gradient(90deg,#6366f1,#a855f7)",
+                  color: "white",
+                  borderRadius: "50px",
+                  px: 3,
+                  py: 1.2,
+                  fontWeight: 600,
+                }}
+              >
+                Add New User
+              </Button>
+
+              {/* Search Bar */}
+              <TextField
+                variant="outlined"
+                placeholder="Search users..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                sx={{
+                  minWidth: { xs: "100%", sm: "300px" },
+                  background: "rgba(255,255,255,0.06)",
+                  borderRadius: "30px",
+                  input: { color: "white" },
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "30px",
+                    color: "white",
+                  },
+                  "& .MuiInputLabel-root": { color: "#9ca3af" },
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search sx={{ color: "#9ca3af" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+
+            {/* User Table */}
+            <TableContainer
+              component={Paper}
+              sx={{
+                borderRadius: 3,
+                overflow: "hidden",
+                background: "rgba(255,255,255,0.04)",
+              }}
+            >
               <Table>
                 <TableHead>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>Phone</TableCell> {/* 🆕 Added */}
-                    <TableCell>User Type</TableCell>
-                    <TableCell>Joined</TableCell>
-                    <TableCell>Actions</TableCell>
+                  <TableRow sx={{ background: "rgba(99,102,241,0.25)" }}>
+                    {["Name", "Email", "Phone", "User Type", "Joined", "Actions"].map((head, idx) => (
+                      <TableCell key={idx} sx={{ color: "white", fontWeight: 600 }}>
+                        {head}
+                      </TableCell>
+                    ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {users.length ? (
-                    users.map((u) => (
-                      <TableRow key={u._id}>
-                        <TableCell>{u.name}</TableCell>
-                        <TableCell>{u.email}</TableCell>
-                        <TableCell>{u.phone}</TableCell> {/* 🆕 Show phone */}
-                        <TableCell>{u.userType}</TableCell>
-                        <TableCell>
+                  {filteredUsers.length ? (
+                    filteredUsers.map((u, idx) => (
+                      <TableRow
+                        key={u._id}
+                        sx={{
+                          backgroundColor: idx % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent",
+                          "&:hover": { backgroundColor: "rgba(99,102,241,0.15)" },
+                        }}
+                      >
+                        <TableCell sx={{ color: "white" }}>{u.name}</TableCell>
+                        <TableCell sx={{ color: "white" }}>{u.email}</TableCell>
+                        <TableCell sx={{ color: "white" }}>{u.phone}</TableCell>
+                        <TableCell sx={{ color: "white" }}>{u.userType}</TableCell>
+                        <TableCell sx={{ color: "white" }}>
                           {new Date(u.createdAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <IconButton onClick={() => handleOpenEditDialog(u)}>
-                            <EditIcon color="primary" />
+                          <IconButton onClick={() => handleOpenEditDialog(u)} size="small">
+                            <EditIcon sx={{ color: "#60a5fa" }} />
                           </IconButton>
-                          <IconButton onClick={() => handleDeleteUser(u._id)}>
-                            <DeleteIcon color="error" />
+                          <IconButton onClick={() => handleDeleteUser(u._id)} size="small">
+                            <DeleteIcon sx={{ color: "#f87171" }} />
                           </IconButton>
                         </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} align="center">
-                        No users found
+                      <TableCell colSpan={6} align="center" sx={{ py: 4, color: "white" }}>
+                        🚫 No users found
                       </TableCell>
                     </TableRow>
                   )}
@@ -201,138 +289,82 @@ const UserManagement = () => {
               </Table>
             </TableContainer>
           </Paper>
-
-          {/* Add User Dialog */}
-          <Dialog open={openAddDialog} onClose={() => setOpenAddDialog(false)}>
-            <DialogTitle>Add User</DialogTitle>
-            <DialogContent>
-              <TextField
-                margin="dense"
-                label="Name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-              <TextField
-                margin="dense"
-                label="Email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-              <TextField
-                margin="dense"
-                label="Phone Number"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-              <TextField
-                margin="dense"
-                label="Password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-              <TextField
-                select
-                margin="dense"
-                label="User Type"
-                name="userType"
-                value={formData.userType}
-                onChange={handleChange}
-                fullWidth
-              >
-                <MenuItem value="customer">Customer</MenuItem>
-                <MenuItem value="admin">Admin</MenuItem>
-                <MenuItem value="mechanic">Mechanic</MenuItem>
-              </TextField>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpenAddDialog(false)}>Cancel</Button>
-              <Button onClick={handleAddUser} variant="contained">
-                Add
-              </Button>
-            </DialogActions>
-          </Dialog>
-
-          {/* Edit User Dialog */}
-          <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
-            <DialogTitle>Edit User</DialogTitle>
-            <DialogContent>
-              <TextField
-                margin="dense"
-                label="Name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-              <TextField
-                margin="dense"
-                label="Email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-              <TextField
-                margin="dense"
-                label="Phone Number"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-              <TextField
-                margin="dense"
-                label="Password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                fullWidth
-              />
-              <TextField
-                select
-                margin="dense"
-                label="User Type"
-                name="userType"
-                value={formData.userType}
-                onChange={handleChange}
-                fullWidth
-              >
-                <MenuItem value="customer">Customer</MenuItem>
-                <MenuItem value="admin">Admin</MenuItem>
-                <MenuItem value="mechanic">Mechanic</MenuItem>
-              </TextField>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
-              <Button onClick={handleEditUser} variant="contained">
-                Update
-              </Button>
-            </DialogActions>
-          </Dialog>
         </Container>
       </Box>
 
-      {/* Footer */}
-      <Footer />
+      {/* Add User Dialog */}
+      <Dialog open={openAddDialog} onClose={() => setOpenAddDialog(false)}>
+        <DialogTitle>➕ Add User</DialogTitle>
+        <DialogContent>
+          {["name", "email", "phone", "password"].map((field) => (
+            <TextField
+              key={field}
+              fullWidth
+              margin="dense"
+              label={field.charAt(0).toUpperCase() + field.slice(1)}
+              name={field}
+              type={field === "password" ? "password" : field === "email" ? "email" : "text"}
+              value={formData[field]}
+              onChange={handleChange}
+            />
+          ))}
+          <TextField
+            select
+            name="userType"
+            value={formData.userType}
+            onChange={handleChange}
+            margin="dense"
+            fullWidth
+            label="User Type"
+          >
+            <MenuItem value="customer">Customer</MenuItem>
+            <MenuItem value="admin">Admin</MenuItem>
+            <MenuItem value="mechanic">Mechanic</MenuItem>
+          </TextField>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAddDialog(false)}>Cancel</Button>
+          <Button onClick={handleAddUser} variant="contained">Add</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+        <DialogTitle>✏️ Edit User</DialogTitle>
+        <DialogContent>
+          {["name", "email", "phone", "password"].map((field) => (
+            <TextField
+              key={field}
+              fullWidth
+              margin="dense"
+              label={field.charAt(0).toUpperCase() + field.slice(1)}
+              name={field}
+              type={field === "password" ? "password" : field === "email" ? "email" : "text"}
+              value={formData[field]}
+              onChange={handleChange}
+            />
+          ))}
+          <TextField
+            select
+            name="userType"
+            value={formData.userType}
+            onChange={handleChange}
+            margin="dense"
+            fullWidth
+            label="User Type"
+          >
+            <MenuItem value="customer">Customer</MenuItem>
+            <MenuItem value="admin">Admin</MenuItem>
+            <MenuItem value="mechanic">Mechanic</MenuItem>
+          </TextField>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
+          <Button onClick={handleEditUser} variant="contained">Update</Button>
+        </DialogActions>
+      </Dialog>
+
+      <AdminFooter />
     </Box>
   );
 };

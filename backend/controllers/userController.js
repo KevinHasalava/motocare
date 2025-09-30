@@ -75,7 +75,7 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const { name, email, userType } = req.body;
+    const { name, email, phone, password, userType } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -83,6 +83,7 @@ const updateUser = async (req, res) => {
 
     if (name) user.name = name;
     if (email) user.email = email;
+    if (phone) user.phone = phone;
     if (userType) user.userType = userType;
 
     await user.save();

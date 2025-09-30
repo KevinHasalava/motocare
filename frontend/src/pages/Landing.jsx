@@ -11,6 +11,7 @@ import {
   DirectionsCar as CarIcon, Engineering as EngineeringIcon
 } from '@mui/icons-material';
 
+
 // Import components
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -25,6 +26,7 @@ import { theme, backgroundKeyframes, mockData } from '../utils/theme';
 const Landing = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+ 
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
@@ -385,6 +387,7 @@ const Landing = () => {
             onBookNowClick={handleBookServiceClick} 
             theme={theme}
           />
+          
         </Box>
         
         {/* Footer */}
