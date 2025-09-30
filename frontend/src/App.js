@@ -14,6 +14,7 @@ import MyBookings from "./pages/MyBooking";
 import AdminRegister from "./pages/AdminRegister";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
+import UserProfile from "./pages/UserProfile";
 
 // 🛠️ NEW IMPORT: Component for manual job creation (Cashier/Admin)
 import CreateWalkInJob from "./components/adminJob/CreateWalkInJob"; 
@@ -33,6 +34,7 @@ export default function App() {
         <Route path="/Header" element={<Header />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/profile" element={<UserProfile />} />
         
         {/* --- Admin/Staff Specific Routes --- */}
         <Route path="/admin-register" element={<AdminRegister />} />

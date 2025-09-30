@@ -441,6 +441,7 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                         </Avatar>
                       }
                       label={user.name}
+                      onClick={() => navigate("/profile")} 
                       sx={{
                         background: 'rgba(16, 185, 129, 0.1)',
                         border: '1px solid rgba(16, 185, 129, 0.3)',
