@@ -1,9 +1,7 @@
 const mongoose = require("mongoose");
 
 const serviceSchema = new mongoose.Schema({
-  s_ID:{
-    
-  },
+  
   name: {
     type: String,
     required: true,
