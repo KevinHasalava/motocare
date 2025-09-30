@@ -70,11 +70,31 @@ export const getJobsByMechanic = async (mechanicId) => {
 };
 
 // ---------------------------------------------------------------------
-// 🚀 NEW FUNCTIONS FOR EDIT/VIEW JOB (Fixes the missing exports error)
+// 🚀 NEW FUNCTION FOR FRONTEND SCHEDULE CHECK
 // ---------------------------------------------------------------------
 
 /**
- * 6. Fetch Single Job Details (For View/Edit)
+ * 6. Get Active Jobs by Date and Mechanic (For conflict check in CreateWalkInJob.jsx)
+ * GET /api/jobs/schedule?date=...&mechanicId=...
+ */
+export const fetchJobsByDateAndMechanic = async ({ date, mechanicId }) => {
+    try {
+        const response = await axios.get(`${API_URL}/schedule`, {
+            params: { date, mechanicId }
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+};
+
+
+// ---------------------------------------------------------------------
+// 💡 OLD FUNCTIONS EXPORTED WITH NEW INDEX
+// ---------------------------------------------------------------------
+
+/**
+ * 7. Fetch Single Job Details (For View/Edit)
  * GET /api/jobs/:id
  */
 export const fetchJobDetails = async (jobId) => {
@@ -88,7 +108,7 @@ export const fetchJobDetails = async (jobId) => {
 };
 
 /**
- * 7. Update Job Details (Full Edit)
+ * 8. Update Job Details (Full Edit)
  * PUT /api/jobs/:id
  */
 export const updateJob = async (jobId, updateData) => {
