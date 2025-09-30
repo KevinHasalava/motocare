@@ -9,9 +9,12 @@ const {
   createWalkInJob, 
   deleteJobOnly,
   
-  // 🚀 NEW IMPORTS REQUIRED FOR VIEW/EDIT FUNCTIONALITY
+  // 🚀 IMPORTS REQUIRED FOR VIEW/EDIT FUNCTIONALITY
   getJobDetails, // Handles GET /api/jobs/:id
-  updateJob      // Handles PUT /api/jobs/:id
+  updateJob,     // Handles PUT /api/jobs/:id
+  
+  // 💡 NEW IMPORT: PDF Generation Function
+  generateJobPdf // Handles GET /api/jobs/:id/download-pdf
 } = require("../controllers/jobController");
 
 const auth = require("../middleware/authMiddleware");
@@ -33,12 +36,18 @@ router.delete("/:id", deleteJobOnly);
 // Update (Status) - PUT /api/jobs/:id/status
 router.put("/:id/status", updateJobStatus);
 
-// ------------------- JOB DETAILS & FULL EDIT (THE MISSING ROUTES) -------------------
+// ------------------- JOB DETAILS & FULL EDIT -------------------
 
-// 👁️ Get Job Details - GET /api/jobs/:id (FIXED)
+// 👁️ Get Job Details - GET /api/jobs/:id
 router.get("/:id", getJobDetails); 
 
-// ✏️ Update Job (Full Edit) - PUT /api/jobs/:id (FIXED)
+// ✏️ Update Job (Full Edit) - PUT /api/jobs/:id
 router.put("/:id", updateJob);
+
+// ------------------- 🚀 NEW: PDF DOWNLOAD ROUTE -------------------
+
+// 📄 Download PDF - GET /api/jobs/:id/download-pdf
+// (You might want to add 'auth' middleware here for security)
+router.get("/:id/download-pdf", generateJobPdf); 
 
 module.exports = router;

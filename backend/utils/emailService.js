@@ -20,7 +20,7 @@ const sendBookingConfirmationEmail = async (data) => {
         await transporter.sendMail({
             from: '"Moto-Care" <kasunmunasinghe745@gmail.com>',
             to: user.email,
-            subject: `✅ Booking Confirmed: Your Job ID is ${jobDetails.jobId}`, // 👈 Job ID එක Subject එකට ඇතුළත් කර ඇත
+            subject: `✅ Booking Confirmed: Your Job ID is ${jobDetails.jobId}`, // 💡 Changed to use jobId
             html: `
                 <div style="font-family: Arial, sans-serif; line-height: 1.6;">
                     <h2>Dear ${user.name},</h2>
@@ -42,4 +42,38 @@ const sendBookingConfirmationEmail = async (data) => {
     }
 };
 
-module.exports = { sendBookingConfirmationEmail };
+const sendJobUpdateEmail = async (data) => {
+    const { user, vehicle, service, jobDetails } = data;
+    
+    // Job එකේ නවතම date එක jobDetails.date වෙතින් ලැබේ
+    const formattedDate = dayjs(jobDetails.date).format('dddd, MMMM D, YYYY');
+    const formattedTime = dayjs(jobDetails.date).format('h:mm A');
+    
+    try {
+        await transporter.sendMail({
+            from: '"Moto-Care" <kasunmunasinghe745@gmail.com>',
+            to: user.email,
+            subject: `🔔 Job Updated: Changes to Job ID ${jobDetails.jobId}`, // 💡 Changed to use jobId
+            html: `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                    <h2>Dear ${user.name},</h2>
+                    <p>Your service job details have been updated by our administration team. Please review the changes below:</p>
+                    <hr>
+                    <p><strong>Job ID:</strong> ${jobDetails.jobId}</p>
+                    <p><strong>Service:</strong> ${service.name}</p>
+                    <p><strong>Vehicle:</strong> ${vehicle.brand} ${vehicle.model} (${vehicle.vehicleNumber})</p>
+                    <p><strong>New Date:</strong> ${formattedDate}</p>
+                    <p><strong>New Time:</strong> ${formattedTime}</p>
+                    <p><strong>Status:</strong> ${jobDetails.status}</p>
+                    <hr>
+                    <p>If you have any questions, please contact us immediately.</p>
+                </div>
+            `
+        });
+        console.log(`Job update email sent to ${user.email} for Job ID ${jobDetails.jobId}`);
+    } catch (error) {
+        console.error("Error sending job update email:", error);
+    }
+};
+
+module.exports = { sendBookingConfirmationEmail, sendJobUpdateEmail };

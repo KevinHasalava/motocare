@@ -1,10 +1,10 @@
 const User = require("../models/User");
-const bcrypt = require("bcryptjs");
+// const bcrypt = require("bcryptjs"); // ❌ Hashing mechanism removed
 const jwt = require("jsonwebtoken");
 
-
-
-
+/**
+ * Register a new user with plain text password.
+ */
 const registerUser = async (req, res) => {
   const { name, email, password, userType } = req.body;
 
@@ -12,34 +12,42 @@ const registerUser = async (req, res) => {
   const exists = await User.findOne({ email });
   if (exists) return res.status(400).json({ message: "User already exists" });
 
-  // Password hash
-  const salt = await bcrypt.genSalt(10);
-  const hashedPw = await bcrypt.hash(password, salt);
+  // ❌ Hashing logic removed. Storing password as plain text.
+  // const salt = await bcrypt.genSalt(10);
+  // const hashedPw = await bcrypt.hash(password, salt);
 
-  const user = new User({ name, email, password: hashedPw, userType });
+  const user = new User({ name, email, password: password, userType }); // Using plain 'password'
   await user.save();
 
-  res.status(201).json({ message: "✅ Registered", user });
+  res.status(201).json({ message: "✅ Registered", user: { name, email, userType } });
 };
 
-// get all users (for testing)
+/**
+ * Get all users (for testing)
+ */
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().select('-password'); // Do not return passwords
     res.status(200).json(users);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-
+/**
+ * Login user by comparing plain text password.
+ */
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
   if (!user) return res.status(400).json({ message: "Invalid email or password" });
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  // ❌ Hashing comparison removed. Comparing plain text passwords directly.
+  // const isMatch = await bcrypt.compare(password, user.password);
+  
+  const isMatch = (password === user.password); // Direct comparison
+  
   if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
 
   // create token

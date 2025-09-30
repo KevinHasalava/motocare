@@ -7,12 +7,12 @@ import {
 import { styled } from '@mui/material/styles';
 import { 
     PersonOutline, DirectionsCarOutlined, BuildOutlined, CalendarTodayOutlined, 
-    EngineeringOutlined, SaveOutlined, ErrorOutline, VisibilityOutlined 
-} from '@mui/icons-material';
-import { fetchJobDetails, updateJob } from '../../api/job'; 
+    EngineeringOutlined, SaveOutlined, ErrorOutline, VisibilityOutlined, GetApp 
+} from '@mui/icons-material'; // 💡 GetApp icon added
+import { fetchJobDetails, updateJob, downloadJobPdf } from '../../api/job'; // 💡 downloadJobPdf imported
 import { fetchServices, fetchMechanics } from '../../api/data'; 
 
-// --- Styled Components (No change needed here) ---
+// --- Styled Components (Unchanged) ---
 const AdminContainer = styled(Box)(({ theme }) => ({
     backgroundColor: '#f5f5f5',
     minHeight: '100vh',
@@ -27,6 +27,7 @@ const AdminPaper = styled(Paper)(({ theme }) => ({
     overflow: 'hidden',
 }));
 
+// 💡 AdminHeader style updated to accommodate the new button/chip arrangement
 const AdminHeader = styled(Box)(({ theme }) => ({
     backgroundColor: '#2c3e50',
     color: '#ffffff',
@@ -35,6 +36,7 @@ const AdminHeader = styled(Box)(({ theme }) => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    flexWrap: 'wrap', // Added for responsiveness
 }));
 
 const SectionHeader = styled(Box)(({ theme }) => ({
@@ -53,7 +55,7 @@ const FormSection = styled(Box)(({ theme }) => ({
     padding: theme.spacing(3),
 }));
 
-// --- Helper Functions (No change needed here) ---
+// --- Helper Functions (Unchanged) ---
 const formatDate = (dateString) => {
     if (!dateString) return '';
     return dateString.split('T')[0];
@@ -61,9 +63,6 @@ const formatDate = (dateString) => {
 
 const formatTime = (dateString) => {
     if (!dateString) return '';
-    // Use substring from the full ISO string (e.g., '2023-10-27T10:30:00.000Z')
-    // We expect the time portion (HH:MM) to be extracted from job.timeSlot if possible, 
-    // but for simplicity, we use the date object to ensure consistency.
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US', { 
         hour: '2-digit', 
@@ -91,15 +90,14 @@ const EditJob = ({ isViewMode = false }) => {
     const [formData, setFormData] = useState({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [downloading, setDownloading] = useState(false); // 💡 New state for PDF download
     const [errorMsg, setErrorMsg] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
     const [services, setServices] = useState([]);
     const [mechanics, setMechanics] = useState([]);
     const [errors, setErrors] = useState({});
 
-    // 🔑 NEW: Customer info is permanently read-only
     const isCustomerInfoDisabled = true;
-
     const currentMode = isViewMode ? 'View' : 'Edit';
 
     // Fetch Job Data and Supporting Data
@@ -142,16 +140,59 @@ const EditJob = ({ isViewMode = false }) => {
         }
     }, [jobId]);
 
+    // 💡 NEW: PDF Download Handler
+    const handleDownloadPdf = async () => {
+        setDownloading(true);
+        setErrorMsg('');
+        setSuccessMsg('');
+
+        if (!jobData || !jobData.jobId) {
+             setErrorMsg('Cannot download PDF: Job details are missing.');
+             setDownloading(false);
+             return;
+        }
+
+        try {
+            // Call the API function to fetch the PDF (see #2 below)
+            const response = await downloadJobPdf(jobId); 
+            
+            // Create a blob from the response data (assuming the backend sends a file stream)
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            
+            // Create a link element, set the download attributes, and click it
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `JobReport_${jobData.jobId}.pdf`; // Use the proper jobId
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+
+            setSuccessMsg(`Successfully downloaded PDF for Job ${jobData.jobId}.`);
+            
+        } catch (err) {
+            // Check for potential error response text from backend
+             const errorMessage = err.response && err.response.data && err.response.data.message 
+                                 ? err.response.data.message 
+                                 : err.message || 'Failed to download PDF due to an unknown error.';
+            setErrorMsg(`Download failed: ${errorMessage}`);
+            console.error(err);
+        } finally {
+            setDownloading(false);
+        }
+    };
+    // End of NEW: PDF Download Handler
+
     useEffect(() => {
         loadJobAndData();
     }, [loadJobAndData]);
     
-    // Simple Validation (We only validate editable fields)
+    // Simple Validation (Unchanged)
     const validate = () => {
         let tempErrors = {};
         let isValid = true;
         
-        // Validate editable fields
         if (!formData.service) { tempErrors.service = 'Required'; isValid = false; }
         if (!formData.date) { tempErrors.date = 'Required'; isValid = false; }
         if (!formData.time) { tempErrors.time = 'Required'; isValid = false; }
@@ -168,13 +209,13 @@ const EditJob = ({ isViewMode = false }) => {
         return isValid;
     };
 
-    // Input Change Handler
+    // Input Change Handler (Unchanged)
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Submission Handler
+    // Submission Handler (Unchanged)
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSuccessMsg('');
@@ -187,7 +228,6 @@ const EditJob = ({ isViewMode = false }) => {
 
         setSaving(true);
 
-        // 🔑 UPDATED: Only send editable fields (service, schedule, status, mechanic)
         const dataToSend = {
             service: formData.service,
             date: formData.date,
@@ -199,7 +239,6 @@ const EditJob = ({ isViewMode = false }) => {
         try {
             const response = await updateJob(jobId, dataToSend);
             setSuccessMsg(response.message || 'Job updated successfully!');
-            // Re-fetch data to reflect changes
             await loadJobAndData(); 
         } catch (err) {
             console.error(err);
@@ -234,7 +273,6 @@ const EditJob = ({ isViewMode = false }) => {
         );
     }
     
-    // Get Service and Mechanic name for display
     const selectedService = services.find(s => s._id === formData.service);
     const selectedMechanic = mechanics.find(m => m._id === formData.mechanic);
 
@@ -242,15 +280,38 @@ const EditJob = ({ isViewMode = false }) => {
         <AdminContainer>
             <AdminPaper>
                 <AdminHeader>
-                    <Typography variant="h5" fontWeight={600}>
-                        {currentMode} Job: {jobData.jobId || jobId}
-                    </Typography>
-                    <Chip 
-                        icon={<VisibilityOutlined />}
-                        label={`Status: ${formData.status}`} 
-                        color={getStatusColor(formData.status)}
-                        sx={{ fontSize: '1rem', height: 32 }}
-                    />
+                    {/* Left side: Title and Job ID */}
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <Typography variant="h5" fontWeight={600}>
+                            {currentMode} Job: {jobData.jobId || jobId}
+                        </Typography>
+                        <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                            Internal ID: {jobId}
+                        </Typography>
+                    </Box>
+
+                    {/* Right side: Status Chip and Download Button */}
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mt: { xs: 1, md: 0 } }}>
+                        <Chip 
+                            icon={<VisibilityOutlined />}
+                            label={`Status: ${formData.status}`} 
+                            color={getStatusColor(formData.status)}
+                            sx={{ fontSize: '1rem', height: 32 }}
+                        />
+                         {/* 💡 NEW: Download PDF Button */}
+                        <Button
+                            variant="contained"
+                            onClick={handleDownloadPdf}
+                            disabled={downloading}
+                            startIcon={downloading ? <CircularProgress size={18} color="inherit" /> : <GetApp />}
+                            sx={{
+                                backgroundColor: '#3498db',
+                                '&:hover': { backgroundColor: '#2980b9' },
+                            }}
+                        >
+                            {downloading ? 'Preparing PDF...' : 'Download PDF'}
+                        </Button>
+                    </Box>
                 </AdminHeader>
 
                 <Box sx={{ p: 3 }}>
@@ -267,7 +328,7 @@ const EditJob = ({ isViewMode = false }) => {
                     )}
 
                     <Box component="form" onSubmit={handleSubmit}>
-                        {/* Customer Information Section */}
+                        {/* ... (Customer Information Section - Unchanged) ... */}
                         <SectionHeader>
                             <PersonOutline sx={{ mr: 1, color: '#6c757d' }} />
                             <Typography variant="subtitle1" fontWeight={600}>
@@ -292,7 +353,7 @@ const EditJob = ({ isViewMode = false }) => {
                                         onChange={handleInputChange}
                                         error={!!errors.customerName}
                                         helperText={errors.customerName}
-                                        disabled={isCustomerInfoDisabled} // 🔑 Permanently disabled
+                                        disabled={isCustomerInfoDisabled} 
                                         required
                                     />
                                 </Grid>
@@ -306,13 +367,12 @@ const EditJob = ({ isViewMode = false }) => {
                                         onChange={handleInputChange}
                                         error={!!errors.customerEmail}
                                         helperText={errors.customerEmail}
-                                        disabled={isCustomerInfoDisabled} // 🔑 Permanently disabled
+                                        disabled={isCustomerInfoDisabled} 
                                         type="email"
                                         required
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={4}> 
-                                    {/* 🔑 Phone Number is back and disabled */}
                                     <TextField
                                         fullWidth
                                         size="small"
@@ -322,14 +382,14 @@ const EditJob = ({ isViewMode = false }) => {
                                         onChange={handleInputChange}
                                         error={!!errors.customerPhoneNumber}
                                         helperText={errors.customerPhoneNumber}
-                                        disabled={isCustomerInfoDisabled} // 🔑 Permanently disabled
+                                        disabled={isCustomerInfoDisabled} 
                                         type="tel"
                                     />
                                 </Grid>
                             </Grid>
                         </FormSection>
 
-                        {/* Vehicle Details Section (Read-Only) */}
+                        {/* ... (Vehicle Details Section - Unchanged) ... */}
                         <SectionHeader>
                             <DirectionsCarOutlined sx={{ mr: 1, color: '#6c757d' }} />
                             <Typography variant="subtitle1" fontWeight={600}>
@@ -368,7 +428,7 @@ const EditJob = ({ isViewMode = false }) => {
                             </FormHelperText>
                         </FormSection>
 
-                        {/* Service & Schedule Section */}
+                        {/* ... (Service & Schedule Section - Unchanged) ... */}
                         <SectionHeader>
                             <BuildOutlined sx={{ mr: 1, color: '#6c757d' }} />
                             <Typography variant="subtitle1" fontWeight={600}>
@@ -465,11 +525,12 @@ const EditJob = ({ isViewMode = false }) => {
                             </Grid>
                         </FormSection>
 
+
                         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
                             <Button
                                 variant="outlined"
                                 onClick={() => navigate('/admin/jobs')}
-                                disabled={saving}
+                                disabled={saving || downloading}
                             >
                                 Back to Job List
                             </Button>
@@ -478,7 +539,7 @@ const EditJob = ({ isViewMode = false }) => {
                                 <Button
                                     type="submit"
                                     variant="contained"
-                                    disabled={saving || !jobData}
+                                    disabled={saving || !jobData || downloading}
                                     startIcon={saving ? <CircularProgress size={18} color="inherit" /> : <SaveOutlined />}
                                     sx={{
                                         backgroundColor: '#2ecc71',

@@ -4,6 +4,13 @@ const Booking = require("../models/Booking");
 const User = require("../models/User");
 const Vehicle = require("../models/Vehicle");
 
+// 💡 NEW IMPORT: PDF Library
+const PDFDocument = require("pdfkit");
+const dayjs = require("dayjs");
+
+// Import only the Email Service
+const { sendBookingConfirmationEmail, sendJobUpdateEmail } = require('../utils/emailService');
+
 // ------------------- STANDARD JOB MANAGEMENT -------------------
 
 // 1. Create Job from booking
@@ -26,8 +33,6 @@ const createJob = async (req, res) => {
         return res.status(400).json({ message: "Invalid mechanic selected" });
       }
 
-      // 💡 NOTE: The overlap check here uses timeSlot which is less robust than startTime/endTime.
-      // For consistency, consider updating this to use the interval check logic from createBooking in the future.
       const overlapJob = await Job.findOne({
         mechanic: mech._id,
         date: booking.date,
@@ -40,7 +45,6 @@ const createJob = async (req, res) => {
 
       assignedMechanic = mech._id;
     } else {
-      // If no mechanic given, leave null instead of breaking
       const freeMech = await User.findOne({ userType: "mechanic" });
       if (freeMech) assignedMechanic = freeMech._id;
     }
@@ -53,7 +57,7 @@ const createJob = async (req, res) => {
       date: booking.date,
       timeSlot: booking.timeSlot,
       duration,
-      mechanic: assignedMechanic || null, // ✅ safe default
+      mechanic: assignedMechanic || null,
     });
 
     await job.save();
@@ -113,12 +117,8 @@ const getJobsByMechanic = async (req, res) => {
   }
 };
 
-// ------------------- NEW: FRONTEND SCHEDULE CHECK -------------------
+// ------------------- FRONTEND SCHEDULE CHECK -------------------
 
-/**
- * Get Active Jobs by Date and Mechanic (For conflict check in CreateWalkInJob.jsx)
- * GET /api/jobs/schedule?date=...&mechanicId=...
- */
 const getJobsByDateAndMechanic = async (req, res) => {
   try {
     const { date, mechanicId } = req.query;
@@ -127,7 +127,6 @@ const getJobsByDateAndMechanic = async (req, res) => {
       return res.status(400).json({ message: "Date and mechanicId are required" });
     }
     
-    // Normalize date range for MongoDB query
     const dayStart = new Date(date);
     dayStart.setHours(0, 0, 0, 0); 
     const dayEnd = new Date(date);
@@ -135,18 +134,15 @@ const getJobsByDateAndMechanic = async (req, res) => {
 
     const jobs = await Job.find({
       mechanic: mechanicId,
-      // Check for jobs within the selected day
       startTime: { $gte: dayStart, $lte: dayEnd },
-      // Check for jobs that are active (not completed or cancelled)
       status: { $in: ["Booked", "Ongoing"] }
-    }).select('startTime endTime status'); // Return only essential fields for conflict check
+    }).select('startTime endTime status'); 
 
     res.status(200).json(jobs);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-
 
 // ------------------- WALK-IN JOB MANAGEMENT -------------------
 
@@ -222,7 +218,7 @@ const createWalkInJob = async (req, res) => {
       return res.status(400).json({ message: "Cannot schedule in the past" });
     }
 
-    // 💡 VALIDATION: Check Business Hours (8:00 AM - 5:00 PM)
+    // Validation: Check Business Hours
     const openHour = new Date(`${date}T08:00:00`);
     const closeHour = new Date(`${date}T17:00:00`);
     if (startTime < openHour || endTime > closeHour) {
@@ -234,14 +230,14 @@ const createWalkInJob = async (req, res) => {
     if (mechanic && mechanic !== "AUTO_ASSIGN") {
       const mechUser = await User.findById(mechanic);
       if (!mechUser || mechUser.userType !== "mechanic") {
-        return res.status(400).json({ message: "Invalid mechanic ID" });
+        return res.status(400).json({ message: "Invalid mechanic ID"
+    });
       }
       
-      // ✅ VALIDATION: Mechanic Overlap Check (Robust interval logic)
+      // Validation: Mechanic Overlap Check 
       const overlap = await Job.findOne({
         mechanic,
-        status: { $in: ["Booked", "Ongoing"] }, // Corrected "In Progress" to "Ongoing" for consistency
-        // Standard interval overlap check: start1 < end2 AND end1 > start2
+        status: { $in: ["Booked", "Ongoing"] },
         startTime: { $lt: endTime },
         endTime: { $gt: startTime },
       });
@@ -278,7 +274,24 @@ const createWalkInJob = async (req, res) => {
       status: "Booked",
     });
 
-    await job.save();
+    await job.save(); // jobId will be generated here by the pre-save hook
+
+    // ----------------------------------------------------
+    // Final Step: Send Email Confirmation
+    // ----------------------------------------------------
+    // 💡 Using job.jobId instead of job._id
+    const jobDetails = { jobId: job.jobId }; 
+    
+    const emailData = { 
+        user: customer, 
+        vehicle, 
+        service: serviceObj, 
+        bookingDetails: dummyBooking, 
+        jobDetails 
+    };
+    
+    sendBookingConfirmationEmail(emailData); 
+    // ----------------------------------------------------
 
     res.status(201).json({ message: "✅ Walk-in job created", job });
   } catch (err) {
@@ -325,17 +338,37 @@ const updateJob = async (req, res) => {
     const jobId = req.params.id;
     const { customerName, customerEmail, customerPhoneNumber, service, date, time, mechanic, status } = req.body;
 
-    const job = await Job.findById(jobId);
+    // Populate all related documents needed for the email
+    const job = await Job.findById(jobId).populate('user').populate('vehicle').populate('service');
     if (!job) return res.status(404).json({ message: "Job not found" });
 
+    // ----------------------------------------------------------------------
+    // Saving old details for change detection
+    const oldJobDetails = {
+        oldDate: job.date.toISOString().split('T')[0],
+        oldTime: job.date.toISOString().split('T')[1].substring(0, 5),
+        oldStatus: job.status
+    };
+    // ----------------------------------------------------------------------
+
     job.service = service || job.service;
-    job.date = date || job.date;
-    job.timeSlot = date && time ? `${date} ${time}` : job.timeSlot;
+    
+    let isTimeUpdated = false;
+    if (date && time) {
+        const newDate = new Date(`${date}T${time}:00`);
+        if (job.date.getTime() !== newDate.getTime()) {
+             job.date = newDate;
+             job.timeSlot = `${date} ${time}`;
+             isTimeUpdated = true;
+        }
+    }
+    
     job.mechanic = mechanic === "AUTO_ASSIGN" ? null : mechanic || job.mechanic;
     job.status = status || job.status;
 
     await job.save();
 
+    // User details update
     if (job.user) {
       await User.findByIdAndUpdate(job.user, {
         name: customerName,
@@ -344,20 +377,137 @@ const updateJob = async (req, res) => {
       });
     }
 
+    // Booking details update
     if (job.booking) {
       await Booking.findByIdAndUpdate(job.booking, {
-        service,
-        date,
-        timeSlot: date && time ? `${date} ${time}` : job.timeSlot,
+        service: job.service,
+        date: job.date,
+        timeSlot: job.timeSlot,
         mechanic: job.mechanic,
       });
     }
+    
+    // ----------------------------------------------------------------------
+    // Send Email Confirmation for Update
+    // ----------------------------------------------------------------------
+    const newDateStr = job.date.toISOString().split('T')[0];
+    const newTimeStr = job.date.toISOString().split('T')[1].substring(0, 5);
+    
+    // Send email if Date/Time or Status has changed
+    if (oldJobDetails.oldDate !== newDateStr || oldJobDetails.oldTime !== newTimeStr || oldJobDetails.oldStatus !== job.status) {
+        
+        const emailData = {
+            user: job.user,
+            vehicle: job.vehicle,
+            service: job.service,
+            jobDetails: { 
+                jobId: job.jobId, // 💡 Using job.jobId
+                date: job.date, 
+                status: job.status 
+            }
+        };
+
+        sendJobUpdateEmail(emailData);
+    }
+    // ----------------------------------------------------------------------
 
     res.status(200).json({ message: "✅ Job updated", job });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
+// ------------------- 🚀 NEW: PDF GENERATION CONTROLLER -------------------
+
+/**
+ * Generates and streams a PDF document containing the job details.
+ * GET /api/jobs/:id/download-pdf
+ */
+const generateJobPdf = async (req, res) => {
+    try {
+        const jobId = req.params.id;
+
+        const job = await Job.findById(jobId)
+            .populate("service", "name duration price")
+            .populate("mechanic", "name")
+            .populate("user", "name email phoneNumber")
+            .populate("vehicle", "vehicleNumber type brand model year");
+
+        if (!job) {
+            return res.status(404).json({ message: "Job not found" });
+        }
+
+        // --- PDF Setup ---
+        const doc = new PDFDocument({ margin: 50 });
+        const filename = `JobReport_${job.jobId}.pdf`;
+
+        // Setting response headers
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+        // Pipe the PDF document stream to the response stream
+        doc.pipe(res);
+
+        // --- PDF Content Generation ---
+        
+        // Header
+        doc.fontSize(20).fillColor('#3498db').text('Job Service Report', { align: 'center' });
+        doc.fontSize(12).fillColor('#555').text(`Report Generated: ${dayjs().format('YYYY-MM-DD HH:mm:ss')}`, { align: 'center' });
+        doc.moveDown(1);
+        
+        // Job Overview
+        doc.fontSize(16).fillColor('#2c3e50').text(`JOB ID: ${job.jobId}`, { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(12).fillColor('#333')
+           .text(`Status: ${job.status}`, { continued: true })
+           .text(` | Date: ${dayjs(job.date).format('YYYY-MM-DD')}`, { continued: true })
+           .text(` | Time: ${dayjs(job.date).format('hh:mm A')}`);
+        doc.moveDown(1);
+        
+        // Customer Details
+        doc.fontSize(14).fillColor('#2c3e50').text('Customer Details', { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(10)
+           .text(`Name: ${job.user.name}`)
+           .text(`Email: ${job.user.email}`)
+           .text(`Phone: ${job.user.phoneNumber}`);
+        doc.moveDown(1);
+        
+        // Vehicle Details
+        doc.fontSize(14).fillColor('#2c3e50').text('Vehicle Details', { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(10)
+           .text(`Number: ${job.vehicle.vehicleNumber}`)
+           .text(`Brand / Model: ${job.vehicle.brand} ${job.vehicle.model}`)
+           .text(`Type / Year: ${job.vehicle.type} (${job.vehicle.year})`);
+        doc.moveDown(1);
+        
+        // Service Details
+        doc.fontSize(14).fillColor('#2c3e50').text('Service & Assignment', { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(10)
+           .text(`Service Name: ${job.service.name}`)
+           .text(`Estimated Duration: ${job.service.duration} minutes`)
+           .text(`Mechanic: ${job.mechanic ? job.mechanic.name : 'Auto Assign (TBD)'}`);
+        doc.moveDown(1);
+
+        // Footer
+        doc.fontSize(8).fillColor('#888').text('This is an official Job Service Report. Please retain this document for your records.', 50, doc.page.height - 50, {
+            align: 'center',
+            width: doc.page.width - 100
+        });
+
+        // Finalize the PDF and end the stream
+        doc.end();
+
+    } catch (err) {
+        console.error("Error generating PDF:", err.message);
+        // Send a proper error response if anything fails
+        res.status(500).json({ message: "PDF generation failed due to a server error." });
+    }
+};
+
+// ------------------- MODULE EXPORTS -------------------
 
 module.exports = {
   createJob,
@@ -369,4 +519,5 @@ module.exports = {
   deleteJobOnly,
   getJobDetails,
   updateJob,
+  generateJobPdf,
 };

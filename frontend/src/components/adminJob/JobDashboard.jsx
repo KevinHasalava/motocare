@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom'; // 👈 Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import { 
     Box, Paper, Typography, CircularProgress, Alert, 
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
-    Button, Chip, MenuItem, Select, IconButton, Tooltip, FormControl
+    Button, Chip, MenuItem, Select, IconButton, Tooltip, FormControl, 
+    TextField // 💡 NEW: TextField for Search Input
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { 
     DeleteOutline, EditOutlined, RefreshOutlined, CheckCircleOutline, 
-    HistoryToggleOffOutlined, CancelOutlined, PlayCircleOutline
+    HistoryToggleOffOutlined, CancelOutlined, PlayCircleOutline, SearchOutlined // 💡 Search icon
 } from '@mui/icons-material';
 import { getAllJobs, updateJobStatus, deleteJob } from '../../api/job'; 
 
-// --- Styled Components ---
+// --- Styled Components (Unchanged) ---
 const AdminContainer = styled(Box)(({ theme }) => ({
     backgroundColor: '#f5f5f5',
     minHeight: '100vh',
@@ -35,6 +36,7 @@ const AdminHeader = styled(Box)(({ theme }) => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    flexWrap: 'wrap', // Allow wrapping for responsiveness
 }));
 
 const StatusChip = ({ status }) => {
@@ -56,8 +58,11 @@ const JobDashboard = () => {
     const [errorMsg, setErrorMsg] = useState('');
     const [statusUpdatingId, setStatusUpdatingId] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
+    
+    // 💡 NEW STATE: Search
+    const [searchText, setSearchText] = useState('');
 
-    const navigate = useNavigate(); // 👈 Initialize useNavigate
+    const navigate = useNavigate();
 
     // --- Data Fetching ---
     const fetchJobs = useCallback(async () => {
@@ -65,7 +70,6 @@ const JobDashboard = () => {
         setErrorMsg('');
         try {
             const data = await getAllJobs();
-            // Sort by creation date descending
             data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             setJobs(data);
         } catch (err) {
@@ -80,9 +84,8 @@ const JobDashboard = () => {
         fetchJobs();
     }, [fetchJobs]);
 
-    // --- Status Update Handler ---
+    // --- Status Update Handler (Unchanged) ---
     const handleStatusChange = async (jobId, newStatus) => {
-        // Find job ID for confirmation message
         const job = jobs.find(j => j._id === jobId);
         if (!window.confirm(`Are you sure you want to change the status of ${job?.jobId || jobId} to ${newStatus}?`)) {
             return;
@@ -91,7 +94,6 @@ const JobDashboard = () => {
         setStatusUpdatingId(jobId);
         try {
             await updateJobStatus(jobId, newStatus);
-            // Update the local state
             setJobs(prevJobs => 
                 prevJobs.map(job => 
                     job._id === jobId ? { ...job, status: newStatus } : job
@@ -105,7 +107,7 @@ const JobDashboard = () => {
         }
     };
 
-    // --- Delete Handler ---
+    // --- Delete Handler (Unchanged) ---
     const handleDeleteJob = async (jobId) => {
         if (!window.confirm(`Are you sure you want to delete job ID ${jobs.find(j => j._id === jobId)?.jobId}? This will also delete the associated booking.`)) {
             return;
@@ -123,7 +125,7 @@ const JobDashboard = () => {
         }
     };
 
-    // Utility function to format date/time
+    // Utility function to format date/time (Unchanged)
     const formatDateTime = (dateString) => {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
@@ -135,6 +137,20 @@ const JobDashboard = () => {
             minute: '2-digit' 
         });
     };
+
+    // 💡 NEW: Filtering Logic
+    const filteredJobs = jobs.filter(job => {
+        if (!searchText) return true;
+        const searchLower = searchText.toLowerCase();
+        
+        const jobId = String(job.jobId || '').toLowerCase();
+        const vehicleNumber = String(job.vehicle?.vehicleNumber || '').toLowerCase();
+        const customerName = String(job.user?.name || '').toLowerCase();
+
+        return jobId.includes(searchLower) || 
+               vehicleNumber.includes(searchLower) ||
+               customerName.includes(searchLower);
+    });
 
     if (loading) {
         return (
@@ -154,7 +170,26 @@ const JobDashboard = () => {
                     <Typography variant="h5" fontWeight={600}>
                         All Service Jobs Dashboard
                     </Typography>
-                    <Box>
+                    
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mt: { xs: 1, md: 0 } }}>
+                        {/* 💡 NEW: Search Input Field */}
+                        <TextField
+                            variant="outlined"
+                            size="small"
+                            placeholder="Search Job ID, Vehicle, or Customer"
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            InputProps={{
+                                startAdornment: <SearchOutlined sx={{ mr: 1, color: 'rgba(255, 255, 255, 0.7)' }} />,
+                                sx: { 
+                                    color: 'white', 
+                                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2) !important' },
+                                    '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5) !important' }
+                                }
+                            }}
+                        />
+
                         <Tooltip title="Refresh Data">
                             <IconButton color="inherit" onClick={fetchJobs} disabled={loading}>
                                 <RefreshOutlined />
@@ -163,8 +198,8 @@ const JobDashboard = () => {
                         <Button 
                             variant="contained" 
                             size="small"
-                            onClick={() => navigate('/admin/walkinjob')} // 👈 Navigate to Create Walk-In Job
-                            sx={{ ml: 2, backgroundColor: '#3498db', '&:hover': { backgroundColor: '#2980b9' } }}
+                            onClick={() => navigate('/admin/walkinjob')} 
+                            sx={{ ml: 0, backgroundColor: '#3498db', '&:hover': { backgroundColor: '#2980b9' } }}
                         >
                             + New Walk-In Job
                         </Button>
@@ -193,14 +228,17 @@ const JobDashboard = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {jobs.length === 0 ? (
+                                {/* 💡 Using filteredJobs array */}
+                                {filteredJobs.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
-                                            <Typography color="textSecondary">No jobs found.</Typography>
+                                            <Typography color="textSecondary">
+                                                {searchText ? `No results found for "${searchText}".` : "No jobs found."}
+                                            </Typography>
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    jobs.map((job) => (
+                                    filteredJobs.map((job) => (
                                         <TableRow hover key={job._id}>
                                             <TableCell sx={{ fontWeight: 600 }}>{job.jobId || job._id}</TableCell>
                                             <TableCell>{job.user?.name || 'N/A'}</TableCell>
@@ -237,7 +275,7 @@ const JobDashboard = () => {
                                             <TableCell align="center">
                                                 <Tooltip title="View/Edit Details">
                                                     <IconButton 
-                                                        onClick={() => navigate(`/admin/jobs/edit/${job._id}`)} // 👈 Navigation added to view page
+                                                        onClick={() => navigate(`/admin/jobs/edit/${job._id}`)} 
                                                         color="info"
                                                         size="small"
                                                     >
