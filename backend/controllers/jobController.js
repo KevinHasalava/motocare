@@ -107,13 +107,42 @@ const updateJobStatus = async (req, res) => {
   }
 };
 
+// 3.1. Update job with all fields (for mechanic portal)
+const updateJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, workHours, notes } = req.body;
+
+    const updateData = {};
+    if (status) updateData.status = status;
+    if (workHours !== undefined) updateData.workHours = workHours;
+    if (notes !== undefined) updateData.notes = notes;
+
+    const job = await Job.findByIdAndUpdate(id, updateData, { new: true })
+      .populate("user", "name email")
+      .populate("vehicle", "vehicleNumber brand model type year")
+      .populate("service", "name duration price")
+      .populate("mechanic", "name email")
+      .populate("booking", "date");
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    res.status(200).json({ message: "✅ Job updated successfully", job });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // 4. Get jobs by mechanic
 const getJobsByMechanic = async (req, res) => {
   try {
     const jobs = await Job.find({ mechanic: req.params.mechanicId })
-      .populate("user", "name")
-      .populate("vehicle", "vehicleNumber")
-      .populate("service", "name duration");
+      .populate("user", "name email")
+      .populate("vehicle", "vehicleNumber brand model type year")
+      .populate("service", "name duration price")
+      .populate("booking", "date");
     res.status(200).json(jobs);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -291,6 +320,7 @@ module.exports = {
   createJob,
   getJobs,
   updateJobStatus,
+  updateJob,
   getJobsByMechanic,
   createWalkInJob, 
   deleteJobOnly 

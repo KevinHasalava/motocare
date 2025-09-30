@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   getJobs,
   updateJobStatus,
+  updateJob,
   getJobsByMechanic,
   // Import the new functions
   createWalkInJob, 
@@ -31,5 +32,9 @@ router.delete("/:id", deleteJobOnly);
 // Update (Status) - Update job → status change (Used for Admin/Cashier to mark Ongoing/Complete/Cancel)
 // PUT /api/jobs/:id/status (Existing Update functionality)
 router.put("/:id/status", updateJobStatus);
+
+// Update (Complete) - Update job with all fields including work hours and notes
+// PUT /api/jobs/:id (New functionality for mechanics)
+router.put("/:id", updateJob);
 
 module.exports = router;

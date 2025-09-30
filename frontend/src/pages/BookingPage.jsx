@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { ThemeProvider } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 
 import {
@@ -19,10 +19,10 @@ import {
     createBooking
 } from '../api/booking';  
 
-import StepVehicleSelect from "../components/booking/StepVehicleSelect";
-import StepServiceSelect from "../components/booking/StepServiceSelect";
-import StepDateTime from "../components/booking/StepDateTime";
-import StepConfirm from "../components/booking/StepConfirm";
+import StepVehicleSelect from "../components/Booking/StepVehicleSelect";
+import StepServiceSelect from "../components/Booking/StepServiceSelect";
+import StepDateTime from "../components/Booking/StepDateTime";
+import StepConfirm from "../components/Booking/StepConfirm";
 
 import { theme, backgroundKeyframes, mockData, gradientText } from "../utils/theme";
 import Header from "../components/Header";
@@ -51,7 +51,16 @@ const BookingPage = () => {
 
     const user = JSON.parse(localStorage.getItem("user"));
     const navigate = useNavigate();
+    const location = useLocation();
  
+    // Handle pre-selected service from services page
+    useEffect(() => {
+        if (location.state?.preSelectedService) {
+            setService(location.state.preSelectedService);
+            // Don't skip steps, let user go through normal flow
+        }
+    }, [location.state]);
+
     useEffect(() => {
         if (user) {
             getVehiclesForUser(user._id)

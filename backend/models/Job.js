@@ -43,6 +43,14 @@ const jobSchema = new mongoose.Schema({
         enum: ["Booked", "Ongoing", "Completed", "Cancelled"],
         default: "Booked"
     },
+    workHours: {
+        type: String,
+        default: ""
+    },
+    notes: {
+        type: String,
+        default: ""
+    },
     createdAt: {
         type: Date,
         default: Date.now
