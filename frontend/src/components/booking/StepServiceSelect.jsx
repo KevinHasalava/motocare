@@ -79,7 +79,7 @@ const StepServiceSelect = ({ services, service, setService, onNext, onBack, sele
                         </Typography>
                         
                       )}
-                      <Chip label={`Rs. ${s.price.toFixed(2)}`} sx={{ background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)', color: 'white', fontWeight: 700, fontSize: '1rem' }} />
+                      <Chip label={`LKR ${s.price.toFixed(2)}`} sx={{ background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)', color: 'white', fontWeight: 700, fontSize: '1rem' }} />
                     </CardContent>
                   </Card>
                 </Zoom>

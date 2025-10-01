@@ -602,7 +602,7 @@ const MyBookingsPage = () => {
                                                                             color: isCompleted ? '#9ca3af' : '#22c55e', 
                                                                             fontWeight: 600 
                                                                         }}>
-                                                                            <strong>Price:</strong> ${booking.service.price}
+                                                                            <strong>Price:</strong> LKR {booking.service.price}
                                                                         </Typography>
                                                                     </Box>
                                                                 )}

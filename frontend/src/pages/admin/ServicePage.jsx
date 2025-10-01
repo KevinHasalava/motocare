@@ -134,7 +134,7 @@ const ServicesPage = () => {
                                     </Stack>
                                     <Typography variant="body2" color="text.secondary">{service.description}</Typography>
                                     <Typography variant="body1" sx={{ mt: 2, fontWeight: 'bold' }}>
-                                        Rs. {service.price.toFixed(2)}
+                                        LKR {service.price.toFixed(2)}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
                                         Duration: {service.duration} mins
@@ -169,7 +169,7 @@ const ServicesPage = () => {
                         </FormControl>
                         <TextField label="Description" value={description} onChange={(e) => setDescription(e.target.value)} multiline rows={2} fullWidth />
                         <Stack direction="row" spacing={2}>
-                           <TextField label="Price (Rs.)" type="number" value={price} onChange={(e) => setPrice(e.target.value)} fullWidth />
+                           <TextField label="Price (LKR)" type="number" value={price} onChange={(e) => setPrice(e.target.value)} fullWidth />
                            <TextField label="Duration (mins)" type="number" value={duration} onChange={(e) => setDuration(e.target.value)} fullWidth />
                         </Stack>
                     </Stack>

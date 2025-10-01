@@ -262,7 +262,7 @@ const ServicesPage = () => {
               {filteredServices.length > 0 && (
                 <Box textAlign={{ xs: 'left', md: 'right' }}>
                   <Typography variant="body2" color="text.secondary">
-                    Price Range: ${Math.min(...filteredServices.map(s => s.price))} - ${Math.max(...filteredServices.map(s => s.price))}
+                    Price Range: LKR {Math.min(...filteredServices.map(s => s.price))} - LKR {Math.max(...filteredServices.map(s => s.price))}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Avg. Duration: {Math.round(filteredServices.reduce((acc, s) => acc + s.duration, 0) / filteredServices.length)} minutes
@@ -367,7 +367,7 @@ const ServicesPage = () => {
                       <Stack direction="row" alignItems="center" spacing={1}>
                         <PriceIcon fontSize="small" color="success" />
                         <Typography variant="body2">
-                          <strong>Price:</strong> ${service.price}
+                          <strong>Price:</strong> LKR {service.price}
                         </Typography>
                       </Stack>
                       

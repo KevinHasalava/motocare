@@ -80,7 +80,7 @@ const StepConfirm = ({ vehicle, service, date, time, mechanic, onBack, onConfirm
                           <Box>
                             <Typography variant="caption" sx={{ color: 'text.secondary' }}>Service</Typography>
                             <Typography variant="h6" sx={{ color: 'white' }}>{service?.name}</Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>Price: Rs.{service?.price}</Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>Price: LKR {service?.price}</Typography>
                           </Box>
                         </Stack>
                       </Paper>

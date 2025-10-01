@@ -400,7 +400,7 @@ const BookingPage = () => {
                                 )}
                                 
                                 <Chip
-                                  label={`₹${s.price}`}
+                                  label={`LKR ${s.price}`}
                                   sx={{
                                     background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)',
                                     color: 'white',
@@ -765,7 +765,7 @@ const BookingPage = () => {
                                       {service?.name}
                                     </Typography>
                                     <Chip
-                                      label={`₹${service?.price}`}
+                                      label={`LKR ${service?.price}`}
                                       size="small"
                                       sx={{
                                         mt: 1,
