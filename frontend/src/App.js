@@ -25,6 +25,11 @@ import MechanicPortal from "./pages/MechanicPortal";
 // 🛠️ NEW IMPORT: Component for manual job creation (Cashier/Admin)
 import CreateWalkInJob from "./components/adminJob/CreateWalkInJob"; 
 
+// 💰 NEW IMPORT: Cashier Portal Components
+import CashierPortal from "./components/Cashier/CashierPortal";
+import PaymentHistory from "./components/Cashier/PaymentHistory";
+import CashierDashboard from "./pages/CashierDashboard"; 
+
 export default function App() {
   return (
     <Router>
@@ -55,6 +60,11 @@ export default function App() {
         
         {/* 🛠️ NEW ROUTE: Manual Walk-In Job Creation (for Cashier) */}
         <Route path="/admin/walkinjob" element={<CreateWalkInJob />} />
+
+        {/* 💰 NEW ROUTES: Cashier Portal */}
+        <Route path="/cashier-dashboard" element={<CashierDashboard />} />
+        <Route path="/cashier" element={<CashierPortal />} />
+        <Route path="/payment-history" element={<PaymentHistory />} />
 
         {/* Inventory Management Routes */}
         <Route path="/inventory" element={<InventoryPage />} />

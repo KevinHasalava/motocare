@@ -47,6 +47,7 @@ app.use("/api/availability", availabilityRoutes);
 app.use('/api/inventory', require('./routes/inventoryRoutes'));
 app.use('/api/suppliers', require('./routes/supplierRoutes'));
 app.use('/api/stock', require('./routes/stockRoutes'));
+app.use('/api/payments', require('./routes/paymentRoutes'));
 
 
 // 🎯 NEW ENDPOINT: Route for general data fetching required by the frontend forms

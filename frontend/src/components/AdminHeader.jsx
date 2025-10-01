@@ -10,7 +10,9 @@ import {
   Logout as LogoutIcon,
   Dashboard as DashboardIcon,
   Engineering as EngineeringIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Payment as PaymentIcon,
+  Receipt as ReceiptIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { theme } from '../utils/theme';
@@ -74,8 +76,10 @@ const AdminHeader = () => {
         ];
       case 'cashier':
         return [
-          { label: 'Create Walk-in Job', path: '/admin/walkinjob', icon: <BuildIcon /> },
-          { label: 'View Jobs', path: '/admin-job-view', icon: <DashboardIcon /> }
+          { label: 'Dashboard', path: '/cashier-dashboard', icon: <DashboardIcon /> },
+          { label: 'Process Payments', path: '/cashier', icon: <PaymentIcon /> },
+          { label: 'Payment History', path: '/payment-history', icon: <ReceiptIcon /> },
+          { label: 'Create Walk-in Job', path: '/admin/walkinjob', icon: <BuildIcon /> }
         ];
       default:
         return [];
@@ -101,7 +105,7 @@ const AdminHeader = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {user.userType === 'admin' && <AdminIcon sx={{ color: '#f59e0b', fontSize: '2rem' }} />}
             {user.userType === 'mechanic' && <EngineeringIcon sx={{ color: '#f59e0b', fontSize: '2rem' }} />}
-            {user.userType === 'cashier' && <BuildIcon sx={{ color: '#f59e0b', fontSize: '2rem' }} />}
+            {user.userType === 'cashier' && <PaymentIcon sx={{ color: '#f59e0b', fontSize: '2rem' }} />}
             
             <Typography 
               variant="h6" 
