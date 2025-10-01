@@ -320,6 +320,7 @@ const UserManagement = () => {
             <MenuItem value="customer">Customer</MenuItem>
             <MenuItem value="admin">Admin</MenuItem>
             <MenuItem value="mechanic">Mechanic</MenuItem>
+            <MenuItem value="cashier">Cashier</MenuItem>
           </TextField>
         </DialogContent>
         <DialogActions>
@@ -356,6 +357,7 @@ const UserManagement = () => {
             <MenuItem value="customer">Customer</MenuItem>
             <MenuItem value="admin">Admin</MenuItem>
             <MenuItem value="mechanic">Mechanic</MenuItem>
+            <MenuItem value="cashier">Cashier</MenuItem>
           </TextField>
         </DialogContent>
         <DialogActions>

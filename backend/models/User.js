@@ -19,22 +19,17 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  phoneNumber: { // 📞 NEW FIELD ADDED
-    type: String,
-    required: false, 
-    unique: true,
-    sparse: true 
-  },
   userType: {
     type: String,
-    enum: ["customer", "admin", "mechanic"],
+    enum: ["customer", "admin", "mechanic", "cashier"],
     default: "customer",
     required: true,
   },
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+
 });
 
 // ⚠️ IMPORTANT: Hash password before saving (Security Enhancement)

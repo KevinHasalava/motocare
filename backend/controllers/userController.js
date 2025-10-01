@@ -103,7 +103,7 @@ const getUserStats = async (req, res) => {
         },
       },
     ]);
-    const labels = ['customer', 'admin', 'mechanic'];
+    const labels = ['customer', 'admin', 'mechanic','cashier'];
     const data = Array(labels.length).fill(0);
     stats.forEach((s) => {
       const index = labels.indexOf(s._id);
@@ -139,5 +139,6 @@ const updatePassword = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 module.exports = { registerUser, getUsers, loginUser, deleteUser, updateUser, getUserStats, updatePassword};
