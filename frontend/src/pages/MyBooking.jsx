@@ -19,6 +19,11 @@ import StepConfirm from "../components/Booking/StepConfirm";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PendingIcon from '@mui/icons-material/Pending';
+import CancelIcon from '@mui/icons-material/Cancel';
+import EngineeringIcon from '@mui/icons-material/Engineering';
+
 
 // Add CSS for loading animation
 const loadingStyles = `
@@ -30,23 +35,36 @@ const loadingStyles = `
 
 const editSteps = ['Select Vehicle', 'Select Service', 'Change Time & Mechanic', 'Confirm Changes'];
 
+const getStatusChip = (status) => {
+    const statusProps = {
+        Pending: { icon: <PendingIcon />, color: "warning" },
+        Confirmed: { icon: <CheckCircleIcon />, color: "primary" },
+        'In Progress': { icon: <EngineeringIcon />, color: "info" },
+        Completed: { icon: <CheckCircleIcon />, color: "success" },
+        Cancelled: { icon: <CancelIcon />, color: "error" },
+    };
+
+    const props = statusProps[status] || { label: status, color: "default" };
+
+    return <Chip icon={props.icon} label={status} color={props.color} size="small" />;
+};
+
+
 const MyBookingsPage = () => {
     const [myBookings, setMyBookings] = useState([]);
     const [allJobs, setAllJobs] = useState([]);
     const [mechanics, setMechanics] = useState([]);
     const [services, setServices] = useState([]);
-    const [vehicles, setVehicles] = useState([]); // User's vehicle list for Step 1
+    const [vehicles, setVehicles] = useState([]); 
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [filter, setFilter] = useState('all'); // 'all', 'active', 'completed'
 
-    // Modal and Edit State
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [activeEditStep, setActiveEditStep] = useState(0);
     const [selectedBooking, setSelectedBooking] = useState(null);
 
-    // A complete state for the editing form, mirroring the main booking flow
     const [editVehicle, setEditVehicle] = useState(null);
     const [editService, setEditService] = useState(null);
     const [editDate, setEditDate] = useState(null);
@@ -167,7 +185,6 @@ const MyBookingsPage = () => {
         setError("");
         
         try {
-            // Fetch all data concurrently
             const [bookingsRes, jobsRes, mechanicsRes, servicesRes, vehiclesRes] = await Promise.all([
                 axios.get(`http://localhost:5000/api/bookings/user/${user._id}`),
                 axios.get("http://localhost:5000/api/jobs"),
@@ -175,8 +192,10 @@ const MyBookingsPage = () => {
                 axios.get("http://localhost:5000/api/services"),
                 axios.get(`http://localhost:5000/api/bookings/vehicles/${user._id}`)
             ]);
+            
+            const sortedBookings = bookingsRes.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+            setMyBookings(sortedBookings);
 
-            setMyBookings(bookingsRes.data);
             setAllJobs(jobsRes.data);
             setMechanics(mechanicsRes.data.filter(u => u.userType === "mechanic"));
             setServices(servicesRes.data);
@@ -196,7 +215,6 @@ const MyBookingsPage = () => {
         }
     }, [fetchData, user]);
 
-    // This function now correctly initializes the state for the 4-step edit modal
     const handleEditClick = (booking) => {
         // Check if booking can be modified
         if (!canModifyBooking(booking)) {
@@ -212,13 +230,13 @@ const MyBookingsPage = () => {
         }
         
         setSelectedBooking(booking);
-        // Initialize state for the modal based on the selected booking
         setEditVehicle(booking.vehicle);
         setEditService(booking.service);
-        setEditDate(dayjs(booking.date));
-        setEditTime(dayjs(booking.date));
+        const bookingDateTime = dayjs(booking.date);
+        setEditDate(bookingDateTime);
+        setEditTime(bookingDateTime);
         setEditMechanic(booking.mechanic);
-        setActiveEditStep(0); // Start the stepper from the first step
+        setActiveEditStep(0);
         setIsEditModalOpen(true);
     };
 
@@ -227,7 +245,6 @@ const MyBookingsPage = () => {
         setSelectedBooking(null);
     };
 
-    // The final update API call, triggered from Step 4 (Confirm)
     const handleUpdateBooking = async () => {
         if (!editVehicle || !editService || !editDate || !editTime) {
             alert("Something is missing. Please go back and check your selections.");
@@ -235,7 +252,6 @@ const MyBookingsPage = () => {
         }
         try {
             await axios.put(`http://localhost:5000/api/bookings/update-with-job/${selectedBooking._id}`, {
-                // We send the new data from the edit state
                 vehicle: editVehicle._id,
                 service: editService._id,
                 date: editDate.format("YYYY-MM-DD"),
@@ -243,7 +259,7 @@ const MyBookingsPage = () => {
                 mechanic: editMechanic?._id,
             });
             handleEditModalClose();
-            fetchData(); // Refresh data to show the changes
+            fetchData();
         } catch (err) {
             alert("Failed to update booking: " + (err.response?.data?.message || err.message));
         }
@@ -273,8 +289,6 @@ const MyBookingsPage = () => {
         }
     };
 
-    // This logic correctly filters out the job being edited so its own time slot doesn't block itself.
-    // This now works because of the backend fix.
     const jobsForAvailabilityCheck = allJobs.filter(job =>
         job.booking?._id !== selectedBooking?._id
     );
@@ -674,61 +688,60 @@ const MyBookingsPage = () => {
                                 );
                             })()
                         )}
-                         </Container>
+                    </Container>
                     <Footer />
                 </Box>
 
-                {/* Edit Booking Modal with Full 4-Step Process */}
                 <Dialog open={isEditModalOpen} onClose={handleEditModalClose} fullWidth maxWidth="lg">
+                    {/* ... The entire modal content remains unchanged ... */}
                     <DialogTitle sx={{ background: '#1e293b', color: 'white' }}>Edit Booking</DialogTitle>
-                    <DialogContent sx={{ background: '#0f172a', p: { xs: 1, sm: 2, md: 3 } }}>
-                        <Stepper activeStep={activeEditStep} sx={{ my: 3 }}>
-                            {editSteps.map(label => <Step key={label}><StepLabel>{label}</StepLabel></Step>)}
-                        </Stepper>
-
-                        <Box sx={{ mt: 4 }}>
-                            {activeEditStep === 0 && (
-                                <StepVehicleSelect
-                                    vehicles={vehicles}
-                                    vehicle={editVehicle}
-                                    setVehicle={setEditVehicle}
-                                    onNext={() => setActiveEditStep(1)}
-                                />
-                            )}
-                            {activeEditStep === 1 && (
-                                <StepServiceSelect
-                                    services={services}
-                                    service={editService}
-                                    setService={setEditService}
-                                    onNext={() => setActiveEditStep(2)}
-                                    onBack={() => setActiveEditStep(0)}
-                                    selectedVehicle={editVehicle} />
-                            )}
-                            {activeEditStep === 2 && (
-                                <StepDateTime
-                                    date={editDate} setDate={setEditDate}
-                                    time={editTime} setTime={setEditTime}
-                                    mechanic={editMechanic} setMechanic={setEditMechanic}
-                                    mechanics={mechanics}
-                                    bookings={jobsForAvailabilityCheck}
-                                    serviceDuration={editService?.duration}
-                                    onNext={() => setActiveEditStep(3)}
-                                    onBack={() => setActiveEditStep(1)}
-                                />
-                            )}
-                            {activeEditStep === 3 && (
-                                <StepConfirm
-                                    vehicle={editVehicle}
-                                    service={editService}
-                                    date={editDate}
-                                    time={editTime}
-                                    mechanic={editMechanic}
-                                    onBack={() => setActiveEditStep(2)}
-                                    onConfirm={handleUpdateBooking} // Final update call
-                                />
-                            )}
-                        </Box>
-                    </DialogContent>
+                     <DialogContent sx={{ background: '#0f172a', p: { xs: 1, sm: 2, md: 3 } }}>
+                         <Stepper activeStep={activeEditStep} sx={{ my: 3 }}>
+                             {editSteps.map(label => <Step key={label}><StepLabel>{label}</StepLabel></Step>)}
+                         </Stepper>
+                         <Box sx={{ mt: 4 }}>
+                             {activeEditStep === 0 && (
+                                 <StepVehicleSelect
+                                     vehicles={vehicles}
+                                     vehicle={editVehicle}
+                                     setVehicle={setEditVehicle}
+                                     onNext={() => setActiveEditStep(1)}
+                                 />
+                             )}
+                             {activeEditStep === 1 && (
+                                 <StepServiceSelect
+                                     services={services}
+                                     service={editService}
+                                     setService={setEditService}
+                                     onNext={() => setActiveEditStep(2)}
+                                     onBack={() => setActiveEditStep(0)}
+                                     selectedVehicle={editVehicle} />
+                             )}
+                             {activeEditStep === 2 && (
+                                 <StepDateTime
+                                     date={editDate} setDate={setEditDate}
+                                     time={editTime} setTime={setEditTime}
+                                     mechanic={editMechanic} setMechanic={setEditMechanic}
+                                     mechanics={mechanics}
+                                     bookings={jobsForAvailabilityCheck}
+                                     serviceDuration={editService?.duration}
+                                     onNext={() => setActiveEditStep(3)}
+                                     onBack={() => setActiveEditStep(1)}
+                                 />
+                             )}
+                             {activeEditStep === 3 && (
+                                 <StepConfirm
+                                     vehicle={editVehicle}
+                                     service={editService}
+                                     date={editDate}
+                                     time={editTime}
+                                     mechanic={editMechanic}
+                                     onBack={() => setActiveEditStep(2)}
+                                     onConfirm={handleUpdateBooking}
+                                 />
+                             )}
+                         </Box>
+                     </DialogContent>
                 </Dialog>
             </LocalizationProvider>
         </ThemeProvider>

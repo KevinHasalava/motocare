@@ -42,6 +42,10 @@ const StepDateTime = ({
   }, []);
 
   const slotAvailability = useMemo(() => {
+
+    const now = dayjs();
+    const isToday = date.isSame(now, 'day');
+    
     if (!date) return {};
 
     // We can now directly use the `bookings` prop as it contains JOBS with `startTime`
@@ -55,6 +59,11 @@ const StepDateTime = ({
       const selectedDateStr = date.format("YYYY-MM-DD");
       const slotStartTime = dayjs(`${selectedDateStr} ${slot}`);
       const slotEndTime = slotStartTime.add(serviceDuration, "minute");
+
+    if (isToday && slotStartTime.isBefore(now)) {
+    availability[slot] = false;
+    continue; // <-- ප්‍රධාන සාධකය මෙයයි!
+    }
       
       let isSlotAvailable = false;
 
