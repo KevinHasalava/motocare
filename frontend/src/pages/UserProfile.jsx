@@ -30,7 +30,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { getUserProfile, updateUserProfile } from '../api/userProfile';
 import { theme, backgroundKeyframes } from '../utils/theme';
-import Header from '../components/Header';
+import HeaderWrapper from '../components/HeaderWrapper';
 import Footer from '../components/Footer';
 
 const UserProfilePage = () => {
@@ -215,7 +215,7 @@ const UserProfilePage = () => {
         <GlobalStyles styles={backgroundKeyframes} />
         
         {/* Header */}
-        <Header 
+        <HeaderWrapper 
           navItems={['Home', 'Services', 'Vehicles']} 
           onBookNowClick={() => navigate('/booking')}
           theme={theme}
@@ -276,7 +276,7 @@ const UserProfilePage = () => {
         <CssBaseline />
         <GlobalStyles styles={backgroundKeyframes} />
         
-        <Header 
+        <HeaderWrapper 
           navItems={['Home', 'Services', 'Vehicles']} 
           onBookNowClick={() => navigate('/booking')}
           theme={theme}
@@ -328,7 +328,7 @@ const UserProfilePage = () => {
       <GlobalStyles styles={backgroundKeyframes} />
       
       {/* Header */}
-      <Header 
+      <HeaderWrapper 
         navItems={['Home', 'Services', 'Vehicles']} 
         onBookNowClick={() => navigate('/booking')}
         theme={theme}

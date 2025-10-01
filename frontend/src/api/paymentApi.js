@@ -79,14 +79,27 @@ export const calculatePayment = async (paymentData) => {
 
 export const createPayment = async (paymentData) => {
     try {
+        console.log('Creating payment with data:', paymentData);
         const response = await axios.post(
             `${API_BASE_URL}/payments/create`,
             paymentData,
             createAuthHeaders()
         );
+        console.log('Payment API response:', response.data);
         return response.data;
     } catch (error) {
-        throw error.response?.data || error.message;
+        console.error('Payment API error:', error);
+        console.error('Error response:', error.response?.data);
+        console.error('Error status:', error.response?.status);
+        
+        // Throw a more detailed error object
+        if (error.response?.data) {
+            throw error.response.data;
+        } else if (error.message) {
+            throw new Error(error.message);
+        } else {
+            throw new Error('Network error occurred');
+        }
     }
 };
 

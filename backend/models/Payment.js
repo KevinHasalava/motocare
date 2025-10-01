@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const paymentSchema = new mongoose.Schema({
     invoiceId: {
         type: String,
-        unique: true,
-        required: true
+        unique: true
+        // Not required here since it's auto-generated in pre-save hook
     },
     job: {
         type: mongoose.Schema.Types.ObjectId,
@@ -142,14 +142,18 @@ paymentSchema.pre('save', async function(next) {
     next();
 });
 
-// Calculate totals before saving
+// Calculate totals before saving (only if not already set)
 paymentSchema.pre('save', function(next) {
-    // Calculate subtotal (service + extra items)
-    const extraItemsTotal = this.extraItems.reduce((sum, item) => sum + item.totalPrice, 0);
-    this.subtotal = this.serviceAmount + extraItemsTotal;
+    // Only recalculate if subtotal is not set or is zero
+    if (!this.subtotal || this.subtotal === 0) {
+        const extraItemsTotal = this.extraItems.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
+        this.subtotal = (this.serviceAmount || 0) + extraItemsTotal;
+    }
     
-    // Calculate total amount after discount
-    this.totalAmount = this.subtotal - this.discount;
+    // Only recalculate total if not already set
+    if (!this.totalAmount || this.totalAmount === 0) {
+        this.totalAmount = (this.subtotal || 0) - (this.discount || 0);
+    }
     
     next();
 });

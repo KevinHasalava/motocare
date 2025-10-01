@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Payment = require('../models/Payment');
 const Job = require('../models/Job');
 const Vehicle = require('../models/Vehicle');
@@ -180,6 +181,11 @@ const calculatePayment = async (req, res) => {
 // Create payment and generate invoice
 const createPayment = async (req, res) => {
     try {
+        console.log('Payment request received:', {
+            body: req.body,
+            user: req.user
+        });
+        
         const { 
             jobId, 
             extraItems, 
@@ -189,15 +195,41 @@ const createPayment = async (req, res) => {
             notes 
         } = req.body;
 
+        // Validate required fields
+        if (!jobId) {
+            return res.status(400).json({ message: 'Job ID is required' });
+        }
+
+        // Validate ObjectId format
+        if (!mongoose.Types.ObjectId.isValid(jobId)) {
+            return res.status(400).json({ message: 'Invalid Job ID format' });
+        }
+
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({ message: 'User authentication required' });
+        }
+
+        // Check if user exists and has proper role
+        const cashierUser = await User.findById(req.user.id);
+        if (!cashierUser) {
+            return res.status(404).json({ message: 'Cashier user not found' });
+        }
+        
+        console.log('Cashier user:', { id: cashierUser._id, name: cashierUser.name, type: cashierUser.userType });
+
         // Get job details
+        console.log('Fetching job with ID:', jobId);
         const job = await Job.findById(jobId)
             .populate('service')
             .populate('vehicle')
             .populate('user');
 
         if (!job) {
+            console.log('Job not found with ID:', jobId);
             return res.status(404).json({ message: 'Job not found' });
         }
+
+        console.log('Job found:', job.jobId);
 
         // Check if payment already exists for this job
         const existingPayment = await Payment.findOne({ job: jobId });
@@ -210,7 +242,18 @@ const createPayment = async (req, res) => {
 
         // Process extra items and update inventory
         const processedExtraItems = [];
+        console.log('Processing extra items:', extraItems);
+        
+        if (!Array.isArray(extraItems)) {
+            console.log('Extra items is not an array:', typeof extraItems);
+        }
+        
         for (const item of extraItems || []) {
+            // Validate inventory item ID format
+            if (!mongoose.Types.ObjectId.isValid(item.inventoryItem)) {
+                return res.status(400).json({ message: `Invalid inventory item ID format: ${item.inventoryItem}` });
+            }
+            
             const inventoryItem = await Inventory.findById(item.inventoryItem);
             if (!inventoryItem) {
                 return res.status(404).json({ message: `Inventory item not found: ${item.inventoryItem}` });
@@ -229,12 +272,25 @@ const createPayment = async (req, res) => {
             inventoryItem.quantity -= item.quantity;
             await inventoryItem.save();
 
+            // Validate all required fields for extra items
+            if (!inventoryItem.name) {
+                return res.status(400).json({ message: `Item name is missing for inventory item: ${item.inventoryItem}` });
+            }
+            
+            if (typeof item.quantity !== 'number' || item.quantity < 1) {
+                return res.status(400).json({ message: `Invalid quantity for item: ${inventoryItem.name}` });
+            }
+            
+            if (typeof inventoryItem.salesPrice !== 'number' || inventoryItem.salesPrice < 0) {
+                return res.status(400).json({ message: `Invalid sales price for item: ${inventoryItem.name}` });
+            }
+
             processedExtraItems.push({
                 inventoryItem: item.inventoryItem,
-                itemName: inventoryItem.name,
-                quantity: item.quantity,
-                unitPrice: inventoryItem.salesPrice,
-                totalPrice: totalPrice
+                itemName: String(inventoryItem.name),
+                quantity: Number(item.quantity),
+                unitPrice: Number(inventoryItem.salesPrice),
+                totalPrice: Number(totalPrice)
             });
         }
 
@@ -242,39 +298,89 @@ const createPayment = async (req, res) => {
         const discountAmount = discount || (subtotal * (discountPercentage || 0) / 100);
         const totalAmount = subtotal - discountAmount;
 
+        // Validate required data before creating payment
+        if (!job.vehicle || !job.vehicle._id) {
+            return res.status(400).json({ message: 'Vehicle information is missing from job' });
+        }
+        
+        if (!job.user || !job.user._id) {
+            return res.status(400).json({ message: 'Customer information is missing from job' });
+        }
+        
+        if (!job.service || !job.service._id) {
+            return res.status(400).json({ message: 'Service information is missing from job' });
+        }
+        
+        if (typeof serviceAmount !== 'number' || serviceAmount < 0) {
+            return res.status(400).json({ message: 'Invalid service amount' });
+        }
+
         // Create payment record
-        const payment = new Payment({
+        console.log('Creating payment record with data:', {
+            jobId,
+            vehicleId: job.vehicle._id,
+            customerId: job.user._id,
+            serviceId: job.service._id,
+            serviceAmount,
+            extraItemsCount: processedExtraItems.length,
+            subtotal,
+            discountAmount,
+            totalAmount,
+            paymentMethod: paymentMethod || 'Cash',
+            cashierId: req.user.id
+        });
+
+        const paymentData = {
             job: jobId,
             vehicle: job.vehicle._id,
             customer: job.user._id,
             service: job.service._id,
-            serviceAmount,
-            extraItems: processedExtraItems,
-            subtotal,
-            discount: discountAmount,
-            discountPercentage: discountPercentage || 0,
-            totalAmount,
+            serviceAmount: Number(serviceAmount),
+            extraItems: processedExtraItems || [],
+            subtotal: Number(subtotal),
+            discount: Number(discountAmount) || 0,
+            discountPercentage: Number(discountPercentage) || 0,
+            totalAmount: Number(totalAmount),
             paymentMethod: paymentMethod || 'Cash',
             paymentStatus: 'Paid',
             cashier: req.user.id,
-            notes: notes || ''
-        });
+            notes: String(notes || '')
+        };
 
+        console.log('Payment data to save:', paymentData);
+        const payment = new Payment(paymentData);
+
+        console.log('Saving payment...');
         await payment.save();
+        console.log('Payment saved successfully:', payment.invoiceId);
 
         // Update job status to completed
         job.status = 'Completed';
         await job.save();
 
         // Populate payment for response
-        await payment.populate([
-            { path: 'job', populate: { path: 'service vehicle user' } },
-            { path: 'vehicle' },
-            { path: 'customer', select: 'name email phone' },
-            { path: 'service' },
-            { path: 'cashier', select: 'name' },
-            { path: 'extraItems.inventoryItem' }
-        ]);
+        console.log('Populating payment data...');
+        try {
+            await payment.populate([
+                { 
+                    path: 'job', 
+                    populate: [
+                        { path: 'service' },
+                        { path: 'vehicle' },
+                        { path: 'user' }
+                    ]
+                },
+                { path: 'vehicle' },
+                { path: 'customer', select: 'name email phone' },
+                { path: 'service' },
+                { path: 'cashier', select: 'name' },
+                { path: 'extraItems.inventoryItem' }
+            ]);
+            console.log('Population completed successfully');
+        } catch (populateError) {
+            console.error('Error during population:', populateError);
+            // Continue without full population if there's an error
+        }
 
         res.status(201).json({
             message: 'Payment created successfully',
@@ -282,7 +388,35 @@ const createPayment = async (req, res) => {
         });
     } catch (error) {
         console.error('Error creating payment:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error('Error stack:', error.stack);
+        
+        // Handle specific error types
+        if (error.name === 'ValidationError') {
+            const validationErrors = Object.keys(error.errors).map(key => ({
+                field: key,
+                message: error.errors[key].message,
+                value: error.errors[key].value
+            }));
+            
+            return res.status(400).json({ 
+                message: 'Validation error - Please check the following fields', 
+                error: error.message,
+                validationErrors: validationErrors
+            });
+        }
+        
+        if (error.name === 'CastError') {
+            return res.status(400).json({ 
+                message: 'Invalid ID format', 
+                error: error.message 
+            });
+        }
+        
+        res.status(500).json({ 
+            message: 'Server error occurred while processing payment', 
+            error: error.message,
+            type: error.name 
+        });
     }
 };
 

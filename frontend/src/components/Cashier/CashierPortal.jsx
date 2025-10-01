@@ -41,7 +41,6 @@ import {
     Clear
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { debounce } from 'lodash';
 import {
     searchVehicles,
     getJobByVehicle,
@@ -50,6 +49,19 @@ import {
     createPayment
 } from '../../api/paymentApi';
 import AdminHeader from '../AdminHeader';
+
+// Custom debounce function to avoid lodash dependency
+const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
 
 // Styled Components
 const CashierContainer = styled(Box)(({ theme }) => ({
@@ -240,9 +252,9 @@ const CashierPortal = () => {
         try {
             const calculation = await calculatePayment({
                 jobId: jobData._id,
-                extraItems: extraItems,
-                discount: discount,
-                discountPercentage: discountPercentage
+                extraItems: extraItems.filter(item => item.inventoryItem && item.quantity > 0),
+                discount: discount || 0,
+                discountPercentage: discountPercentage || 0
             });
             setPaymentCalculation(calculation);
             setError('');
@@ -261,15 +273,30 @@ const CashierPortal = () => {
             return;
         }
 
+        if (!jobData || !jobData._id) {
+            setError('No job selected. Please select a vehicle and job first.');
+            return;
+        }
+
+        // Check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setError('Authentication required. Please log in again.');
+            return;
+        }
+
         setLoading(true);
         try {
+            console.log('Processing payment for job:', jobData._id);
+            console.log('Extra items:', extraItems);
+            
             const paymentResult = await createPayment({
                 jobId: jobData._id,
-                extraItems: extraItems,
-                discount: discount,
-                discountPercentage: discountPercentage,
-                paymentMethod: paymentMethod,
-                notes: notes
+                extraItems: extraItems.filter(item => item.inventoryItem && item.quantity > 0), // Filter out invalid items
+                discount: discount || 0,
+                discountPercentage: discountPercentage || 0,
+                paymentMethod: paymentMethod || 'Cash',
+                notes: notes || ''
             });
 
             setCreatedPayment(paymentResult.payment);
@@ -280,7 +307,16 @@ const CashierPortal = () => {
             resetForm();
         } catch (error) {
             console.error('Error processing payment:', error);
-            setError(error.message || 'Error processing payment');
+            // Extract more detailed error message
+            let errorMessage = 'Error processing payment';
+            if (error.message) {
+                errorMessage = error.message;
+            } else if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.response?.data?.error) {
+                errorMessage = error.response.data.error;
+            }
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }

@@ -28,7 +28,7 @@ const AdminPaper = styled(Paper)(({ theme }) => ({
     overflow: 'hidden',
 }));
 
-const AdminHeader = styled(Box)(({ theme }) => ({
+const AdminHeader    = styled(Box)(({ theme }) => ({
     backgroundColor: '#2c3e50',
     color: '#ffffff',
     padding: theme.spacing(2.5),
