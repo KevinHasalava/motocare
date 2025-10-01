@@ -10,14 +10,13 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
-// ඔබගේ project එකේ components වලට අදාළ නිවැරදි path යොදන්න
 import { theme } from "../utils/theme";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import StepVehicleSelect from "../components/booking/StepVehicleSelect";
-import StepServiceSelect from "../components/booking/StepServiceSelect";
-import StepDateTime from "../components/booking/StepDateTime";
-import StepConfirm from "../components/booking/StepConfirm";
+import StepVehicleSelect from "../components/Booking/StepVehicleSelect";
+import StepServiceSelect from "../components/Booking/StepServiceSelect";
+import StepDateTime from "../components/Booking/StepDateTime";
+import StepConfirm from "../components/Booking/StepConfirm";
 
 // Icons
 import EditIcon from '@mui/icons-material/Edit';
