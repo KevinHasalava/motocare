@@ -1,6 +1,12 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+//inventory
+import './App.css';
+import InventoryPage from './components/InventoryCom/InventoryPage';
+import SupplierPage from './components/InventoryCom/SupplierPage';
+import StockPage from './components/InventoryCom/StockPage';
+
 // Import your pages
 import Landing from "./pages/Landing";
 import VehiclePage from "./pages/VehiclePage";
@@ -49,6 +55,11 @@ export default function App() {
         
         {/* 🛠️ NEW ROUTE: Manual Walk-In Job Creation (for Cashier) */}
         <Route path="/admin/walkinjob" element={<CreateWalkInJob />} />
+
+        {/* Inventory Management Routes */}
+        <Route path="/inventory" element={<InventoryPage />} />
+        <Route path="/suppliers" element={<SupplierPage />} />
+        <Route path="/stock" element={<StockPage />} />
 
       </Routes>
     </Router>
