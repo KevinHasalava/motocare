@@ -53,6 +53,7 @@ const mockAdminStats = {
   vehicles: 0,
   services: 0,
   tasks: 0,
+  inventory: 0,
 };
 
 const AdminDashboard = () => {
@@ -84,7 +85,7 @@ const AdminDashboard = () => {
 
   // Chart setup
   const chartData = {
-    labels: ["Users", "Bookings", "Vehicles", "Services", "Tasks", "Payments"],
+    labels: ["Users", "Bookings", "Vehicles", "Services", "Tasks", "Payments", "Inventory"],
     datasets: [
       {
         label: "Count",
@@ -95,6 +96,7 @@ const AdminDashboard = () => {
           stats.services,
           stats.tasks,
           stats.payments,
+          stats.inventory,
         ],
         backgroundColor: (ctx) => {
           const chart = ctx.chart;
@@ -266,6 +268,17 @@ const AdminDashboard = () => {
                   color="#06b6d4"
                   path="/admin/payments"
                 />
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+              <StatCard
+                 title="Inventory"
+                 value={stats.inventory}
+                 description="Spare parts stock"
+                 icon={<Inventory />}
+                 color="#14b8a6" // teal-ish
+                 path="/admin/inventory" // navigate ekata route
+              />
               </Grid>
 
               <Grid item xs={12}>

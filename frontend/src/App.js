@@ -15,6 +15,8 @@ import AdminRegister from "./pages/AdminRegister";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import UserProfile from "./pages/UserProfile";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // 🛠️ NEW IMPORT: Component for manual job creation (Cashier/Admin)
 import CreateWalkInJob from "./components/adminJob/CreateWalkInJob"; 
@@ -51,6 +53,9 @@ export default function App() {
         <Route path="/admin-service" element={< ServicesPage/>} />
         <Route path="/admin-dashboard" element={< AdminDashboard/>} />
         <Route path="/admin-users" element={< UserManagement/>} />
+
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+  <Route path="/reset-password" element={<ResetPassword />} />
 
       </Routes>
     </Router>
