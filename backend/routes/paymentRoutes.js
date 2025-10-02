@@ -7,11 +7,16 @@ const {
     getInventoryItem,
     calculatePayment,
     createPayment,
+    updatePayment,
+    deletePayment,
     getPayment,
     getPaymentByInvoiceId,
-    getAllPayments
+    getAllPayments,
+    getUserPayments,
+    uploadPaymentSlip
 } = require('../controllers/paymentController');
 const authMiddleware = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware');
 
 // Apply authentication middleware to all routes
 router.use(authMiddleware);
@@ -27,10 +32,16 @@ router.get('/inventory/:itemId', getInventoryItem);
 // Payment calculation and processing
 router.post('/calculate', calculatePayment);
 router.post('/create', createPayment);
+router.put('/:paymentId', updatePayment);
+router.delete('/:paymentId', deletePayment);
 
 // Payment retrieval routes
 router.get('/all', getAllPayments);
+router.get('/user/my-payments', getUserPayments);
 router.get('/invoice/:invoiceId', getPaymentByInvoiceId);
 router.get('/:paymentId', getPayment);
+
+// Payment slip upload (with file upload middleware)
+router.post('/upload-slip', upload.single('slip'), uploadPaymentSlip);
 
 module.exports = router;

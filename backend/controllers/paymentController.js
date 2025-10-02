@@ -60,6 +60,18 @@ const getJobByVehicle = async (req, res) => {
             });
         }
 
+        // Check if payment already exists for this job
+        const existingPayment = await Payment.findOne({ job: job._id });
+        if (existingPayment) {
+            return res.status(400).json({ 
+                message: `Payment already processed for this job (Invoice: ${existingPayment.invoiceId})`,
+                paymentExists: true,
+                invoiceId: existingPayment.invoiceId,
+                job: job,
+                vehicle: vehicle
+            });
+        }
+
         res.status(200).json({
             job: job,
             vehicle: vehicle
@@ -181,9 +193,11 @@ const calculatePayment = async (req, res) => {
 // Create payment and generate invoice
 const createPayment = async (req, res) => {
     try {
+        console.log('=== PAYMENT PROCESSING STARTED ===');
         console.log('Payment request received:', {
             body: req.body,
-            user: req.user
+            user: req.user,
+            headers: req.headers.authorization ? 'Bearer token present' : 'No token'
         });
         
         const { 
@@ -243,12 +257,35 @@ const createPayment = async (req, res) => {
         // Process extra items and update inventory
         const processedExtraItems = [];
         console.log('Processing extra items:', extraItems);
+        console.log('Extra items type:', typeof extraItems);
+        console.log('Is Array:', Array.isArray(extraItems));
         
         if (!Array.isArray(extraItems)) {
             console.log('Extra items is not an array:', typeof extraItems);
+            return res.status(400).json({ message: 'Extra items must be an array' });
         }
         
+        console.log('Extra items length:', extraItems?.length || 0);
+        extraItems.forEach((item, index) => {
+            console.log(`Item ${index}:`, item);
+        });
+        
         for (const item of extraItems || []) {
+            console.log('Processing extra item:', item);
+            
+            // Validate item structure
+            if (!item || typeof item !== 'object') {
+                return res.status(400).json({ message: 'Invalid extra item format' });
+            }
+            
+            if (!item.inventoryItem) {
+                return res.status(400).json({ message: 'Extra item missing inventory item ID' });
+            }
+            
+            if (!item.quantity || typeof item.quantity !== 'number' || item.quantity <= 0) {
+                return res.status(400).json({ message: 'Extra item missing valid quantity' });
+            }
+            
             // Validate inventory item ID format
             if (!mongoose.Types.ObjectId.isValid(item.inventoryItem)) {
                 return res.status(400).json({ message: `Invalid inventory item ID format: ${item.inventoryItem}` });
@@ -387,8 +424,13 @@ const createPayment = async (req, res) => {
             payment
         });
     } catch (error) {
+        console.error('=== PAYMENT ERROR DETAILS ===');
         console.error('Error creating payment:', error);
         console.error('Error stack:', error.stack);
+        console.error('Error name:', error.name);
+        console.error('Request body:', req.body);
+        console.error('User:', req.user);
+        console.error('================================');
         
         // Handle specific error types
         if (error.name === 'ValidationError') {
@@ -398,6 +440,8 @@ const createPayment = async (req, res) => {
                 value: error.errors[key].value
             }));
             
+            console.error('Validation errors:', validationErrors);
+            
             return res.status(400).json({ 
                 message: 'Validation error - Please check the following fields', 
                 error: error.message,
@@ -406,6 +450,11 @@ const createPayment = async (req, res) => {
         }
         
         if (error.name === 'CastError') {
+            console.error('Cast error details:', {
+                path: error.path,
+                value: error.value,
+                kind: error.kind
+            });
             return res.status(400).json({ 
                 message: 'Invalid ID format', 
                 error: error.message 
@@ -415,7 +464,8 @@ const createPayment = async (req, res) => {
         res.status(500).json({ 
             message: 'Server error occurred while processing payment', 
             error: error.message,
-            type: error.name 
+            type: error.name,
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 };
@@ -483,6 +533,10 @@ const getPaymentByInvoiceId = async (req, res) => {
 // Get all payments with pagination
 const getAllPayments = async (req, res) => {
     try {
+        console.log('=== GET ALL PAYMENTS REQUEST ===');
+        console.log('Query params:', req.query);
+        console.log('User:', req.user);
+        
         const { page = 1, limit = 10, status, search } = req.query;
         const skip = (page - 1) * limit;
 
@@ -498,16 +552,38 @@ const getAllPayments = async (req, res) => {
             ];
         }
 
+        console.log('Query object:', query);
+        console.log('Skip:', skip, 'Limit:', limit);
+        
         const payments = await Payment.find(query)
-            .populate('customer', 'name email')
-            .populate('vehicle', 'vehicleNumber type brand model')
-            .populate('service', 'name price')
-            .populate('cashier', 'name')
+            .populate({
+                path: 'customer',
+                select: 'name email',
+                options: { strictPopulate: false }
+            })
+            .populate({
+                path: 'vehicle',
+                select: 'vehicleNumber type brand model',
+                options: { strictPopulate: false }
+            })
+            .populate({
+                path: 'service',
+                select: 'name price',
+                options: { strictPopulate: false }
+            })
+            .populate({
+                path: 'cashier',
+                select: 'name',
+                options: { strictPopulate: false }
+            })
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(parseInt(limit));
 
+        console.log('Found payments:', payments.length);
+        
         const total = await Payment.countDocuments(query);
+        console.log('Total payments:', total);
 
         res.status(200).json({
             payments,
@@ -519,7 +595,300 @@ const getAllPayments = async (req, res) => {
             }
         });
     } catch (error) {
+        console.error('=== GET ALL PAYMENTS ERROR ===');
         console.error('Error fetching payments:', error);
+        console.error('Error stack:', error.stack);
+        console.error('============================');
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+// Get payments for a specific user (customer)
+const getUserPayments = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        const payments = await Payment.find({ customer: userId })
+            .populate('job', 'jobId')
+            .populate('service', 'name description price')
+            .populate('vehicle', 'vehicleNumber type brand model')
+            .populate('cashier', 'name')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            payments,
+            total: payments.length
+        });
+    } catch (error) {
+        console.error('Error fetching user payments:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+// Update/Edit payment details (Cashier only)
+const updatePayment = async (req, res) => {
+    try {
+        const { paymentId } = req.params;
+        const { 
+            extraItems, 
+            discount, 
+            discountPercentage, 
+            paymentMethod, 
+            notes,
+            paymentStatus
+        } = req.body;
+
+        // Validate payment ID
+        if (!mongoose.Types.ObjectId.isValid(paymentId)) {
+            return res.status(400).json({ message: 'Invalid payment ID format' });
+        }
+
+        // Check if user is cashier/admin
+        const user = await User.findById(req.user.id);
+        if (!user || !['admin', 'cashier', 'Admin', 'Cashier'].includes(user.userType)) {
+            return res.status(403).json({ message: 'Access denied. Cashier privileges required.' });
+        }
+
+        // Find existing payment
+        const payment = await Payment.findById(paymentId)
+            .populate('job')
+            .populate('service');
+            
+        if (!payment) {
+            return res.status(404).json({ message: 'Payment not found' });
+        }
+
+        console.log('Updating payment:', paymentId);
+
+        let extraItemsTotal = 0;
+        const processedExtraItems = [];
+
+        // Process extra items if provided
+        if (extraItems && Array.isArray(extraItems)) {
+            // First, restore inventory quantities from old extra items
+            for (const oldItem of payment.extraItems) {
+                const inventoryItem = await Inventory.findById(oldItem.inventoryItem);
+                if (inventoryItem) {
+                    inventoryItem.quantity += oldItem.quantity; // Restore old quantity
+                    await inventoryItem.save();
+                }
+            }
+
+            // Process new extra items
+            for (const item of extraItems) {
+                if (!mongoose.Types.ObjectId.isValid(item.inventoryItem)) {
+                    return res.status(400).json({ message: `Invalid inventory item ID: ${item.inventoryItem}` });
+                }
+                
+                const inventoryItem = await Inventory.findById(item.inventoryItem);
+                if (!inventoryItem) {
+                    return res.status(404).json({ message: `Inventory item not found: ${item.inventoryItem}` });
+                }
+
+                if (inventoryItem.quantity < item.quantity) {
+                    return res.status(400).json({ 
+                        message: `Insufficient stock for ${inventoryItem.name}. Available: ${inventoryItem.quantity}` 
+                    });
+                }
+
+                const totalPrice = item.quantity * inventoryItem.salesPrice;
+                extraItemsTotal += totalPrice;
+
+                // Update inventory quantity
+                inventoryItem.quantity -= item.quantity;
+                await inventoryItem.save();
+
+                processedExtraItems.push({
+                    inventoryItem: item.inventoryItem,
+                    itemName: inventoryItem.name,
+                    quantity: Number(item.quantity),
+                    unitPrice: Number(inventoryItem.salesPrice),
+                    totalPrice: Number(totalPrice)
+                });
+            }
+        } else {
+            // Keep existing extra items
+            extraItemsTotal = payment.extraItems.reduce((sum, item) => sum + item.totalPrice, 0);
+        }
+
+        // Recalculate totals
+        const serviceAmount = payment.serviceAmount;
+        const subtotal = serviceAmount + extraItemsTotal;
+        const discountAmount = discount !== undefined ? discount : payment.discount;
+        const totalAmount = subtotal - discountAmount;
+
+        // Update payment data
+        const updateData = {
+            serviceAmount,
+            subtotal: Number(subtotal),
+            discount: Number(discountAmount) || 0,
+            discountPercentage: Number(discountPercentage) || payment.discountPercentage,
+            totalAmount: Number(totalAmount),
+            paymentMethod: paymentMethod || payment.paymentMethod,
+            notes: notes !== undefined ? notes : payment.notes,
+            paymentStatus: paymentStatus || payment.paymentStatus,
+            updatedAt: new Date(),
+            lastUpdatedBy: req.user.id
+        };
+
+        if (processedExtraItems.length > 0) {
+            updateData.extraItems = processedExtraItems;
+        }
+
+        const updatedPayment = await Payment.findByIdAndUpdate(
+            paymentId, 
+            updateData, 
+            { new: true, runValidators: true }
+        )
+        .populate('job')
+        .populate('vehicle')
+        .populate('customer', 'name email phone')
+        .populate('service')
+        .populate('cashier', 'name')
+        .populate('extraItems.inventoryItem');
+
+        res.status(200).json({
+            message: 'Payment updated successfully',
+            payment: updatedPayment
+        });
+    } catch (error) {
+        console.error('Error updating payment:', error);
+        res.status(500).json({ 
+            message: 'Server error occurred while updating payment', 
+            error: error.message 
+        });
+    }
+};
+
+// Delete payment (Cashier only)
+const deletePayment = async (req, res) => {
+    try {
+        console.log('=== DELETE PAYMENT REQUEST ===');
+        console.log('Payment ID to delete:', req.params.paymentId);
+        console.log('User requesting deletion:', req.user);
+        
+        const { paymentId } = req.params;
+
+        // Validate payment ID
+        if (!mongoose.Types.ObjectId.isValid(paymentId)) {
+            console.log('Invalid payment ID format:', paymentId);
+            return res.status(400).json({ message: 'Invalid payment ID format' });
+        }
+
+        // Check if user is cashier/admin
+        const user = await User.findById(req.user.id);
+        if (!user || !['admin', 'cashier', 'Admin', 'Cashier'].includes(user.userType)) {
+            console.log('Access denied for user:', user?.userType);
+            return res.status(403).json({ message: 'Access denied. Cashier privileges required.' });
+        }
+
+        console.log('User authorized for deletion:', user.name, user.userType);
+
+        // Find payment
+        const payment = await Payment.findById(paymentId).populate('job');
+        if (!payment) {
+            console.log('Payment not found with ID:', paymentId);
+            return res.status(404).json({ message: 'Payment not found' });
+        }
+
+        console.log('Payment found:', payment.invoiceId, 'Status:', payment.paymentStatus);
+        console.log('Extra items to restore:', payment.extraItems.length);
+
+        // Restore inventory quantities for extra items
+        for (const item of payment.extraItems) {
+            const inventoryItem = await Inventory.findById(item.inventoryItem);
+            if (inventoryItem) {
+                const oldQuantity = inventoryItem.quantity;
+                inventoryItem.quantity += item.quantity;
+                await inventoryItem.save();
+                console.log(`Restored ${item.quantity} units of ${inventoryItem.name} (from ${oldQuantity} to ${inventoryItem.quantity})`);
+            } else {
+                console.log('Inventory item not found:', item.inventoryItem);
+            }
+        }
+
+        // Update job status back to 'Completed' or original status
+        if (payment.job) {
+            payment.job.status = 'Completed';
+            await payment.job.save();
+            console.log('Job status updated to Completed for job:', payment.job.jobId);
+        } else {
+            console.log('No job associated with payment');
+        }
+
+        // Delete the payment
+        console.log('Attempting to delete payment from database...');
+        const deletedPayment = await Payment.findByIdAndDelete(paymentId);
+        
+        if (deletedPayment) {
+            console.log('Payment successfully deleted from database');
+        } else {
+            console.log('Payment deletion returned null - payment may not exist');
+        }
+
+        res.status(200).json({
+            message: 'Payment deleted successfully',
+            deletedPaymentId: paymentId,
+            invoiceId: payment.invoiceId,
+            success: true
+        });
+        
+        console.log('=== DELETE PAYMENT COMPLETED ===');
+    } catch (error) {
+        console.error('=== DELETE PAYMENT ERROR ===');
+        console.error('Error deleting payment:', error);
+        console.error('Error stack:', error.stack);
+        console.error('Request params:', req.params);
+        console.error('User:', req.user);
+        console.error('===========================');
+        
+        res.status(500).json({ 
+            message: 'Server error occurred while deleting payment', 
+            error: error.message,
+            success: false
+        });
+    }
+};
+
+// Upload payment slip for a specific payment
+const uploadPaymentSlip = async (req, res) => {
+    try {
+        const { paymentId, notes } = req.body;
+        const userId = req.user.id;
+
+        // Find payment and verify it belongs to the user
+        const payment = await Payment.findOne({ 
+            _id: paymentId, 
+            customer: userId 
+        });
+
+        if (!payment) {
+            return res.status(404).json({ message: 'Payment not found or unauthorized' });
+        }
+
+        // Handle file upload (you might want to use multer for this)
+        let slipUrl = null;
+        if (req.file) {
+            // Store file and get URL - this is a simplified version
+            slipUrl = `/uploads/payment-slips/${req.file.filename}`;
+        }
+
+        // Update payment with slip information
+        payment.paymentSlip = {
+            url: slipUrl,
+            uploadedAt: new Date(),
+            notes: notes || '',
+            status: 'Under Review'
+        };
+
+        await payment.save();
+
+        res.status(200).json({
+            message: 'Payment slip uploaded successfully',
+            payment: payment
+        });
+    } catch (error) {
+        console.error('Error uploading payment slip:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
@@ -531,7 +900,11 @@ module.exports = {
     getInventoryItem,
     calculatePayment,
     createPayment,
+    updatePayment,
+    deletePayment,
     getPayment,
     getPaymentByInvoiceId,
-    getAllPayments
+    getAllPayments,
+    getUserPayments,
+    uploadPaymentSlip
 };

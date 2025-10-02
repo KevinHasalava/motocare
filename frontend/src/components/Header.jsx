@@ -12,7 +12,7 @@ import {
   Home as HomeIcon, DirectionsCar as CarIcon, Build as ServiceIcon,
   AutoAwesome as SparkleIcon, ArrowForward as ArrowIcon, 
   Dashboard as DashboardIcon, ExpandMore as ExpandMoreIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon, Payment as PaymentIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import Logo from './Landing_Page/Logo';
@@ -919,6 +919,25 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
           >
             <CalendarIcon sx={{ mr: 1 }} />
             My Bookings
+          </MenuItem>
+        )}
+
+        {user?.userType === 'customer' && (
+          <MenuItem
+            onClick={() => { navigate("/my-payments"); handleProfileMenuClose(); }}
+            sx={{
+              mx: 1,
+              mb: 0.5,
+              borderRadius: 1,
+              color: 'white',
+              '&:hover': {
+                background: 'rgba(99, 102, 241, 0.1)',
+                color: '#6366f1',
+              }
+            }}
+          >
+            <PaymentIcon sx={{ mr: 1 }} />
+            Payments
           </MenuItem>
         )}
 

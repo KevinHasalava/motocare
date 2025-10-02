@@ -103,6 +103,49 @@ export const createPayment = async (paymentData) => {
     }
 };
 
+export const updatePayment = async (paymentId, paymentData) => {
+    try {
+        console.log('Updating payment:', paymentId, 'with data:', paymentData);
+        const response = await axios.put(
+            `${API_BASE_URL}/payments/${paymentId}`,
+            paymentData,
+            createAuthHeaders()
+        );
+        console.log('Update payment API response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Update payment API error:', error);
+        if (error.response?.data) {
+            throw error.response.data;
+        } else if (error.message) {
+            throw new Error(error.message);
+        } else {
+            throw new Error('Network error occurred');
+        }
+    }
+};
+
+export const deletePayment = async (paymentId) => {
+    try {
+        console.log('Deleting payment:', paymentId);
+        const response = await axios.delete(
+            `${API_BASE_URL}/payments/${paymentId}`,
+            createAuthHeaders()
+        );
+        console.log('Delete payment API response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Delete payment API error:', error);
+        if (error.response?.data) {
+            throw error.response.data;
+        } else if (error.message) {
+            throw new Error(error.message);
+        } else {
+            throw new Error('Network error occurred');
+        }
+    }
+};
+
 // Payment retrieval functions
 export const getPayment = async (paymentId) => {
     try {
@@ -139,6 +182,39 @@ export const getAllPayments = async (page = 1, limit = 10, filters = {}) => {
         const response = await axios.get(
             `${API_BASE_URL}/payments/all?${params.toString()}`,
             createAuthHeaders()
+        );
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error.message;
+    }
+};
+
+// Get payments for current user
+export const getUserPayments = async () => {
+    try {
+        const response = await axios.get(
+            `${API_BASE_URL}/payments/user/my-payments`,
+            createAuthHeaders()
+        );
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error.message;
+    }
+};
+
+// Upload payment slip
+export const uploadPaymentSlip = async (formData) => {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.post(
+            `${API_BASE_URL}/payments/upload-slip`,
+            formData,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
         );
         return response.data;
     } catch (error) {

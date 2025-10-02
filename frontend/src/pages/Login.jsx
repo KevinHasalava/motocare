@@ -35,6 +35,7 @@ const Login = () => {
 
       if (user.userType === "admin") navigate("/admin/dashboard");
       else if (user.userType === "mechanic") navigate("/mechanic-portal");
+      else if (user.userType === "cashier") navigate("/cashier-dashboard");
       else navigate("/home");
 
     } catch (err) {

@@ -28,10 +28,14 @@ import {
     FilterList,
     Payment,
     DateRange,
-    TrendingUp
+    TrendingUp,
+    Edit,
+    Delete,
+    Save,
+    Cancel
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { getAllPayments } from '../../api/paymentApi';
+import { getAllPayments, updatePayment, deletePayment } from '../../api/paymentApi';
 import Invoice from './Invoice';
 import AdminHeader from '../AdminHeader';
 
@@ -85,6 +89,11 @@ const PaymentHistory = () => {
     const [selectedInvoiceId, setSelectedInvoiceId] = useState('');
     const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
 
+    // Edit/Delete functionality
+    const [editingPaymentId, setEditingPaymentId] = useState(null);
+    const [editFormData, setEditFormData] = useState({});
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+
     // Statistics
     const [stats, setStats] = useState({
         totalRevenue: 0,
@@ -98,20 +107,44 @@ const PaymentHistory = () => {
 
     const fetchPayments = async () => {
         setLoading(true);
+        setError('');
         try {
+            console.log('Fetching payments with params:', { page: page + 1, rowsPerPage, statusFilter, searchTerm });
+            
             const filters = {};
             if (statusFilter) filters.status = statusFilter;
             if (searchTerm) filters.search = searchTerm;
 
             const response = await getAllPayments(page + 1, rowsPerPage, filters);
-            setPayments(response.payments);
-            setTotalItems(response.pagination.totalItems);
+            console.log('Payment API response:', response);
             
-            // Calculate statistics
-            calculateStats(response.payments);
+            if (response && response.payments) {
+                setPayments(response.payments);
+                setTotalItems(response.pagination?.totalItems || 0);
+                
+                // Calculate statistics
+                calculateStats(response.payments);
+            } else {
+                console.warn('Unexpected API response format:', response);
+                setPayments([]);
+                setTotalItems(0);
+                setError('Unexpected response format from server');
+            }
         } catch (error) {
             console.error('Error fetching payments:', error);
-            setError('Failed to load payment history');
+            console.error('Error details:', error.message);
+            console.error('Error response:', error.response?.data);
+            
+            let errorMessage = 'Failed to load payment history';
+            if (error.message) {
+                errorMessage += `: ${error.message}`;
+            } else if (error.response?.data?.message) {
+                errorMessage += `: ${error.response.data.message}`;
+            }
+            
+            setError(errorMessage);
+            setPayments([]);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }
@@ -169,6 +202,96 @@ const PaymentHistory = () => {
             default:
                 return 'default';
         }
+    };
+
+    const handleEditPayment = (payment) => {
+        setEditingPaymentId(payment._id);
+        setEditFormData({
+            discount: payment.discount || 0,
+            discountPercentage: payment.discountPercentage || 0,
+            paymentMethod: payment.paymentMethod || 'Cash',
+            notes: payment.notes || '',
+            paymentStatus: payment.paymentStatus || 'Paid'
+        });
+    };
+
+    const handleSaveEdit = async (paymentId) => {
+        try {
+            setLoading(true);
+            await updatePayment(paymentId, editFormData);
+            setEditingPaymentId(null);
+            setEditFormData({});
+            fetchPayments(); // Refresh the list
+            setError('');
+        } catch (error) {
+            console.error('Error updating payment:', error);
+            setError(error.message || 'Failed to update payment');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setEditingPaymentId(null);
+        setEditFormData({});
+    };
+
+    const handleDeletePayment = async (paymentId) => {
+        console.log('=== DELETE PAYMENT INITIATED ===');
+        console.log('Payment ID to delete:', paymentId);
+        
+        if (window.confirm('Are you sure you want to delete this payment? This action cannot be undone.')) {
+            try {
+                setLoading(true);
+                setError('');
+                
+                console.log('Calling delete API...');
+                const response = await deletePayment(paymentId);
+                console.log('Delete API response:', response);
+                
+                if (response && response.success) {
+                    console.log('Payment deleted successfully, refreshing list...');
+                    await fetchPayments(); // Refresh the list
+                    console.log('Payment list refreshed');
+                    
+                    // Show success message
+                    alert(`Payment ${response.invoiceId} deleted successfully!`);
+                } else {
+                    console.error('Delete response indicates failure:', response);
+                    setError('Payment deletion failed - unexpected response');
+                }
+            } catch (error) {
+                console.error('=== DELETE PAYMENT ERROR ===');
+                console.error('Error deleting payment:', error);
+                console.error('Error type:', typeof error);
+                console.error('Error keys:', Object.keys(error || {}));
+                console.error('Error response:', error.response?.data);
+                console.error('Error message:', error.message);
+                console.error('============================');
+                
+                let errorMessage = 'Failed to delete payment';
+                if (error.response?.data?.message) {
+                    errorMessage = error.response.data.message;
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                setError(errorMessage);
+                alert(`Error: ${errorMessage}`);
+            } finally {
+                setLoading(false);
+                console.log('=== DELETE PAYMENT COMPLETED ===');
+            }
+        } else {
+            console.log('Delete payment cancelled by user');
+        }
+    };
+
+    const handleEditFieldChange = (field, value) => {
+        setEditFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
     };
 
     return (
@@ -372,23 +495,63 @@ const PaymentHistory = () => {
                                                 <Typography variant="body1" fontWeight="bold">
                                                     {payment.totalAmount.toLocaleString()}
                                                 </Typography>
-                                                {payment.discount > 0 && (
-                                                    <Typography variant="caption" color="error">
-                                                        Discount: {payment.discount.toLocaleString()}
+                                                {editingPaymentId === payment._id ? (
+                                                    <TextField
+                                                        size="small"
+                                                        type="number"
+                                                        label="Discount"
+                                                        value={editFormData.discount || 0}
+                                                        onChange={(e) => handleEditFieldChange('discount', parseFloat(e.target.value) || 0)}
+                                                        sx={{ mt: 1, width: 100 }}
+                                                    />
+                                                ) : (
+                                                    payment.discount > 0 && (
+                                                        <Typography variant="caption" color="error">
+                                                            Discount: {payment.discount.toLocaleString()}
+                                                        </Typography>
+                                                    )
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                {editingPaymentId === payment._id ? (
+                                                    <TextField
+                                                        select
+                                                        size="small"
+                                                        value={editFormData.paymentMethod || 'Cash'}
+                                                        onChange={(e) => handleEditFieldChange('paymentMethod', e.target.value)}
+                                                        sx={{ width: 120 }}
+                                                    >
+                                                        <MenuItem value="Cash">Cash</MenuItem>
+                                                        <MenuItem value="Card">Card</MenuItem>
+                                                        <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
+                                                        <MenuItem value="Online">Online</MenuItem>
+                                                    </TextField>
+                                                ) : (
+                                                    <Typography variant="body2">
+                                                        {payment.paymentMethod}
                                                     </Typography>
                                                 )}
                                             </TableCell>
                                             <TableCell>
-                                                <Typography variant="body2">
-                                                    {payment.paymentMethod}
-                                                </Typography>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Chip
-                                                    label={payment.paymentStatus}
-                                                    color={getStatusColor(payment.paymentStatus)}
-                                                    size="small"
-                                                />
+                                                {editingPaymentId === payment._id ? (
+                                                    <TextField
+                                                        select
+                                                        size="small"
+                                                        value={editFormData.paymentStatus || 'Paid'}
+                                                        onChange={(e) => handleEditFieldChange('paymentStatus', e.target.value)}
+                                                        sx={{ width: 120 }}
+                                                    >
+                                                        <MenuItem value="Paid">Paid</MenuItem>
+                                                        <MenuItem value="Pending">Pending</MenuItem>
+                                                        <MenuItem value="Refunded">Refunded</MenuItem>
+                                                    </TextField>
+                                                ) : (
+                                                    <Chip
+                                                        label={payment.paymentStatus}
+                                                        color={getStatusColor(payment.paymentStatus)}
+                                                        size="small"
+                                                    />
+                                                )}
                                             </TableCell>
                                             <TableCell>
                                                 <Typography variant="body2">
@@ -399,15 +562,58 @@ const PaymentHistory = () => {
                                                 </Typography>
                                             </TableCell>
                                             <TableCell>
-                                                <Tooltip title="View Invoice">
-                                                    <IconButton
-                                                        onClick={() => handleViewInvoice(payment.invoiceId)}
-                                                        color="primary"
-                                                        size="small"
-                                                    >
-                                                        <Visibility />
-                                                    </IconButton>
-                                                </Tooltip>
+                                                {editingPaymentId === payment._id ? (
+                                                    <Box display="flex" gap={1}>
+                                                        <Tooltip title="Save Changes">
+                                                            <IconButton
+                                                                onClick={() => handleSaveEdit(payment._id)}
+                                                                color="success"
+                                                                size="small"
+                                                            >
+                                                                <Save />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title="Cancel">
+                                                            <IconButton
+                                                                onClick={handleCancelEdit}
+                                                                color="default"
+                                                                size="small"
+                                                            >
+                                                                <Cancel />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </Box>
+                                                ) : (
+                                                    <Box display="flex" gap={1}>
+                                                        <Tooltip title="View Invoice">
+                                                            <IconButton
+                                                                onClick={() => handleViewInvoice(payment.invoiceId)}
+                                                                color="primary"
+                                                                size="small"
+                                                            >
+                                                                <Visibility />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title="Edit Payment">
+                                                            <IconButton
+                                                                onClick={() => handleEditPayment(payment)}
+                                                                color="warning"
+                                                                size="small"
+                                                            >
+                                                                <Edit />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title="Delete Payment">
+                                                            <IconButton
+                                                                onClick={() => handleDeletePayment(payment._id)}
+                                                                color="error"
+                                                                size="small"
+                                                            >
+                                                                <Delete />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </Box>
+                                                )}
                                             </TableCell>
                                         </TableRow>
                                     ))

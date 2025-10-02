@@ -1,12 +1,10 @@
 const express = require('express');
 const dotenv = require('dotenv');
-require('dotenv').config();
-
 const cors = require('cors');
 const connectDB = require('./config/db');
 
 // Environment variables configuration
-dotenv.config();
+dotenv.config({ path: './.env' });
 
 // Connect to MongoDB database
 connectDB();
@@ -16,6 +14,9 @@ const app = express();
 // --- Middleware ---
 app.use(cors()); // Enable CORS for cross-origin requests (e.g., from frontend)
 app.use(express.json()); // Enable body parser for JSON requests
+
+// Serve static files (uploaded payment slips)
+app.use('/uploads', express.static('uploads'));
 
 // --- Basic Route ---
 app.get("/", (req,res) => {

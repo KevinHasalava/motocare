@@ -28,7 +28,8 @@ import CreateWalkInJob from "./components/adminJob/CreateWalkInJob";
 // 💰 NEW IMPORT: Cashier Portal Components
 import CashierPortal from "./components/Cashier/CashierPortal";
 import PaymentHistory from "./components/Cashier/PaymentHistory";
-import CashierDashboard from "./pages/CashierDashboard"; 
+import CashierDashboard from "./pages/CashierDashboard";
+import MyPayments from "./pages/MyPayments"; 
 
 export default function App() {
   return (
@@ -65,6 +66,9 @@ export default function App() {
         <Route path="/cashier-dashboard" element={<CashierDashboard />} />
         <Route path="/cashier" element={<CashierPortal />} />
         <Route path="/payment-history" element={<PaymentHistory />} />
+        
+        {/* 💳 User Payment Routes */}
+        <Route path="/my-payments" element={<MyPayments />} />
 
         {/* Inventory Management Routes */}
         <Route path="/inventory" element={<InventoryPage />} />

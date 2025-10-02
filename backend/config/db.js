@@ -4,8 +4,6 @@ const mongoose = require('mongoose');
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       // This option is essential for Mongoose transactions
       // It ensures write operations are replicated across a majority of nodes
       w: 'majority',

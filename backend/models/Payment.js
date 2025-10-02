@@ -80,7 +80,7 @@ const paymentSchema = new mongoose.Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ['Cash', 'Card', 'Bank Transfer', 'Other'],
+        enum: ['Cash', 'Card', 'Bank Transfer', 'Online', 'Other'],
         default: 'Cash'
     },
     paymentStatus: {
@@ -96,6 +96,23 @@ const paymentSchema = new mongoose.Schema({
     notes: {
         type: String,
         default: ''
+    },
+    paymentSlip: {
+        url: {
+            type: String
+        },
+        uploadedAt: {
+            type: Date
+        },
+        notes: {
+            type: String,
+            default: ''
+        },
+        status: {
+            type: String,
+            enum: ['Under Review', 'Approved', 'Rejected'],
+            default: 'Under Review'
+        }
     },
     createdAt: {
         type: Date,
