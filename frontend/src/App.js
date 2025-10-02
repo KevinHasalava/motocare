@@ -52,7 +52,6 @@ export default function App() {
         <Route path="/admin/walkinjob" element={<CreateWalkInJob />} />
 
         {/* 3. View/Edit Routes - TEMPORARILY REMOVED to avoid build errors.         */}
-           We will add these back once the EditJob.js file is created. 
         <Route path="/admin/jobs/view/:id" element={<EditJob isViewMode={true} />} />
         <Route path="/admin/jobs/edit/:id" element={<EditJob />} />
 

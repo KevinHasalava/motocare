@@ -343,10 +343,10 @@ const updateJob = async (req, res) => {
     if (!job) return res.status(404).json({ message: "Job not found" });
 
     // ----------------------------------------------------------------------
-    // Saving old details for change detection
+    // Saving old details for change detection - ✅ FIXED to handle null/undefined job.date
     const oldJobDetails = {
-        oldDate: job.date.toISOString().split('T')[0],
-        oldTime: job.date.toISOString().split('T')[1].substring(0, 5),
+        oldDate: job.date ? job.date.toISOString().split('T')[0] : '', // FIX
+        oldTime: job.date ? job.date.toISOString().split('T')[1].substring(0, 5) : '', // FIX
         oldStatus: job.status
     };
     // ----------------------------------------------------------------------
@@ -356,7 +356,8 @@ const updateJob = async (req, res) => {
     let isTimeUpdated = false;
     if (date && time) {
         const newDate = new Date(`${date}T${time}:00`);
-        if (job.date.getTime() !== newDate.getTime()) {
+        // Check if job.date exists before getTime()
+        if (!job.date || job.date.getTime() !== newDate.getTime()) {
              job.date = newDate;
              job.timeSlot = `${date} ${time}`;
              isTimeUpdated = true;
@@ -388,10 +389,10 @@ const updateJob = async (req, res) => {
     }
     
     // ----------------------------------------------------------------------
-    // Send Email Confirmation for Update
+    // Send Email Confirmation for Update - ✅ FIXED to handle null/undefined job.date
     // ----------------------------------------------------------------------
-    const newDateStr = job.date.toISOString().split('T')[0];
-    const newTimeStr = job.date.toISOString().split('T')[1].substring(0, 5);
+    const newDateStr = job.date ? job.date.toISOString().split('T')[0] : ''; // FIX
+    const newTimeStr = job.date ? job.date.toISOString().split('T')[1].substring(0, 5) : ''; // FIX
     
     // Send email if Date/Time or Status has changed
     if (oldJobDetails.oldDate !== newDateStr || oldJobDetails.oldTime !== newTimeStr || oldJobDetails.oldStatus !== job.status) {
@@ -458,36 +459,41 @@ const generateJobPdf = async (req, res) => {
         // Job Overview
         doc.fontSize(16).fillColor('#2c3e50').text(`JOB ID: ${job.jobId}`, { underline: true });
         doc.moveDown(0.5);
+        
+        // Use job.date with dayjs for formatting, dayjs handles null/undefined gracefully
+        const jobDateFormatted = job.date ? dayjs(job.date).format('YYYY-MM-DD') : 'N/A';
+        const jobTimeFormatted = job.date ? dayjs(job.date).format('hh:mm A') : 'N/A';
+
         doc.fontSize(12).fillColor('#333')
            .text(`Status: ${job.status}`, { continued: true })
-           .text(` | Date: ${dayjs(job.date).format('YYYY-MM-DD')}`, { continued: true })
-           .text(` | Time: ${dayjs(job.date).format('hh:mm A')}`);
+           .text(` | Date: ${jobDateFormatted}`, { continued: true })
+           .text(` | Time: ${jobTimeFormatted}`);
         doc.moveDown(1);
         
-        // Customer Details
+        // Customer Details (Conditional checks added for safety, though Mongoose populate usually ensures existence)
         doc.fontSize(14).fillColor('#2c3e50').text('Customer Details', { underline: true });
         doc.moveDown(0.5);
         doc.fontSize(10)
-           .text(`Name: ${job.user.name}`)
-           .text(`Email: ${job.user.email}`)
-           .text(`Phone: ${job.user.phoneNumber}`);
+           .text(`Name: ${job.user?.name || 'N/A'}`)
+           .text(`Email: ${job.user?.email || 'N/A'}`)
+           .text(`Phone: ${job.user?.phoneNumber || 'N/A'}`);
         doc.moveDown(1);
         
         // Vehicle Details
         doc.fontSize(14).fillColor('#2c3e50').text('Vehicle Details', { underline: true });
         doc.moveDown(0.5);
         doc.fontSize(10)
-           .text(`Number: ${job.vehicle.vehicleNumber}`)
-           .text(`Brand / Model: ${job.vehicle.brand} ${job.vehicle.model}`)
-           .text(`Type / Year: ${job.vehicle.type} (${job.vehicle.year})`);
+           .text(`Number: ${job.vehicle?.vehicleNumber || 'N/A'}`)
+           .text(`Brand / Model: ${job.vehicle?.brand || 'N/A'} ${job.vehicle?.model || 'N/A'}`)
+           .text(`Type / Year: ${job.vehicle?.type || 'N/A'} (${job.vehicle?.year || 'N/A'})`);
         doc.moveDown(1);
         
         // Service Details
         doc.fontSize(14).fillColor('#2c3e50').text('Service & Assignment', { underline: true });
         doc.moveDown(0.5);
         doc.fontSize(10)
-           .text(`Service Name: ${job.service.name}`)
-           .text(`Estimated Duration: ${job.service.duration} minutes`)
+           .text(`Service Name: ${job.service?.name || 'N/A'}`)
+           .text(`Estimated Duration: ${job.service?.duration || 'N/A'} minutes`)
            .text(`Mechanic: ${job.mechanic ? job.mechanic.name : 'Auto Assign (TBD)'}`);
         doc.moveDown(1);
 
