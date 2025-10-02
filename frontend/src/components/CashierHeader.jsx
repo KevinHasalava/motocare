@@ -17,7 +17,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { theme } from '../utils/theme';
 
-const AdminHeader = () => {
+const CashierHeader = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
   
@@ -261,4 +261,4 @@ const AdminHeader = () => {
   );
 };
 
-export default AdminHeader;
+export default CashierHeader;

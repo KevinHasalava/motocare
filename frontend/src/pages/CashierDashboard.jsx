@@ -19,7 +19,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
-import AdminHeader from '../components/AdminHeader';
+import CashierHeader from '../components/CashierHeader';
 
 const CashierContainer = styled(Box)(({ theme }) => ({
     backgroundColor: '#f5f7fa',
@@ -85,7 +85,7 @@ const CashierDashboard = () => {
 
     return (
         <>
-            <AdminHeader />
+            <CashierHeader />
             <CashierContainer>
                 <Container maxWidth="lg">
                     <WelcomeSection elevation={0}>

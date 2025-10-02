@@ -37,7 +37,7 @@ import {
 import { styled } from '@mui/material/styles';
 import { getAllPayments, updatePayment, deletePayment } from '../../api/paymentApi';
 import Invoice from './Invoice';
-import AdminHeader from '../AdminHeader';
+import CashierHeader from '../CashierHeader';
 
 const HistoryContainer = styled(Box)(({ theme }) => ({
     backgroundColor: '#f5f7fa',
@@ -296,7 +296,7 @@ const PaymentHistory = () => {
 
     return (
         <>
-            <AdminHeader />
+            <CashierHeader />
             <HistoryContainer>
             <MainPaper>
                 <HeaderSection>

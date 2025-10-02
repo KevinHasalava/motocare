@@ -1,13 +1,13 @@
 import React from 'react';
 import Header from './Header';
-import AdminHeader from './AdminHeader';
+import CashierHeader from './CashierHeader';
 
 const HeaderWrapper = (props) => {
   const user = JSON.parse(localStorage.getItem('user'));
   
-  // If user is admin, mechanic, or cashier, use AdminHeader
+  // If user is admin, mechanic, or cashier, use CashierHeader
   if (user && ['admin', 'mechanic', 'cashier'].includes(user.userType)) {
-    return <AdminHeader {...props} />;
+    return <CashierHeader {...props} />;
   }
   
   // Otherwise use regular Header for customers or non-logged-in users
