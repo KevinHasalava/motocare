@@ -197,9 +197,17 @@ const CashierPortal = () => {
             }
         } catch (error) {
             console.error('Error fetching job:', error);
-            setError(error.message || 'Error fetching job data');
-            setJobData(null);
-            setVehicleData(null);
+            
+            // Handle specific case for already paid jobs
+            if (error.paymentExists) {
+                setError(`⚠️ ${error.message}\n\nThis job has already been processed. You can edit or delete the existing payment from the Payment History section.`);
+                setJobData(null);
+                setVehicleData(error.vehicle);
+            } else {
+                setError(error.message || 'Error fetching job data');
+                setJobData(null);
+                setVehicleData(null);
+            }
         } finally {
             setLoading(false);
         }
@@ -218,10 +226,10 @@ const CashierPortal = () => {
         } else {
             setExtraItems([...extraItems, {
                 inventoryItem: item._id,
-                itemName: item.name,
+                itemName: item?.name || 'Unknown Item',
                 quantity: quantity,
-                unitPrice: item.salesPrice,
-                availableStock: item.quantity
+                unitPrice: item?.salesPrice || 0,
+                availableStock: item?.quantity || 0
             }]);
         }
         setInventorySearch('');
@@ -243,8 +251,8 @@ const CashierPortal = () => {
 
     // Calculate payment
     const handleCalculatePayment = async () => {
-        if (!jobData) {
-            setError('No job selected for payment calculation');
+        if (!jobData || !jobData._id) {
+            setError('No valid job selected for payment calculation');
             return;
         }
 
@@ -398,7 +406,7 @@ const CashierPortal = () => {
                                     <Autocomplete
                                         options={vehicleOptions}
                                         getOptionLabel={(option) => 
-                                            `${option.vehicleNumber} - ${option.brand} ${option.model} (${option.ownerName})`
+                                            `${option?.vehicleNumber || 'N/A'} - ${option?.brand || ''} ${option?.model || ''} (${option?.ownerName || 'Unknown Owner'})`
                                         }
                                         renderInput={(params) => (
                                             <TextField
@@ -442,13 +450,13 @@ const CashierPortal = () => {
                                         <Grid container spacing={2}>
                                             <Grid item xs={12}>
                                                 <Typography variant="h6" color="primary">
-                                                    {jobData ? jobData.user.name : vehicleData?.ownerName}
+                                                    {jobData?.user?.name || vehicleData?.ownerName || 'No customer info'}
                                                 </Typography>
                                                 <Typography variant="body2" color="textSecondary">
-                                                    {jobData ? jobData.user.email : 'No email available'}
+                                                    {jobData?.user?.email || 'No email available'}
                                                 </Typography>
                                                 <Typography variant="body2" color="textSecondary">
-                                                    {jobData ? jobData.user.phone : 'No phone available'}
+                                                    {jobData?.user?.phone || 'No phone available'}
                                                 </Typography>
                                             </Grid>
                                             <Grid item xs={12}>
@@ -478,7 +486,7 @@ const CashierPortal = () => {
                                 <SectionCard>
                                     <SectionHeader>
                                         <Build sx={{ mr: 1, color: '#ffc107' }} />
-                                        Service Details - Job ID: {jobData.jobId}
+                                        Service Details - Job ID: {jobData?.jobId || 'N/A'}
                                     </SectionHeader>
                                     <CardContent>
                                         <Grid container spacing={3}>
@@ -487,7 +495,7 @@ const CashierPortal = () => {
                                                     Service
                                                 </Typography>
                                                 <Typography variant="h6">
-                                                    {jobData.service.name}
+                                                    {jobData?.service?.name || 'No service info'}
                                                 </Typography>
                                             </Grid>
                                             <Grid item xs={12} sm={6} md={3}>
@@ -495,7 +503,7 @@ const CashierPortal = () => {
                                                     Price
                                                 </Typography>
                                                 <Typography variant="h6" color="primary">
-                                                    LKR {jobData.service.price.toLocaleString()}
+                                                    LKR {jobData?.service?.price?.toLocaleString() || '0'}
                                                 </Typography>
                                             </Grid>
                                             <Grid item xs={12} sm={6} md={3}>
@@ -503,7 +511,7 @@ const CashierPortal = () => {
                                                     Duration
                                                 </Typography>
                                                 <Typography variant="body1">
-                                                    {jobData.service.duration} minutes
+                                                    {jobData?.service?.duration || 0} minutes
                                                 </Typography>
                                             </Grid>
                                             <Grid item xs={12} sm={6} md={3}>
@@ -511,8 +519,8 @@ const CashierPortal = () => {
                                                     Status
                                                 </Typography>
                                                 <Chip 
-                                                    label={jobData.status} 
-                                                    color={jobData.status === 'Completed' ? 'success' : 'warning'}
+                                                    label={jobData?.status || 'Unknown'} 
+                                                    color={jobData?.status === 'Completed' ? 'success' : 'warning'}
                                                 />
                                             </Grid>
                                         </Grid>
@@ -535,7 +543,7 @@ const CashierPortal = () => {
                                                 <Autocomplete
                                                     options={inventoryOptions}
                                                     getOptionLabel={(option) => 
-                                                        `${option.name} - LKR ${option.salesPrice} (Stock: ${option.quantity})`
+                                                        `${option?.name || 'Unknown Item'} - LKR ${option?.salesPrice || 0} (Stock: ${option?.quantity || 0})`
                                                     }
                                                     renderInput={(params) => (
                                                         <TextField
