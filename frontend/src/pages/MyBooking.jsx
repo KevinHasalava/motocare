@@ -10,7 +10,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
-// ඔබගේ project එකේ components වලට අදාළ නිවැරදි path යොදන්න
 import { theme } from "../utils/theme";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
