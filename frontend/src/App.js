@@ -14,6 +14,7 @@ import MyBookings from "./pages/MyBooking";
 import AdminRegister from "./pages/AdminRegister";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
+import AdminBookingManagement from "./pages/admin/AdminBookingManagement";
 import UserProfile from "./pages/UserProfile";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -53,6 +54,7 @@ export default function App() {
         <Route path="/admin-service" element={< ServicesPage/>} />
         <Route path="/admin-dashboard" element={< AdminDashboard/>} />
         <Route path="/admin-users" element={< UserManagement/>} />
+        <Route path="/admin/bookings" element={< AdminBookingManagement/>} />
 
         <Route path="/forgot-password" element={<ForgotPassword />} />
   <Route path="/reset-password" element={<ResetPassword />} />

@@ -45,6 +45,7 @@ const UserManagement = () => {
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [userTypeFilter, setUserTypeFilter] = useState("all");
   const [formData, setFormData] = useState(defaultFormState);
   const [editUserId, setEditUserId] = useState(null);
 
@@ -138,12 +139,16 @@ const UserManagement = () => {
     );
 
   // filter logic
-  const filteredUsers = users.filter((u) =>
-    [u.name, u.email, u.phone, u.userType]
+  const filteredUsers = users.filter((u) => {
+    const matchesSearch = [u.name, u.email, u.phone, u.userType]
       .join(" ")
       .toLowerCase()
-      .includes(searchQuery.toLowerCase())
-  );
+      .includes(searchQuery.toLowerCase());
+    
+    const matchesUserType = userTypeFilter === "all" || u.userType === userTypeFilter;
+    
+    return matchesSearch && matchesUserType;
+  });
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#111827" }}>
@@ -205,31 +210,64 @@ const UserManagement = () => {
                 Add New User
               </Button>
 
-              {/* Search Bar */}
-              <TextField
-                variant="outlined"
-                placeholder="Search users..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                sx={{
-                  minWidth: { xs: "100%", sm: "300px" },
-                  background: "rgba(255,255,255,0.06)",
-                  borderRadius: "30px",
-                  input: { color: "white" },
-                  "& .MuiOutlinedInput-root": {
+              {/* Filter and Search Controls */}
+              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+                {/* User Type Filter */}
+                <TextField
+                  select
+                  value={userTypeFilter}
+                  onChange={(e) => setUserTypeFilter(e.target.value)}
+                  sx={{
+                    minWidth: "150px",
+                    background: "rgba(255,255,255,0.06)",
                     borderRadius: "30px",
-                    color: "white",
-                  },
-                  "& .MuiInputLabel-root": { color: "#9ca3af" },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search sx={{ color: "#9ca3af" }} />
-                    </InputAdornment>
-                  ),
-                }}
-              />
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "30px",
+                      color: "white",
+                    },
+                    "& .MuiInputLabel-root": { color: "#9ca3af" },
+                    "& .MuiSelect-icon": { color: "#9ca3af" },
+                  }}
+                  variant="outlined"
+                  size="small"
+                  label="Filter by Type"
+                  InputLabelProps={{
+                    sx: { color: "#9ca3af" }
+                  }}
+                >
+                  <MenuItem value="all">All Types</MenuItem>
+                  <MenuItem value="customer">Customer</MenuItem>
+                  <MenuItem value="admin">Admin</MenuItem>
+                  <MenuItem value="mechanic">Mechanic</MenuItem>
+                  <MenuItem value="cashier">Cashier</MenuItem>
+                </TextField>
+
+                {/* Search Bar */}
+                <TextField
+                  variant="outlined"
+                  placeholder="Search users..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  sx={{
+                    minWidth: { xs: "100%", sm: "300px" },
+                    background: "rgba(255,255,255,0.06)",
+                    borderRadius: "30px",
+                    input: { color: "white" },
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "30px",
+                      color: "white",
+                    },
+                    "& .MuiInputLabel-root": { color: "#9ca3af" },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search sx={{ color: "#9ca3af" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
             </Box>
 
             {/* User Table */}
