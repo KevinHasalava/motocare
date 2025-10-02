@@ -418,7 +418,7 @@ const updateJob = async (req, res) => {
   }
 };
 
-// ------------------- 🚀 NEW: PDF GENERATION CONTROLLER -------------------
+// ------------------- NEW: PDF GENERATION CONTROLLER -------------------
 
 /**
  * Generates and streams a PDF document containing the job details.
