@@ -12,17 +12,16 @@ import {
 } from "@mui/material";
 import {
   Logout as LogoutIcon,
-  Dashboard as DashboardIcon,
-  Payment as PaymentIcon,
-  Receipt as InvoiceIcon,
-  History as HistoryIcon,
+  Build as RepairIcon,
+  Assignment as TaskIcon,
+  Timeline as ProgressIcon,
   Person as ProfileIcon,
   Home as HomeIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Logo from "./Landing_Page/Logo";
 
-const CashierHeader = () => {
+const MechanicHeader = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
@@ -91,18 +90,18 @@ const CashierHeader = () => {
             variant="h6"
             sx={{
               fontWeight: 700,
-              background: "linear-gradient(90deg, #f59e0b, #ef4444)",
+              background: "linear-gradient(90deg, #10b981, #3b82f6)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               cursor: "pointer",
             }}
-            onClick={() => navigate("/cashier-dashboard")}
+            onClick={() => navigate("/mechanic-portal")}
           >
-            Cashier Portal
+            Mechanic Portal
           </Typography>
         </Stack>
 
-        {/* Center: Cashier Navigation (desktop only) */}
+        {/* Center: Mechanic Navigation (desktop only) */}
         <Stack
           direction="row"
           spacing={2}
@@ -110,31 +109,31 @@ const CashierHeader = () => {
         >
           <Button 
             startIcon={<HomeIcon />} 
-            onClick={() => navigate("/cashier-dashboard")} 
+            onClick={() => navigate("/mechanic-portal")} 
             sx={navButtonStyle}
           >
             Dashboard
           </Button>
           <Button 
-            startIcon={<PaymentIcon />} 
-            onClick={() => navigate("/cashier/payments")} 
+            startIcon={<TaskIcon />} 
+            onClick={() => navigate("/mechanic/jobs")} 
             sx={navButtonStyle}
           >
-            Process Payments
+            My Jobs
           </Button>
           <Button 
-            startIcon={<InvoiceIcon />} 
-            onClick={() => navigate("/cashier/invoices")} 
+            startIcon={<RepairIcon />} 
+            onClick={() => navigate("/mechanic/active-jobs")} 
             sx={navButtonStyle}
           >
-            Generate Invoice
+            Active Work
           </Button>
           <Button 
-            startIcon={<HistoryIcon />} 
-            onClick={() => navigate("/cashier/payment-history")} 
+            startIcon={<ProgressIcon />} 
+            onClick={() => navigate("/mechanic/job-history")} 
             sx={navButtonStyle}
           >
-            Payment History
+            Job History
           </Button>
         </Stack>
 
@@ -145,7 +144,7 @@ const CashierHeader = () => {
               avatar={
                 <Avatar
                   sx={{
-                    background: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)",
+                    background: "linear-gradient(135deg, #10b981 0%, #3b82f6 100%)",
                     color: "white !important",
                   }}
                 >
@@ -153,16 +152,16 @@ const CashierHeader = () => {
                 </Avatar>
               }
               label={user.name}
-              onClick={() => navigate("/cashier/profile")} 
+              onClick={() => navigate("/mechanic/profile")} 
               sx={{
-                background: "rgba(245, 158, 11, 0.1)",
-                border: "1px solid rgba(245, 158, 11, 0.3)",
+                background: "rgba(16, 185, 129, 0.1)",
+                border: "1px solid rgba(16, 185, 129, 0.3)",
                 color: "white",
                 fontWeight: 600,
                 px: 1,
                 cursor: "pointer",
                 "&:hover": {
-                  background: "rgba(245, 158, 11, 0.2)",
+                  background: "rgba(16, 185, 129, 0.2)",
                 },
                 "& .MuiChip-avatar": {
                   color: "white",
@@ -214,4 +213,4 @@ const CashierHeader = () => {
   );
 };
 
-export default CashierHeader;
+export default MechanicHeader;
