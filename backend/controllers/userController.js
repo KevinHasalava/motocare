@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password, userType } = req.body;
+    const { name, email, phone, password, userType } = req.body;
     console.log("Registration attempt:", { name, email, userType });
 
     // Email duplicate check
@@ -18,7 +18,7 @@ const registerUser = async (req, res) => {
     }
 
     // Don't hash password here - the User model pre-save hook will handle it
-    const user = new User({ name, email, password, userType: userType || "customer" });
+    const user = new User({ name, email, password, phone, userType: userType || "customer" });
     await user.save();
     console.log("User created successfully:", { id: user._id, email: user.email, userType: user.userType });
 
@@ -58,38 +58,113 @@ const loginUser = async (req, res) => {
 
     console.log("User found:", { id: user._id, email: user.email, userType: user.userType });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      console.log("Password mismatch for user:", email);
-      return res.status(400).json({ message: "Invalid email or password" });
-    }
+  // create token
+   const token = jwt.sign(
+    { 
+      user: {           // ← Added 'user' wrapper
+        id: user._id,   // ← Changed from just 'id'
+        userType: user.userType  // ← Changed from 'type'
+      }
+    }, 
+    process.env.JWT_SECRET, 
+    { expiresIn: "1d" }
+  );
+  res.json({
+    message: "✅ Login success",
+    token,
+    user: { _id: user._id, name: user.name, email: user.email, userType: user.userType },
+  });
 
-    console.log("Password match successful for user:", email);
-
-    // create token
-    const token = jwt.sign(
-      { id: user._id, type: user.userType }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: "1d" }
-    );
-
-    console.log("Login successful for user:", { email: user.email, userType: user.userType });
-
-    res.json({
-      message: "✅ Login success",
-      token,
-      user: { _id: user._id, name: user.name, email: user.email, userType: user.userType }
-    });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error: " + err.message });
   }
 };
 
-// 🆕 Get user profile
+
+const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ message: "🗑️ User deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const updateUser = async (req, res) => {
+  try {
+    const { name, email, phone, password, userType } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (phone) user.phone = phone;
+    if (userType) user.userType = userType;
+
+    await user.save();
+    res.status(200).json({ message: "✅ User updated", user });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const getUserStats = async (req, res) => {
+  try {
+    const stats = await User.aggregate([
+      {
+        $group: {
+          _id: '$userType',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+    const labels = ['customer', 'admin', 'mechanic','cashier'];
+    const data = Array(labels.length).fill(0);
+    stats.forEach((s) => {
+      const index = labels.indexOf(s._id);
+      if (index !== -1) data[index] = s.count;
+    });
+    res.status(200).json({ labels, data });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const updatePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // check old password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "❌ Current password is incorrect" });
+    }
+
+    // change password (hashing happens in schema pre-save hook)
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({ message: "✅ Password updated successfully!" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Get user profile 
 const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user.id).select('-password');
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -99,50 +174,37 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-// 🆕 Update user profile
+// Update user profile
 const updateUserProfile = async (req, res) => {
   try {
-    const { name, email, phoneNumber } = req.body;
-    const userId = req.user.id;
+    const { name, email, phone } = req.body;
+    const user = await User.findById(req.user.id);
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    // Check if email is being changed and if it's already taken
-    if (email) {
-      const existingUser = await User.findOne({ email, _id: { $ne: userId } });
-      if (existingUser) {
+    // Check if email is being changed and if it already exists
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({ email });
+      if (emailExists) {
         return res.status(400).json({ message: "Email already exists" });
       }
     }
 
-    // Check if phone number is being changed and if it's already taken
-    if (phoneNumber) {
-      const existingPhone = await User.findOne({ phoneNumber, _id: { $ne: userId } });
-      if (existingPhone) {
-        return res.status(400).json({ message: "Phone number already exists" });
-      }
-    }
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (phone) user.phone = phone;
 
-    const updateData = {};
-    if (name) updateData.name = name;
-    if (email) updateData.email = email;
-    if (phoneNumber) updateData.phoneNumber = phoneNumber;
-
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      updateData,
-      { new: true, runValidators: true }
-    ).select("-password");
-
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.status(200).json({
-      message: "✅ Profile updated successfully",
-      user: updatedUser
-    });
+    await user.save();
+    
+    // Return user without password
+    const updatedUser = await User.findById(user._id).select('-password');
+    res.status(200).json({ message: "✅ Profile updated", user: updatedUser });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-module.exports = { registerUser, getUsers, loginUser, getUserProfile, updateUserProfile };
+
+module.exports = { registerUser, getUsers, loginUser, deleteUser, updateUser, getUserStats, updatePassword, getUserProfile, updateUserProfile};

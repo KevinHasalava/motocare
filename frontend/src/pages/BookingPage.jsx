@@ -11,6 +11,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { ThemeProvider } from "@mui/material/styles";
 import { useNavigate, useLocation } from "react-router-dom";
 
+
 import {
     getVehiclesForUser,
     getAllServices,
@@ -26,12 +27,36 @@ import StepServiceSelect from "../components/Booking/StepServiceSelect";
 import StepDateTime from "../components/Booking/StepDateTime";
 import StepConfirm from "../components/Booking/StepConfirm";
 
-import { theme, backgroundKeyframes, mockData, gradientText } from "../utils/theme";
+import { theme, backgroundKeyframes } from "../utils/theme";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import handleBookServiceClick from "../pages/VehiclePage";
 
 const steps = ["Select Vehicle", "Select Service", "Choose Date, Time & Mechanic", "Confirm"];
+
+class ErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false };
+    }
+
+    static getDerivedStateFromError(error) {
+        return { hasError: true };
+    }
+
+    componentDidCatch(error, errorInfo) {
+        console.error('Booking Error:', error, errorInfo);
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return <Box p={3}>
+                <Alert severity="error">Something went wrong in the booking process. Please try again.</Alert>
+                <Button onClick={() => window.location.reload()} sx={{ mt: 2 }}>Reload Page</Button>
+            </Box>;
+        }
+        return this.props.children;
+    }
+}
 
 const BookingPage = () => {
     // ... (useState, useEffect, and other functions remain exactly the same) ...
@@ -247,11 +272,11 @@ const BookingPage = () => {
                 <CssBaseline />
                 <GlobalStyles styles={backgroundKeyframes} />
                 <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-                    <Header navItems={mockData.navItems} onBookNowClick={handleBookServiceClick} theme={theme} />
+                    <Header theme={theme} />
                     <Box component="main" sx={{ flexGrow: 1, pt: "80px", pb: 8 }}>
                         <Container maxWidth="lg" sx={{ mt: 8 }}>
                             <Paper sx={{ p: 3, mb: 4, background: 'linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1))' }}>
-                                <Typography variant="h4" sx={gradientText}>Book a Service</Typography>
+                                <Typography variant="h4" sx={{ background: 'linear-gradient(to right, #6366f1, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Book a Service</Typography>
                             </Paper>
                             {error && <Alert severity="error">{error}</Alert>}
                             <Stepper activeStep={activeStep} sx={{ mb: 4 }}>

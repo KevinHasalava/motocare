@@ -1,5 +1,5 @@
+// backend/controllers/vehicleController.js
 const Vehicle = require('../models/Vehicle');
-
 
 // Add new vehicle
 const addVehicle = async (req, res) => {
