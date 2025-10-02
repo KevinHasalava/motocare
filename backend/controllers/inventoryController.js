@@ -1,3 +1,4 @@
+// controllers/inventoryController.js
 const Inventory = require('../models/inventory');
 
 // Get all inventory items with optional search and sort
@@ -54,7 +55,7 @@ exports.createInventoryItem = async (req, res) => {
 // Update an inventory item
 exports.updateInventoryItem = async (req, res) => {
     try {
-        // Exclude quantity, buyingPrice, and salesPrice from being updated directly
+        // Exclude quantity and price fields from direct update
         const { quantity, buyingPrice, ...updateData } = req.body;
         const updatedItem = await Inventory.findByIdAndUpdate(
             req.params.id, 

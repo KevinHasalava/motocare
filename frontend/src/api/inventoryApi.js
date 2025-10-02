@@ -21,3 +21,7 @@ export const updateInventoryItem = async (id, itemData) => {
 export const deleteInventoryItem = async (id) => {
     return await axios.delete(`${API_URL}/${id}`);
 };
+
+export const getLowStockParts = async () => {
+  return await axios.get(`${API_URL}/low-stock`);
+};

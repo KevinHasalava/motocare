@@ -31,9 +31,8 @@ const serviceRoutes = require('./routes/serviceRoutes');
 const userRoutes = require('./routes/userRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const availabilityRoutes = require('./routes/availabilityRoutes');
-// 🛠️ NEW IMPORT: For fetching services, mechanics, and user vehicle data
 const dataRoutes = require('./routes/dataRoutes'); 
-
+const purchaseRequestRoutes = require('./routes/purchaseRequestRoutes');
 
 
 // --- API Endpoints ---
@@ -53,8 +52,10 @@ app.use('/api/suppliers', require('./routes/supplierRoutes'));
 app.use('/api/stock', require('./routes/stockRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
 
+// NEW ENDPOINT: Route for Purchase Requests
+app.use('/api/purchase-requests', purchaseRequestRoutes);
 
-// 🎯 NEW ENDPOINT: Route for general data fetching required by the frontend forms
+// Route for general data fetching required by the frontend forms
 app.use('/api/data', dataRoutes); 
 
 
