@@ -3,12 +3,13 @@ const router = express.Router();
 const {
     getLowStockParts,
     createPurchaseRequest,
-} = require('../controllers/purchaseRequestController.js');
+    getPurchaseRequestById,
+    getAllPurchaseRequests
+} = require('../controllers/purchaseRequestController');
 
-// Route to get items that are below their lowStockThreshold
 router.get('/low-stock-parts', getLowStockParts);
-
-// Route to create a new request, save it, and send the email
+router.get('/', getAllPurchaseRequests);
+router.get('/:id', getPurchaseRequestById);
 router.post('/', createPurchaseRequest);
 
 module.exports = router;

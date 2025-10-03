@@ -4,8 +4,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 //inventory
 import './App.css';
 import InventoryPage from './components/InventoryCom/InventoryPage';
-import SupplierPage from './components/InventoryCom/SupplierPage';
-import StockPage from './components/InventoryCom/StockPage';
+import SupplierPage from './components/InventoryCom/SupplierPage'; // Kept for the route definition
+import StockPage from './components/InventoryCom/StockPage'; // Kept for the route definition
+// 📦 IMPORT: The Purchase Request View Component
+import PurchaseRequestView from './components/InventoryCom/PurchaseRequestView'; 
+// 📦 NEW IMPORT: The Purchase Request List Component
+import PurchaseRequestListPage from './components/InventoryCom/PurchaseRequestListPage'; 
 
 // Import your pages
 import Landing from "./pages/Landing";
@@ -65,21 +69,32 @@ export default function App() {
         {/* Mechanic Portal */}
         <Route path="/mechanic-portal" element={<MechanicPortal />} />
         
-        {/* 🛠️ NEW ROUTE: Manual Walk-In Job Creation (for Cashier) */}
+        {/* NEW ROUTE: Manual Walk-In Job Creation (for Cashier) */}
         <Route path="/admin/walkinjob" element={<CreateWalkInJob />} />
 
-        {/* 💰 NEW ROUTES: Cashier Portal */}
+        {/* NEW ROUTES: Cashier Portal */}
         <Route path="/cashier-dashboard" element={<CashierDashboard />} />
         <Route path="/cashier" element={<CashierPortal />} />
         <Route path="/payment-history" element={<PaymentHistory />} />
         
-        {/* 💳 User Payment Routes */}
+        {/* User Payment Routes */}
         <Route path="/my-payments" element={<MyPayments />} />
 
         {/* Inventory Management Routes */}
         <Route path="/inventory" element={<InventoryPage />} />
+        {/* ✂️ REMOVED ROUTE: <Route path="/suppliers" element={<SupplierPage />} /> */}
+        {/* ✂️ REMOVED ROUTE: <Route path="/stock" element={<StockPage />} /> */}
+        
+        {/* These routes are now accessed directly from InventoryPage */}
         <Route path="/suppliers" element={<SupplierPage />} />
         <Route path="/stock" element={<StockPage />} />
+
+
+        {/* NEW ROUTE: View ALL Purchase Requests */}
+        <Route path="/purchase-requests" element={<PurchaseRequestListPage />} /> 
+        {/* Existing Route: View a single Purchase Request by ID */}
+        <Route path="/purchase-requests/:id" element={<PurchaseRequestView />} />
+
 
         <Route path="/admin-service" element={< ServicesPage/>} />
         <Route path="/admin-dashboard" element={< AdminDashboard/>} />
@@ -87,7 +102,7 @@ export default function App() {
         <Route path="/admin/bookings" element={< AdminBookingManagement/>} />
 
         <Route path="/forgot-password" element={<ForgotPassword />} />
-  <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
       </Routes>
     </Router>

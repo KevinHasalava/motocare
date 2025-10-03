@@ -1,13 +1,11 @@
 const mongoose = require('mongoose');
 
 const purchaseRequestSchema = new mongoose.Schema({
-    // Link to the Supplier who will receive the order
     supplier: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Supplier',
         required: [true, 'Supplier is required for the request.'],
     },
-    // Array of parts included in this request
     requestedItems: [
         {
             inventoryItem: {
@@ -16,7 +14,7 @@ const purchaseRequestSchema = new mongoose.Schema({
                 required: true,
             },
             partName: {
-                type: String, // Denormalized name for easy history viewing
+                type: String,
                 required: true,
             },
             currentStock: {
@@ -46,7 +44,7 @@ const purchaseRequestSchema = new mongoose.Schema({
         default: 'Pending',
     },
     sentBy: {
-        type: String, // You might want to link this to a User ID in a full system
+        type: String,
         default: 'System User',
     }
 });

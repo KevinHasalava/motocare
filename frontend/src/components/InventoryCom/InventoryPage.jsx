@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container, Typography, Box, Button, CircularProgress, Alert, IconButton,
   createTheme, ThemeProvider, Snackbar
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber'; // Import Warning Icon
-import CloseIcon from '@mui/icons-material/Close'; // Import Close Icon for Snackbar
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import CloseIcon from '@mui/icons-material/Close';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+// 📦 NEW IMPORTS: Icons for Stock and Supplier navigation
+import GroupWorkIcon from '@mui/icons-material/GroupWork'; // For Suppliers
+import AssessmentIcon from '@mui/icons-material/Assessment'; // For Stock
 
 // Local Component Imports
 import StatsCards from './StatsCards';
@@ -19,12 +24,13 @@ import CreatePurchaseRequestDialog from './CreatePurchaseRequestDialog';
 import { getInventoryItems, deleteInventoryItem } from '../../api/inventoryApi';
 
 const InventoryPage = () => {
+  const navigate = useNavigate();
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   // Dialog States
-  const [openAddEditDialog, setOpenAddEditDialog] = useState(false); // Renamed from openDialog
+  const [openAddEditDialog, setOpenAddEditDialog] = useState(false);
   const [itemToEdit, setItemToEdit] = useState(null);
   const [openRequestDialog, setOpenRequestDialog] = useState(false);
   const [lowStockRequestItems, setLowStockRequestItems] = useState([]);
@@ -43,7 +49,7 @@ const InventoryPage = () => {
             ? {
                 // Palette for light mode
                 background: { default: '#f5f5f5', paper: '#fff' },
-                warning: { // Added Warning color for the button
+                warning: {
                     main: '#ff9800',
                     light: '#ffb74d',
                 }
@@ -51,7 +57,7 @@ const InventoryPage = () => {
             : {
                 // Palette for dark mode
                 background: { default: '#121212', paper: '#1d1d1d' },
-                warning: { // Warning color for dark mode (can be same or adjusted)
+                warning: {
                     main: '#ffb74d',
                     light: '#ffb74d',
                 }
@@ -77,13 +83,11 @@ const InventoryPage = () => {
 
   useEffect(() => { fetchItems(); }, []);
 
-  // Updated to use setOpenAddEditDialog
   const handleAddClick = () => {
     setItemToEdit(null);
     setOpenAddEditDialog(true);
   };
 
-  // Updated to use setOpenAddEditDialog
   const handleEditClick = (item) => {
     setItemToEdit(item);
     setOpenAddEditDialog(true);
@@ -108,7 +112,6 @@ const InventoryPage = () => {
     const totalItems = inventory.length;
     const lowStockCount = inventory.filter(item => item.quantity <= item.lowStockThreshold).length;
     const totalInventoryValue = inventory.reduce((sum, item) => sum + (item.quantity * (item.buyingPrice || 0)), 0);
-    // Passing the raw number to prevent .toFixed() errors in child components
     return { totalItems, lowStockCount, totalInventoryValue }; 
   }, [inventory]);
 
@@ -126,14 +129,14 @@ const InventoryPage = () => {
       setSnackbarMessage({ open: true, message: 'No low stock items available to create a request.', severity: 'info' });
       return;
     }
-    setLowStockRequestItems(lowStockItems); // Prefill dialog
+    setLowStockRequestItems(lowStockItems);
     setOpenRequestDialog(true);
   };
 
   const handleRequestSuccess = (message) => {
     setSnackbarMessage({ open: true, message, severity: 'success' });
     fetchItems();
-    setOpenRequestDialog(false); // Close dialog on success
+    setOpenRequestDialog(false);
   };
 
   const handleCloseSnackbar = (event, reason) => {
@@ -158,25 +161,51 @@ const InventoryPage = () => {
             <Alert severity="error">{error}</Alert>
           ) : (
             <>
-              {/* NOTE: If StatsCards expects a formatted string for totalInventoryValue, 
-                  you must format it before passing it, e.g., totalInventoryValue.toFixed(2) 
-                  or handle formatting inside StatsCards component. */}
               <StatsCards stats={stats} />
 
               {/* Action Buttons: Positioned to the right and styled */}
               <Box sx={{ 
                   display: 'flex', 
-                  justifyContent: 'flex-end', // Aligns buttons to the right
-                  gap: 2, // Space between buttons
+                  justifyContent: 'flex-end',
+                  gap: 2,
                   mb: 2, 
                   mt: 4 
               }}>
+                {/* 🛠️ NEW BUTTON: Navigate to Supplier Page */}
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    startIcon={<GroupWorkIcon />}
+                    onClick={() => navigate('/suppliers')}
+                >
+                    View Suppliers
+                </Button>
+
+                {/* 🛠️ NEW BUTTON: Navigate to Stock Page */}
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    startIcon={<AssessmentIcon />}
+                    onClick={() => navigate('/stock')}
+                >
+                    View Stock Reports
+                </Button>
+
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<ListAltIcon />}
+                    onClick={() => navigate('/purchase-requests')}
+                >
+                    View All Requests
+                </Button>
+
                 <Button
                     variant="contained"
-                    color="warning" // Uses the warning palette color
+                    color="warning"
                     startIcon={<WarningAmberIcon />}
                     onClick={handleLowStockRequest}
-                    disabled={stats.lowStockCount === 0} // Disable if no low stock items
+                    disabled={stats.lowStockCount === 0}
                 >
                     Request Low Stock Items ({stats.lowStockCount})
                 </Button>
@@ -201,7 +230,7 @@ const InventoryPage = () => {
 
           {/* Add/Edit Inventory Dialog */}
           <AddEditInventoryDialog
-            open={openAddEditDialog} // Updated state name
+            open={openAddEditDialog}
             handleClose={() => setOpenAddEditDialog(false)}
             itemToEdit={itemToEdit}
             onSave={() => {
