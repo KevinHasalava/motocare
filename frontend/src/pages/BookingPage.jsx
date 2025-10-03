@@ -26,7 +26,7 @@ import StepServiceSelect from "../components/Booking/StepServiceSelect";
 import StepDateTime from "../components/Booking/StepDateTime";
 import StepConfirm from "../components/Booking/StepConfirm";
 
-import { theme } from "../utils/theme";
+import { theme, backgroundKeyframes } from "../utils/theme";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 

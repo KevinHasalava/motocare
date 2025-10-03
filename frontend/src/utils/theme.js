@@ -70,7 +70,7 @@ export const mockData = {
     { 
       title: "Live Queue Update", 
       description: "Real-time progress tracking so you never miss your turn.", 
-      gradient: `linear-gradient(to right, ${theme.palette.success  .main}, ${theme.palette.success.dark})` 
+      gradient: `linear-gradient(to right, ${theme.palette.success.main}, ${theme.palette.success.dark})` 
     }
   ],
   

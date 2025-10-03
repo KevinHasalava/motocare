@@ -66,7 +66,7 @@ const CashierHeader = () => {
     switch (userType) {
       case 'admin':
         return [
-          { label: 'Admin Dashboard', path: '/admin-job-view', icon: <DashboardIcon /> },
+          { label: 'Admin Dashboard', path: '/admin-dashboard', icon: <DashboardIcon /> },
           { label: 'Manage Services', path: '/admin-service', icon: <SettingsIcon /> },
           { label: 'Create Walk-in Job', path: '/admin/walkinjob', icon: <BuildIcon /> }
         ];

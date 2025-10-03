@@ -57,13 +57,13 @@ const MechanicPortal = () => {
         switch (tabIndex) {
             case 0: // Today's Jobs
                 return jobs.filter(job => 
-                    dayjs(job.booking?.date).format('YYYY-MM-DD') === now.format('YYYY-MM-DD')
+                    dayjs(job.booking?.date || job.date).format('YYYY-MM-DD') === now.format('YYYY-MM-DD')
                 );
             case 1: // Active Jobs (Ongoing)
                 return jobs.filter(job => job.status === 'Ongoing');
             case 2: // Upcoming Jobs
                 return jobs.filter(job => 
-                    dayjs(job.booking?.date).isAfter(now) && job.status === 'Booked'
+                    dayjs(job.booking?.date || job.date).isAfter(now) && job.status === 'Booked'
                 );
             case 3: // Completed Jobs
                 return jobs.filter(job => job.status === 'Completed');
@@ -396,10 +396,10 @@ const MechanicPortal = () => {
                                                             fontWeight: 600,
                                                             mb: 1
                                                         }}>
-                                                            {job.booking?.service?.name}
+                                                            {job.service?.name || 'Service not specified'}
                                                         </Typography>
                                                         <Typography variant="body2" sx={{ color: '#94a3b8' }}>
-                                                            Duration: {job.booking?.service?.duration || 'N/A'} mins
+                                                            Duration: {job.service?.duration || 'N/A'} mins
                                                         </Typography>
                                                     </Box>
 
@@ -408,19 +408,19 @@ const MechanicPortal = () => {
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                             <CarIcon sx={{ color: '#6b7280', fontSize: '1rem' }} />
                                                             <Typography variant="body2" sx={{ color: '#94a3b8' }}>
-                                                                {job.booking?.vehicle?.brand} {job.booking?.vehicle?.model}
+                                                                {job.vehicle?.vehicleNumber || 'Vehicle number not available'} - {job.vehicle?.brand} {job.vehicle?.model}
                                                             </Typography>
                                                         </Box>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                             <PersonIcon sx={{ color: '#6b7280', fontSize: '1rem' }} />
                                                             <Typography variant="body2" sx={{ color: '#94a3b8' }}>
-                                                                {job.booking?.user?.name}
+                                                                {job.user?.name || 'Customer name not available'}
                                                             </Typography>
                                                         </Box>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                             <AccessTimeIcon sx={{ color: '#6b7280', fontSize: '1rem' }} />
                                                             <Typography variant="body2" sx={{ color: '#94a3b8' }}>
-                                                                {dayjs(job.booking?.date).format('ddd, D MMM YYYY, h:mm A')}
+                                                                {dayjs(job.booking?.date || job.date).format('ddd, D MMM YYYY, h:mm A')}
                                                             </Typography>
                                                         </Box>
                                                         {job.workHours && (

@@ -122,8 +122,8 @@ const AdminHeader = () => {
           <Button startIcon={<Inventory />} onClick={() => navigate("/admin/services")} sx={navButtonStyle}>
             Services
           </Button>
-          <Button startIcon={<Assignment />} onClick={() => navigate("/admin/tasks")} sx={navButtonStyle}>
-            Tasks
+          <Button startIcon={<Assignment />} onClick={() => navigate("/inventory")} sx={navButtonStyle}>
+            Inventory
           </Button>
           <Button startIcon={<Payment />} onClick={() => navigate("/admin/payments")} sx={navButtonStyle}>
             Payments

@@ -7,8 +7,13 @@ const jwt = require("jsonwebtoken");
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password, userType } = req.body;
-    console.log("Registration attempt:", { name, email, userType });
+    const { name, email, phone, password, userType } = req.body;
+    console.log("Registration attempt:", { name, email, phone, userType });
+
+    // Validate required fields
+    if (!name || !email || !phone || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
     // Email duplicate check
     const exists = await User.findOne({ email });
@@ -17,14 +22,21 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
+    // Phone duplicate check
+    const phoneExists = await User.findOne({ phone });
+    if (phoneExists) {
+      console.log("Phone already exists:", phone);
+      return res.status(400).json({ message: "Phone number already exists" });
+    }
+
     // Don't hash password here - the User model pre-save hook will handle it
-    const user = new User({ name, email, password, userType: userType || "customer" });
+    const user = new User({ name, email, phone, password, userType: userType || "customer" });
     await user.save();
     console.log("User created successfully:", { id: user._id, email: user.email, userType: user.userType });
 
     res.status(201).json({ 
       message: "✅ Registered", 
-      user: { _id: user._id, name: user.name, email: user.email, userType: user.userType }
+      user: { _id: user._id, name: user.name, email: user.email, phone: user.phone, userType: user.userType }
     });
   } catch (err) {
     console.error("Registration error:", err);
@@ -35,7 +47,7 @@ const registerUser = async (req, res) => {
 // get all users (for testing)
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find({}, 'name email userType createdAt').sort({ createdAt: -1 });
+    const users = await User.find({}, 'name email phone userType createdAt').sort({ createdAt: -1 });
     console.log("Fetching all users, count:", users.length);
     res.status(200).json(users);
   } catch (err) {
@@ -106,7 +118,7 @@ const getUserProfile = async (req, res) => {
 // 🆕 Update user profile
 const updateUserProfile = async (req, res) => {
   try {
-    const { name, email, phoneNumber } = req.body;
+    const { name, email, phone } = req.body;
     const userId = req.user.id;
 
     // Check if email is being changed and if it's already taken
@@ -118,8 +130,8 @@ const updateUserProfile = async (req, res) => {
     }
 
     // Check if phone number is being changed and if it's already taken
-    if (phoneNumber) {
-      const existingPhone = await User.findOne({ phoneNumber, _id: { $ne: userId } });
+    if (phone) {
+      const existingPhone = await User.findOne({ phone, _id: { $ne: userId } });
       if (existingPhone) {
         return res.status(400).json({ message: "Phone number already exists" });
       }
@@ -128,7 +140,7 @@ const updateUserProfile = async (req, res) => {
     const updateData = {};
     if (name) updateData.name = name;
     if (email) updateData.email = email;
-    if (phoneNumber) updateData.phoneNumber = phoneNumber;
+    if (phone) updateData.phone = phone;
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
@@ -149,4 +161,115 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, getUsers, loginUser, getUserProfile, updateUserProfile };
+// 🆕 Delete user (Admin only)
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedUser = await User.findByIdAndDelete(id);
+    
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    res.status(200).json({ message: "✅ User deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// 🆕 Update user (Admin only)
+const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, phone, userType } = req.body;
+    
+    // Check if email is being changed and if it's already taken
+    if (email) {
+      const existingUser = await User.findOne({ email, _id: { $ne: id } });
+      if (existingUser) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+    }
+    
+    // Check if phone is being changed and if it's already taken
+    if (phone) {
+      const existingPhone = await User.findOne({ phone, _id: { $ne: id } });
+      if (existingPhone) {
+        return res.status(400).json({ message: "Phone number already exists" });
+      }
+    }
+    
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
+    if (phone) updateData.phone = phone;
+    if (userType) updateData.userType = userType;
+    
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select("-password");
+    
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    res.status(200).json({
+      message: "✅ User updated successfully",
+      user: updatedUser
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// 🆕 Get user stats (Admin only)
+const getUserStats = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const adminUsers = await User.countDocuments({ userType: 'admin' });
+    const customerUsers = await User.countDocuments({ userType: 'customer' });
+    const mechanicUsers = await User.countDocuments({ userType: 'mechanic' });
+    const cashierUsers = await User.countDocuments({ userType: 'cashier' });
+    
+    const stats = {
+      total: totalUsers,
+      admin: adminUsers,
+      customer: customerUsers,
+      mechanic: mechanicUsers,
+      cashier: cashierUsers
+    };
+    
+    res.status(200).json({ data: stats, message: "User stats retrieved successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// 🆕 Update user password (Admin only)
+const updatePassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+    
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
+    }
+    
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    // Update password (pre-save hook will hash it)
+    user.password = password;
+    await user.save();
+    
+    res.status(200).json({ message: "✅ Password updated successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { registerUser, getUsers, loginUser, getUserProfile, updateUserProfile, deleteUser, updateUser, getUserStats, updatePassword };

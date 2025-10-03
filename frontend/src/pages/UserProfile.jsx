@@ -44,7 +44,7 @@ const UserProfilePage = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phoneNumber: ''
+    phone: ''
   });
 
   const navigate = useNavigate();
@@ -86,7 +86,7 @@ const UserProfilePage = () => {
         setFormData({
           name: userData.name || '',
           email: userData.email || '',
-          phoneNumber: userData.phoneNumber || ''
+          phone: userData.phone || ''
         });
         setRetryCount(0); // Reset retry count on success
       } else {

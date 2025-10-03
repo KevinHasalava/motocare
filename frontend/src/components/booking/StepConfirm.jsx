@@ -16,6 +16,7 @@ const StepConfirm = ({ vehicle, service, date, time, mechanic, onBack, onConfirm
     const icons = {
       car: '🚗',
       motorcycle: '🏍️',
+      'three wheel': '🛺',
       truck: '🚛',
       bus: '🚌',
       van: '🚐',
