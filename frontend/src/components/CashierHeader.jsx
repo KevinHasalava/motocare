@@ -18,6 +18,11 @@ import {
   History as HistoryIcon,
   Person as ProfileIcon,
   Home as HomeIcon,
+  Build as BuildIcon,
+  AddTask as AddTaskIcon,
+  Settings as SettingsIcon,
+  Engineering as EngineeringIcon,
+  Receipt as ReceiptIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Logo from "./Landing_Page/Logo";
@@ -155,7 +160,7 @@ const CashierHeader = () => {
           sx={{ display: { xs: "none", md: "flex" } }}
         >
           <Button 
-            startIcon={<HomeIcon />} 
+            startIcon={<DashboardIcon />} 
             onClick={() => navigate("/cashier-dashboard")} 
             sx={navButtonStyle}
           >
@@ -163,24 +168,24 @@ const CashierHeader = () => {
           </Button>
           <Button 
             startIcon={<PaymentIcon />} 
-            onClick={() => navigate("/cashier/payments")} 
+            onClick={() => navigate("/cashier")} 
             sx={navButtonStyle}
           >
             Process Payments
           </Button>
           <Button 
-            startIcon={<InvoiceIcon />} 
-            onClick={() => navigate("/cashier/invoices")} 
-            sx={navButtonStyle}
-          >
-            Generate Invoice
-          </Button>
-          <Button 
             startIcon={<HistoryIcon />} 
-            onClick={() => navigate("/cashier/payment-history")} 
+            onClick={() => navigate("/payment-history")} 
             sx={navButtonStyle}
           >
             Payment History
+          </Button>
+          <Button 
+            startIcon={<AddTaskIcon />} 
+            onClick={() => navigate("/admin/walkinjob")} 
+            sx={navButtonStyle}
+          >
+            Create Walk-in Job
           </Button>
         </Stack>
 

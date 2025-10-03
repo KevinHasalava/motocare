@@ -119,7 +119,7 @@ const AdminHeader = () => {
           <Button startIcon={<Build />} onClick={() => navigate("/admin/vehicles")} sx={navButtonStyle}>
             Vehicles
           </Button>
-          <Button startIcon={<Inventory />} onClick={() => navigate("/admin/services")} sx={navButtonStyle}>
+          <Button startIcon={<Inventory />} onClick={() => navigate("/admin-service")} sx={navButtonStyle}>
             Services
           </Button>
           <Button startIcon={<Assignment />} onClick={() => navigate("/inventory")} sx={navButtonStyle}>

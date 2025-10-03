@@ -246,7 +246,7 @@ const AdminDashboard = () => {
                   description="Service packages"
                   icon={<Inventory />}
                   color="#10b981"
-                  path="/admin/services"
+                  path="/admin-service"
                 />
               </Grid>
               <Grid item xs={12} sm={4}>

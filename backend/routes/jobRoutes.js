@@ -11,7 +11,7 @@ const {
   
   // 🚀 IMPORTS REQUIRED FOR VIEW/EDIT FUNCTIONALITY
   getJobDetails, // Handles GET /api/jobs/:id
-  updateJob,     // Handles PUT /api/jobs/:id
+  updateJobDetails, // Handles PUT /api/jobs/:id
   
   // 💡 NEW IMPORT: PDF Generation Function
   generateJobPdf // Handles GET /api/jobs/:id/download-pdf
@@ -42,7 +42,7 @@ router.put("/:id/status", updateJobStatus);
 router.get("/:id", getJobDetails); 
 
 // ✏️ Update Job (Full Edit) - PUT /api/jobs/:id
-router.put("/:id", updateJob);
+router.put("/:id", updateJobDetails);
 
 // ------------------- 🚀 NEW: PDF DOWNLOAD ROUTE -------------------
 

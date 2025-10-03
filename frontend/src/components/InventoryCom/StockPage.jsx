@@ -13,6 +13,8 @@ import 'jspdf-autotable';
 import { getStockMovements, deleteStockMovement } from '../../api/stockApi';
 import AddStockInForm from './AddStockInForm';
 import AddStockOutForm from './AddStockOutForm';
+import AdminHeader from "../../components/AdminHeader";
+
 
 const StockPage = () => {
   const [stockMovements, setStockMovements] = useState([]);
@@ -182,7 +184,8 @@ const StockPage = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 4, color: 'text.primary' }}>
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 10, color: 'text.primary' }}>
+        <AdminHeader />
         <Container maxWidth="xl">
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>

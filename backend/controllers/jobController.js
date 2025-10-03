@@ -361,7 +361,7 @@ const getJobDetails = async (req, res) => {
   }
 };
 
-const updateJob = async (req, res) => {
+const updateJobDetails = async (req, res) => {
   try {
     const jobId = req.params.id;
     const { customerName, customerEmail, customerPhoneNumber, service, date, time, mechanic, status } = req.body;
@@ -553,6 +553,6 @@ module.exports = {
   createWalkInJob,
   deleteJobOnly,
   getJobDetails,
-  updateJob,
+  updateJobDetails,
   generateJobPdf,
 };

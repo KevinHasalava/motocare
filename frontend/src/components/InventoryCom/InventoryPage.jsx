@@ -15,6 +15,8 @@ import DownloadIcon from '@mui/icons-material/Download';
 // Icons for Stock and Supplier navigation
 import GroupWorkIcon from '@mui/icons-material/GroupWork'; 
 import AssessmentIcon from '@mui/icons-material/Assessment'; 
+import AdminHeader from "../../components/AdminHeader";
+
 
 // PDF Library Imports
 import jsPDF from 'jspdf';
@@ -202,7 +204,8 @@ const InventoryPage = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 4, color: 'text.primary' }}>
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 10, color: 'text.primary' }}>
+        <AdminHeader />
         <Container maxWidth="xl">
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
             <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Inventory Dashboard</Typography>

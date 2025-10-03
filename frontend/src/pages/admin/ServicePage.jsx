@@ -8,6 +8,8 @@ import {
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import AdminHeader from "../../components/AdminHeader";
+
 
 const vehicleTypes = ['Car', 'Van', 'SUV', 'Motorcycle', 'Three Wheel'];
 
@@ -111,7 +113,8 @@ const ServicesPage = () => {
 
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Container maxWidth="lg" sx={{ mt: 15, mb: 4 }}>
+            <AdminHeader/>
             <Paper sx={{ p: 3 }}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
                     <Typography variant="h4" component="h1">Manage Services</Typography>
