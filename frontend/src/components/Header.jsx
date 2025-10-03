@@ -27,6 +27,10 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
   const [vehicleMenuAnchor, setVehicleMenuAnchor] = useState(null);
   const [profileMenuAnchor, setProfileMenuAnchor] = useState(null);
   const navigate = useNavigate();
+  const savedUser = JSON.parse(localStorage.getItem('user'));
+  const isLoggedIn = !!savedUser;
+
+  const isAdmin = user?.userType === "admin";
 
   // Handle scroll effect
   useEffect(() => {
@@ -228,6 +232,43 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
 
       {/* Navigation Items */}
       <List sx={{ p: 2 }}>
+        {/* ✅ Admin Dashboard link (only visible for admins) */}
+{isAdmin && (
+  <Fade in timeout={200}>
+    <ListItem disablePadding sx={{ mb: 1 }}>
+      <ListItemButton 
+        onClick={() => { navigate('/admin-dashboard'); setIsMenuOpen(false); }}
+        sx={{
+          borderRadius: 2,
+          py: 1.5,
+          px: 2,
+          background: 'linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(255, 159, 64, 0.1) 100%)',
+          border: '1px solid rgba(255, 107, 107, 0.3)',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            background: 'linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 159, 64, 0.2) 100%)',
+            borderColor: 'rgba(255, 107, 107, 0.5)',
+            transform: 'translateX(8px)',
+          }
+        }}
+      >
+        <Stack direction="row" spacing={2} alignItems="center">
+          <DashboardIcon sx={{ fontSize: 20, color: '#ff6b6b' }} />
+          <ListItemText 
+            primary="Admin Dashboard" 
+            sx={{ 
+              '& .MuiListItemText-primary': { 
+                color: 'white',
+                fontWeight: 600,
+                fontSize: '1rem'
+              } 
+            }} 
+          />
+        </Stack>
+      </ListItemButton>
+    </ListItem>
+  </Fade>
+)}
         {navItems.map((item, index) => (
           <Fade in timeout={300 + index * 100} key={item}>
             <ListItem disablePadding sx={{ mb: 1 }}>
@@ -507,6 +548,29 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
               alignItems="center" 
               sx={{ display: { xs: 'none', md: 'flex' } }}
             >
+              {/* ✅ Admin Dashboard button (desktop) */}
+              {isAdmin && (
+                <Fade in timeout={200}>
+                  <Button 
+                    onClick={() => navigate('/admin-dashboard')}
+                    startIcon={<DashboardIcon />}
+                    sx={{
+                      mx: 0.5,
+                      px: 2.5,
+                      py: 1,
+                      borderRadius: 2,
+                      color: 'white',
+                      fontWeight: 600,
+                      background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                      border: 'none',
+                      '&:hover': {transform: 'translateY(-2px)',
+                      boxShadow: '0 6px 18px rgba(99, 102, 241, 0.4)', }
+                    }}
+                  >
+                    Admin Dashboard
+                  </Button>
+                </Fade>
+              )}
               {navItems.map((item, index) => (
                 <Fade in timeout={300 + index * 100} key={item}>
                   <Button 

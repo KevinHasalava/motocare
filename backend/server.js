@@ -35,6 +35,7 @@ const availabilityRoutes = require('./routes/availabilityRoutes');
 const dataRoutes = require('./routes/dataRoutes'); 
 
 
+
 // --- API Endpoints ---
 
 // Standard Routes
@@ -44,6 +45,8 @@ app.use("/api/services", serviceRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/availability", availabilityRoutes); 
+app.use('/api/admin', require('./routes/adminRoutes'));
+
 
 app.use('/api/inventory', require('./routes/inventoryRoutes'));
 app.use('/api/suppliers', require('./routes/supplierRoutes'));

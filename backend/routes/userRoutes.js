@@ -14,5 +14,9 @@ router.post("/login", loginUser);
 // 🆕 User Profile Routes
 router.get("/profile", auth, getUserProfile);
 router.put("/profile", auth, updateUserProfile);
+router.delete("/:id", auth, deleteUser);
+router.put("/:id", auth, updateUser);
+router.get("/stats/data", auth, getUserStats);
+router.put("/:id/password", auth, updatePassword);
 
 module.exports = router;

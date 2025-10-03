@@ -21,6 +21,11 @@ import MyBookings from "./pages/MyBooking";
 import AdminRegister from "./pages/AdminRegister";
 import UserProfile from "./pages/UserProfile";
 import MechanicPortal from "./pages/MechanicPortal";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserManagement from "./pages/admin/UserManagement";
+import AdminBookingManagement from "./pages/admin/AdminBookingManagement";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // 🛠️ NEW IMPORT: Component for manual job creation (Cashier/Admin)
 import CreateWalkInJob from "./components/adminJob/CreateWalkInJob"; 
@@ -54,7 +59,8 @@ export default function App() {
 
         {/* Admin/Staff Views */}
         <Route path="/admin-job-view" element={<AdminJobView />} />
-        <Route path="/admin-service" element={<ServicesPage />} />
+
+
         
         {/* Mechanic Portal */}
         <Route path="/mechanic-portal" element={<MechanicPortal />} />
@@ -74,6 +80,14 @@ export default function App() {
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/suppliers" element={<SupplierPage />} />
         <Route path="/stock" element={<StockPage />} />
+
+        <Route path="/admin-service" element={< ServicesPage/>} />
+        <Route path="/admin-dashboard" element={< AdminDashboard/>} />
+        <Route path="/admin-users" element={< UserManagement/>} />
+        <Route path="/admin/bookings" element={< AdminBookingManagement/>} />
+
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+  <Route path="/reset-password" element={<ResetPassword />} />
 
       </Routes>
     </Router>
