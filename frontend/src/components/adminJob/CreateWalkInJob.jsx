@@ -10,6 +10,7 @@ import {
 } from '@mui/icons-material';
 import { createWalkInJob, fetchJobsByDateAndMechanic } from '../../api/job'; // Assuming you added this
 import { fetchServices, fetchMechanics, fetchVehiclesByEmail } from '../../api/data'; 
+import CashierHeader from '../CashierHeader';
 
 // --- Styled Components (No changes) ---
 const AdminContainer = styled(Box)(({ theme }) => ({
@@ -473,17 +474,19 @@ const CreateWalkInJob = () => {
 
     return (
         <AdminContainer>
+            <CashierHeader />
+            {/* <AdminHeader/> */}
             <AdminPaper>
                 <AdminHeader>
-                    <Typography variant="h5" fontWeight={600}>
+                    <Typography variant="h5" fontWeight={600} sx={{ mt: 4, opacity: 0.9 }}>
                         Walk-In Job Creation
                     </Typography>
-                    <Typography variant="body2" sx={{ mt: 0.5, opacity: 0.9 }}>
+                    <Typography variant="body2" sx={{ mt: 4, opacity: 0.9 }}>
                         Create service jobs for walk-in customers
                     </Typography>
                 </AdminHeader>
 
-                <Box sx={{ p: 3 }}>
+                <Box sx={{ p: 10 }}>
                     {successMsg && (
                         <Alert severity="success" onClose={() => setSuccessMsg('')} sx={{ mb: 2 }}>
                             {successMsg}
