@@ -1,3 +1,4 @@
 @echo off
-cd /d "c:\Users\ASUS\OneDrive\Desktop\Moto-Care\backend"
+cd /d "C:\Users\ASUS\OneDrive\Desktop\Moto-Care\backend"
+echo Starting backend server...
 node server.js

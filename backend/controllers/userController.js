@@ -89,12 +89,16 @@ const loginUser = async (req, res) => {
 // 🆕 Get user profile
 const getUserProfile = async (req, res) => {
   try {
+    console.log('Getting profile for user ID:', req.user.id);
     const user = await User.findById(req.user.id).select("-password");
     if (!user) {
+      console.log('User not found with ID:', req.user.id);
       return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).json(user);
+    console.log('User profile found:', user.name, user.email);
+    res.status(200).json({ data: user, message: "Profile retrieved successfully" });
   } catch (err) {
+    console.error('Error getting user profile:', err);
     res.status(500).json({ message: err.message });
   }
 };

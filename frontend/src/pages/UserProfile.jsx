@@ -80,14 +80,18 @@ const UserProfilePage = () => {
       
       const response = await getUserProfile();
       
-      if (response.data) {
-        setUser(response.data);
+      if (response.data && response.data.data) {
+        const userData = response.data.data;
+        setUser(userData);
         setFormData({
-          name: response.data.name || '',
-          email: response.data.email || '',
-          phoneNumber: response.data.phoneNumber || ''
+          name: userData.name || '',
+          email: userData.email || '',
+          phoneNumber: userData.phoneNumber || ''
         });
         setRetryCount(0); // Reset retry count on success
+      } else {
+        console.error('Unexpected response format:', response.data);
+        setError('Invalid response format from server');
       }
     } catch (err) {
       console.error('Profile fetch error:', err);
