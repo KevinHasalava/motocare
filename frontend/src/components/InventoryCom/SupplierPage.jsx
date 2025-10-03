@@ -3,9 +3,14 @@ import {
   Container, Typography, Box, Button, CircularProgress, Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import DownloadIcon from '@mui/icons-material/Download';
 import { getSuppliers, deleteSupplier } from '../../api/supplierApi';
-import DataTable from '../DataTable'; // Note: Path is now relative to pages/
-import AddEditSupplierDialog from './AddEditSupplierDialog'; // Note: Path is now relative to pages/
+import DataTable from '../DataTable'; 
+import AddEditSupplierDialog from './AddEditSupplierDialog';
+
+// Import the PDF libraries
+import jsPDF from 'jspdf';
+import 'jspdf-autotable'; // This extends jsPDF with the autoTable method
 
 const SupplierPage = () => {
   const [suppliers, setSuppliers] = useState([]);
@@ -50,10 +55,49 @@ const SupplierPage = () => {
     }
   };
 
+  // -------------------------------------------------------------------
+  // **FIXED IMPLEMENTATION:** PDF Download Handler using jsPDF
+  // -------------------------------------------------------------------
+  const handleDownloadPdf = () => {
+    const doc = new jsPDF();
+    
+    const head = [['Supplier ID', 'Name', 'Phone', 'Email']];
+    
+    // Prepare data body from filtered suppliers
+    const body = filteredSuppliers.map(s => [
+        s.supplierId || '-',
+        s.name,
+        s.contact?.phone || '-',
+        s.contact?.email || '-'
+    ]);
+
+    if (body.length === 0) {
+        alert("No suppliers to download.");
+        return;
+    }
+
+    // Add title
+    doc.setFontSize(18);
+    doc.text("Supplier List Report", 14, 20);
+
+    // Generate table using jspdf-autotable
+    doc.autoTable({
+        startY: 25, // Start table below the title
+        head: head,
+        body: body,
+        theme: 'striped',
+        headStyles: { fillColor: [52, 73, 94] }, // Dark header background
+        styles: { fontSize: 10, cellPadding: 2, overflow: 'linebreak' }
+    });
+
+    // Save the PDF file
+    doc.save('Supplier_List.pdf');
+  };
+  // -------------------------------------------------------------------
+
   const columns = [
     { id: 'supplierId', label: 'Supplier ID', render: (row) => row.supplierId || '-' },
     { id: 'name', label: 'Name' },
-    // **FIXED:** Added optional chaining to prevent crash
     { id: 'contact.phone', label: 'Phone', render: (row) => row.contact?.phone || '-' },
     { id: 'contact.email', label: 'Email', render: (row) => row.contact?.email || '-' },
     {
@@ -78,7 +122,16 @@ const SupplierPage = () => {
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
         Supplier Management
       </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+      
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mb: 2 }}>
+        <Button
+          variant="outlined"
+          startIcon={<DownloadIcon />}
+          onClick={handleDownloadPdf}
+          disabled={loading || filteredSuppliers.length === 0}
+        >
+          Download PDF
+        </Button>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -87,6 +140,7 @@ const SupplierPage = () => {
           Add Supplier
         </Button>
       </Box>
+      
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
           <CircularProgress />

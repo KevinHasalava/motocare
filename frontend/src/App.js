@@ -4,8 +4,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 //inventory
 import './App.css';
 import InventoryPage from './components/InventoryCom/InventoryPage';
-import SupplierPage from './components/InventoryCom/SupplierPage';
-import StockPage from './components/InventoryCom/StockPage';
+import SupplierPage from './components/InventoryCom/SupplierPage'; // Kept for the route definition
+import StockPage from './components/InventoryCom/StockPage'; // Kept for the route definition
+// 📦 IMPORT: The Purchase Request View Component
+import PurchaseRequestView from './components/InventoryCom/PurchaseRequestView'; 
+// 📦 NEW IMPORT: The Purchase Request List Component
+import PurchaseRequestListPage from './components/InventoryCom/PurchaseRequestListPage'; 
 
 // Import your pages
 import Landing from "./pages/Landing";
@@ -65,7 +69,7 @@ export default function App() {
         {/* Mechanic Portal */}
         <Route path="/mechanic-portal" element={<MechanicPortal />} />
         
-        {/* 🛠️ NEW ROUTE: Manual Walk-In Job Creation (for Cashier) */}
+        {/* NEW ROUTE: Manual Walk-In Job Creation (for Cashier) */}
         <Route path="/admin/walkinjob" element={<CreateWalkInJob />} />
 
         {/* 💰 NEW ROUTES: Cashier Portal */}

@@ -62,9 +62,17 @@ const AddStockInForm = ({ open, handleClose, onSave }) => {
     const { name, value } = e.target;
     setValidationErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
     
-    // Logic to ensure only numbers are entered for price fields
-    if ((name === 'buyingPrice' || name === 'salesPrice') && value !== '' && !/^\d*\.?\d*$/.test(value)) {
-        return; // Prevents updating the state if a non-number is entered
+    // FIX 1: Logic to prevent non-numeric, '+' and '-' characters in price and quantity fields
+    if (name === 'buyingPrice' || name === 'salesPrice') {
+        // Allows digits and one decimal point, but restricts '+' and '-'
+        if (value !== '' && !/^\d*\.?\d*$/.test(value)) {
+            return; 
+        }
+    } else if (name === 'quantity') {
+        // Allows only whole digits (no decimal point), and restricts '+' and '-'
+        if (value !== '' && !/^\d*$/.test(value)) {
+            return;
+        }
     }
 
     setFormData(prevData => ({ ...prevData, [name]: value }));
@@ -92,17 +100,23 @@ const AddStockInForm = ({ open, handleClose, onSave }) => {
       isValid = false;
     }
   
-    if (isNaN(formData.quantity) || parseFloat(formData.quantity) <= 0) {
-      errors.quantity = 'Quantity must be a positive number.';
+    // Check if Quantity is a positive number
+    const quantityValue = parseFloat(formData.quantity);
+    if (isNaN(quantityValue) || quantityValue <= 0 || !/^\d+$/.test(formData.quantity)) {
+      errors.quantity = 'Quantity must be a whole positive number.';
       isValid = false;
     }
 
-    if (isNaN(formData.buyingPrice) || parseFloat(formData.buyingPrice) <= 0) {
+    // Check if Buying Price is a positive number
+    const buyingPriceValue = parseFloat(formData.buyingPrice);
+    if (isNaN(buyingPriceValue) || buyingPriceValue <= 0) {
       errors.buyingPrice = 'Buying price must be a positive number.';
       isValid = false;
     }
 
-    if (isNaN(formData.salesPrice) || parseFloat(formData.salesPrice) <= 0) {
+    // Check if Sales Price is a positive number
+    const salesPriceValue = parseFloat(formData.salesPrice);
+    if (isNaN(salesPriceValue) || salesPriceValue <= 0) {
       errors.salesPrice = 'Sales price must be a positive number.';
       isValid = false;
     }
@@ -187,6 +201,7 @@ const AddStockInForm = ({ open, handleClose, onSave }) => {
                     </MenuItem>
                   ))}
                 </Select>
+                {/* MUI HelperText should be used here, but keeping P tag for minimal changes */}
                 {validationErrors.supplier && <p className="text-red-500 text-xs mt-1">{validationErrors.supplier}</p>}
               </FormControl>
 
@@ -199,7 +214,14 @@ const AddStockInForm = ({ open, handleClose, onSave }) => {
                 value={formData.quantity}
                 onChange={handleChange}
                 required
+                // FIX 2: Restrict typing of '+' or '-' in the input field
+                onKeyDown={(e) => {
+                    if (e.key === '-' || e.key === '+' || e.key === '.') {
+                        e.preventDefault();
+                    }
+                }}
                 InputProps={{
+                  // FIX 3: Quantity must be a whole number
                   inputProps: { min: 1, step: 1 },
                 }}
                 error={!!validationErrors.quantity}
@@ -215,6 +237,12 @@ const AddStockInForm = ({ open, handleClose, onSave }) => {
                 value={formData.buyingPrice}
                 onChange={handleChange}
                 required
+                 // FIX 2: Restrict typing of '+' or '-' in the input field
+                onKeyDown={(e) => {
+                    if (e.key === '-' || e.key === '+') {
+                        e.preventDefault();
+                    }
+                }}
                 InputProps={{
                   inputProps: { min: 0, step: "any" },
                 }}
@@ -231,6 +259,12 @@ const AddStockInForm = ({ open, handleClose, onSave }) => {
                 value={formData.salesPrice}
                 onChange={handleChange}
                 required
+                 // FIX 2: Restrict typing of '+' or '-' in the input field
+                onKeyDown={(e) => {
+                    if (e.key === '-' || e.key === '+') {
+                        e.preventDefault();
+                    }
+                }}
                 InputProps={{
                   inputProps: { min: 0, step: "any" },
                 }}

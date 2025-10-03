@@ -1,23 +1,29 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/suppliers';
+const API = axios.create({ baseURL: '/api' }); 
 
+const SUPPLIER_BASE_URL = '/suppliers'; // API.get('/suppliers') ලෙස යැවීමට
+
+/**
+ * Fetches all available suppliers.
+ */
 export const getSuppliers = async () => {
-    return await axios.get(API_URL);
+    // Calls http://localhost:5000/api/suppliers via proxy
+    return await API.get(SUPPLIER_BASE_URL);
 };
 
 export const getSupplierById = async (id) => {
-    return await axios.get(`${API_URL}/${id}`);
+    return await API.get(`${SUPPLIER_BASE_URL}/${id}`);
 };
 
 export const createSupplier = async (supplierData) => {
-    return await axios.post(API_URL, supplierData);
+    return await API.post(SUPPLIER_BASE_URL, supplierData);
 };
 
 export const updateSupplier = async (id, supplierData) => {
-    return await axios.put(`${API_URL}/${id}`, supplierData);
+    return await API.put(`${SUPPLIER_BASE_URL}/${id}`, supplierData);
 };
 
 export const deleteSupplier = async (id) => {
-    return await axios.delete(`${API_URL}/${id}`);
+    return await API.delete(`${SUPPLIER_BASE_URL}/${id}`);
 };
