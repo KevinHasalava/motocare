@@ -47,7 +47,7 @@ const PartQuantityRow = ({ item, onChange, onRemove }) => (
 
 const CreatePurchaseRequestDialog = ({ open, handleClose, onSaveSuccess, prefillItems = [] }) => {
   const [suppliers, setSuppliers] = useState([]);
-  const [lowStockParts, setLowStockParts] = useState([]);
+  // const [lowStockParts, setLowStockParts] = useState([]); // Removed as parts dropdown is removed
   const [selectedSupplierId, setSelectedSupplierId] = useState('');
   const [selectedParts, setSelectedParts] = useState([]);
   const [notes, setNotes] = useState('');
@@ -62,35 +62,35 @@ const CreatePurchaseRequestDialog = ({ open, handleClose, onSaveSuccess, prefill
         setLoading(true);
         setError('');
         try {
-          const [supRes, partsRes] = await Promise.all([
-            getSuppliers(), 
-            getLowStockParts(),
-          ]);
+          // Fetch only suppliers, no need to fetch low stock parts list as dropdown is removed
+          const supRes = await getSuppliers(); 
           
-          const fetchedLowStockParts = partsRes.data;
           setSuppliers(supRes.data);
-          setLowStockParts(fetchedLowStockParts);
+          // setLowStockParts(partsRes.data); // Removed
 
           if (prefillItems && prefillItems.length > 0) {
               const initialParts = prefillItems.map(item => ({
                   ...item,
+                  // Ensure suggested quantity is at least 1
                   quantityNeeded: Math.max(1, item.lowStockThreshold - item.quantity),
               }));
               setSelectedParts(initialParts);
           } else {
-              setSelectedParts([]);
+              // Ensure selectedParts is correctly initialized even if prefill is empty
+              setSelectedParts([]); 
           }
 
 
         } catch (err) {
           console.error("API Fetch Error:", err);
-          setError('Failed to load suppliers or low stock parts. Check API connectivity and routes.');
+          setError('Failed to load suppliers. Check API connectivity and routes.');
         } finally {
           setLoading(false);
         }
       };
       fetchData();
     } else {
+      // Reset state on close
       setSelectedSupplierId('');
       setSelectedParts([]);
       setNotes('');
@@ -98,16 +98,9 @@ const CreatePurchaseRequestDialog = ({ open, handleClose, onSaveSuccess, prefill
     }
   }, [open, prefillItems]);
 
-
-  const handlePartSelect = (e) => {
-    const partId = e.target.value;
-    const partToAdd = lowStockParts.find(p => p._id === partId);
-    if (partToAdd && !selectedParts.some(p => p._id === partId)) {
-      const suggestedQuantity = Math.max(1, partToAdd.lowStockThreshold - partToAdd.quantity);
-      setSelectedParts([...selectedParts, { ...partToAdd, quantityNeeded: suggestedQuantity }]);
-    }
-  };
-
+  // Removed handlePartSelect function as the dropdown is removed
+  // Removed handleQuantityChange and handleRemovePart function as they are still needed for the list
+  
   const handleQuantityChange = (id, qty) => {
     setSelectedParts(prev => prev.map(p => p._id === id ? { ...p, quantityNeeded: qty } : p));
   };
@@ -115,6 +108,7 @@ const CreatePurchaseRequestDialog = ({ open, handleClose, onSaveSuccess, prefill
   const handleRemovePart = (id) => {
     setSelectedParts(prev => prev.filter(p => p._id !== id));
   };
+
 
   const handleSubmit = async () => {
     if (!selectedSupplierId) return setError('Please select a supplier.');
@@ -147,7 +141,9 @@ const CreatePurchaseRequestDialog = ({ open, handleClose, onSaveSuccess, prefill
     }
   };
 
-  const availableParts = lowStockParts.filter(p => !selectedParts.some(s => s._id === p._id));
+  // Removed availableParts as the dropdown is removed
+  // const availableParts = lowStockParts.filter(p => !selectedParts.some(s => s._id === p._id)); 
+
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
@@ -160,16 +156,34 @@ const CreatePurchaseRequestDialog = ({ open, handleClose, onSaveSuccess, prefill
             {error && <Grid item xs={12}><Alert severity="error">{error}</Alert></Grid>}
 
             <Grid item xs={12} sm={6}>
+              {/* Supplier Select field - FIXES applied here to show full placeholder text */}
               <FormControl fullWidth required>
-                <InputLabel>Supplier</InputLabel>
+                {/* InputLabel removed to fix placeholder issue */}
                 <Select
                   value={selectedSupplierId}
                   onChange={(e) => setSelectedSupplierId(e.target.value)}
+                  displayEmpty 
+                  sx={{
+                    '& .MuiSelect-select': { 
+                      paddingRight: '50px !important', // Ensure space for the icon
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    },
+                  }}
+                  renderValue={(selected) => {
+                    if (selected === "") {
+                        // Display the full placeholder text when nothing is selected
+                        return <Box sx={{ color: 'text.secondary' }}>Select Supplier</Box>; 
+                    }
+                    const supplier = suppliers.find(s => s._id === selected);
+                    // Display the selected supplier name and email
+                    return supplier ? `${supplier.name} (${supplier.contact?.email || 'N/A'})` : '';
+                  }}
                 >
-                  <MenuItem value=""><em>None</em></MenuItem>
+                  <MenuItem value="">Select Supplier</MenuItem> 
                   {suppliers.map(s => (
                     <MenuItem key={s._id} value={s._id}>
-                      {/* FIX: Access the email via the contact object */}
                       {s.name} ({s.contact?.email || 'N/A'})
                     </MenuItem>
                   ))}
@@ -177,23 +191,16 @@ const CreatePurchaseRequestDialog = ({ open, handleClose, onSaveSuccess, prefill
               </FormControl>
             </Grid>
 
+            {/* REMOVED: Add Low Stock Part dropdown column */}
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth disabled={availableParts.length === 0}>
-                <InputLabel>Add Low Stock Part</InputLabel>
-                <Select value="" onChange={handlePartSelect}>
-                  {availableParts.length > 0 ? availableParts.map(p => (
-                    <MenuItem key={p._id} value={p._id}>
-                      {p.name} (Stock: {p.quantity}, Threshold: {p.lowStockThreshold})
-                    </MenuItem>
-                  )) : <MenuItem disabled>No more low stock parts</MenuItem>}
-                </Select>
-              </FormControl>
+              {/* Empty column now, or fill with another component if needed */}
             </Grid>
+            
 
             <Grid item xs={12}>
               <Typography variant="h6" sx={{ mt: 2 }}>Requested Items ({selectedParts.length})</Typography>
               {selectedParts.length === 0 ? (
-                <Alert severity="info">Use the dropdown to add parts, or they might be pre-filled from the Inventory Page.</Alert>
+                <Alert severity="warning">No parts are currently requested. Please pre-fill items from the Inventory Page.</Alert>
               ) : (
                 <Box sx={{ maxHeight: 300, overflowY: 'auto', p: 1 }}>
                   {selectedParts.map(p => (
@@ -224,6 +231,7 @@ const CreatePurchaseRequestDialog = ({ open, handleClose, onSaveSuccess, prefill
 
       <DialogActions>
         <Button onClick={handleClose} color="secondary" disabled={isSubmitting}>Cancel</Button>
+        {/* Button is enabled only if a supplier is selected and at least one part is present */}
         <Button onClick={handleSubmit} variant="contained" disabled={isSubmitting || selectedParts.length === 0 || !selectedSupplierId}>
           {isSubmitting ? <CircularProgress size={20} color="inherit" /> : 'Send & Save Request'}
         </Button>

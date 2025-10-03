@@ -10,9 +10,15 @@ import CloseIcon from '@mui/icons-material/Close';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import ListAltIcon from '@mui/icons-material/ListAlt';
-// 📦 NEW IMPORTS: Icons for Stock and Supplier navigation
-import GroupWorkIcon from '@mui/icons-material/GroupWork'; // For Suppliers
-import AssessmentIcon from '@mui/icons-material/Assessment'; // For Stock
+// New Import for PDF download
+import DownloadIcon from '@mui/icons-material/Download'; 
+// Icons for Stock and Supplier navigation
+import GroupWorkIcon from '@mui/icons-material/GroupWork'; 
+import AssessmentIcon from '@mui/icons-material/Assessment'; 
+
+// PDF Library Imports
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 // Local Component Imports
 import StatsCards from './StatsCards';
@@ -111,6 +117,7 @@ const InventoryPage = () => {
     }
     const totalItems = inventory.length;
     const lowStockCount = inventory.filter(item => item.quantity <= item.lowStockThreshold).length;
+    // Calculate total value based on current quantity * buying price
     const totalInventoryValue = inventory.reduce((sum, item) => sum + (item.quantity * (item.buyingPrice || 0)), 0);
     return { totalItems, lowStockCount, totalInventoryValue }; 
   }, [inventory]);
@@ -144,6 +151,55 @@ const InventoryPage = () => {
     setSnackbarMessage({ ...snackbarMessage, open: false });
   };
 
+  // -------------------------------------------------------------------
+  // NEW FUNCTION: PDF Download Handler for Inventory
+  // -------------------------------------------------------------------
+  const handleDownloadPdf = () => {
+    const doc = new jsPDF('landscape'); // Use landscape for more columns
+    
+    // Define table headers
+    const head = [
+      ['Part ID', 'Name', 'Category', 'Stock Qty', 'Min Threshold', 'Buying Price', 'Selling Price', 'Last Update']
+    ];
+    
+    // Prepare data body from filtered suppliers
+    const body = filteredItems.map(item => [
+      item.partId,
+      item.name,
+      item.category,
+      item.quantity.toString(),
+      item.lowStockThreshold.toString(),
+      `Rs. ${item.buyingPrice.toFixed(2)}`,
+      `Rs. ${item.salesPrice.toFixed(2)}`,
+      new Date(item.updatedAt || item.createdAt).toLocaleDateString()
+    ]);
+
+    if (body.length === 0) {
+        setSnackbarMessage({ open: true, message: 'No inventory items to download.', severity: 'info' });
+        return;
+    }
+
+    // Add title
+    doc.setFontSize(16);
+    doc.text("Inventory Stock Report", 14, 20);
+
+    // Generate table using jspdf-autotable
+    doc.autoTable({
+        startY: 25, 
+        head: head,
+        body: body,
+        theme: 'striped',
+        headStyles: { fillColor: [0, 123, 255] }, // Blue header background
+        styles: { fontSize: 8, cellPadding: 1.5, overflow: 'linebreak' }
+    });
+
+    // Save the PDF file
+    doc.save('Inventory_Stock_Report.pdf');
+    setSnackbarMessage({ open: true, message: 'Inventory report downloaded successfully!', severity: 'success' });
+  };
+  // -------------------------------------------------------------------
+
+
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 4, color: 'text.primary' }}>
@@ -171,7 +227,17 @@ const InventoryPage = () => {
                   mb: 2, 
                   mt: 4 
               }}>
-                {/* 🛠️ NEW BUTTON: Navigate to Supplier Page */}
+                {/* PDF DOWNLOAD BUTTON */}
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<DownloadIcon />}
+                    onClick={handleDownloadPdf}
+                    disabled={loading || filteredItems.length === 0}
+                >
+                    Download PDF
+                </Button>
+                
                 <Button
                     variant="outlined"
                     color="secondary"
@@ -181,7 +247,6 @@ const InventoryPage = () => {
                     View Suppliers
                 </Button>
 
-                {/* 🛠️ NEW BUTTON: Navigate to Stock Page */}
                 <Button
                     variant="outlined"
                     color="secondary"
