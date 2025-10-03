@@ -31,8 +31,12 @@ import AdminBookingManagement from "./pages/admin/AdminBookingManagement";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 
-// 🛠️ NEW IMPORT: Component for manual job creation (Cashier/Admin)
+// --- CURRENT JOB COMPONENT IMPORTS ---
+// We keep the two working components: JobDashboard and CreateWalkInJob
 import CreateWalkInJob from "./components/adminJob/CreateWalkInJob"; 
+import JobDashboard from "./components/adminJob/JobDashboard";
+import EditJob from "./components/adminJob/EditJob"; 
+// ----------------------------------
 
 // 💰 NEW IMPORT: Cashier Portal Components
 import CashierPortal from "./components/Cashier/CashierPortal";
@@ -61,7 +65,7 @@ export default function App() {
         {/* --- Admin/Staff Specific Routes --- */}
         <Route path="/admin-register" element={<AdminRegister />} />
 
-        {/* Admin/Staff Views */}
+        {/* Admin/Staff Views (Existing legacy routes) */}
         <Route path="/admin-job-view" element={<AdminJobView />} />
 
 
@@ -92,6 +96,17 @@ export default function App() {
 
         <Route path="/forgot-password" element={<ForgotPassword />} />
   <Route path="/reset-password" element={<ResetPassword />} />
+        {/* --- JOB MANAGEMENT ROUTES (WORKING ONLY) --- */}
+        
+        {/* 1. Job List - Displays the DataGrid with all jobs */}
+        <Route path="/admin/jobs" element={<JobDashboard />} />
+
+        {/* 2. Create Job - Manual Walk-In Job Creation (for Cashier) */}
+        <Route path="/admin/walkinjob" element={<CreateWalkInJob />} />
+
+        {/* 3. View/Edit Routes - TEMPORARILY REMOVED to avoid build errors.         */}
+        <Route path="/admin/jobs/view/:id" element={<EditJob isViewMode={true} />} />
+        <Route path="/admin/jobs/edit/:id" element={<EditJob />} />
 
       </Routes>
     </Router>

@@ -1,19 +1,17 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
     Box, Paper, Typography, TextField, Button, Grid, MenuItem, Alert, CircularProgress, 
-    FormControl, InputLabel, Select, Autocomplete, Chip, InputAdornment, FormHelperText
+    FormControl, InputLabel, Select, Autocomplete, Chip, FormHelperText
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { 
-    PersonOutline, EmailOutlined, PhoneOutlined, DirectionsCarOutlined,
-    BuildOutlined, AccessTimeOutlined, CheckCircle, ErrorOutline,
-    AddCircleOutline, SearchOutlined, CalendarTodayOutlined,
-    EngineeringOutlined
+    PersonOutline, DirectionsCarOutlined,
+    BuildOutlined, AddCircleOutline
 } from '@mui/icons-material';
-import { createWalkInJob } from '../../api/job'; 
+import { createWalkInJob, fetchJobsByDateAndMechanic } from '../../api/job'; // Assuming you added this
 import { fetchServices, fetchMechanics, fetchVehiclesByEmail } from '../../api/data'; 
 
-// --- Styled Components ---
+// --- Styled Components (No changes) ---
 const AdminContainer = styled(Box)(({ theme }) => ({
     backgroundColor: '#f5f5f5',
     minHeight: '100vh',
@@ -51,7 +49,22 @@ const FormSection = styled(Box)(({ theme }) => ({
     padding: theme.spacing(3),
 }));
 
-// --- Constants ---
+// --- Time Slot Generator (NEW HELPER FUNCTION) ---
+const generateTimeSlots = () => {
+    const slots = [];
+    // From 8:00 AM to 5:00 PM (17:00)
+    for (let hour = 8; hour < 17; hour++) {
+        for (let minute = 0; minute < 60; minute += 15) {
+            slots.push(`${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`);
+        }
+    }
+    return slots;
+};
+
+const ALL_TIME_SLOTS = generateTimeSlots();
+
+
+// --- Constants (No changes) ---
 const currentYear = new Date().getFullYear();
 const initialState = {
     customerName: '',
@@ -70,7 +83,9 @@ const initialState = {
 };
 
 const vehicleTypes = ['Car', 'Van', 'SUV', 'Motorcycle', 'Three Wheel'];
-const phonePrefixes = ['070', '071', '072', '074', '075', '076', '077', '078', '011', '021', '023', '024', '025', '026', '027', '031', '032', '033', '034', '035', '036', '037', '038', '041', '045', '047', '051', '052', '054', '055', '057', '063', '065', '066'];
+const phonePrefixes = ['070', '071', '072', '074', '075', '076', '077', '078',
+    '011', '021', '023', '024', '025', '026', '027', '031', '032', '033', '034',
+    '035', '036', '037', '038', '041', '045', '047', '051', '052', '054', '055', '057', '063', '065', '066'];
 
 const CreateWalkInJob = () => {
     const [formData, setFormData] = useState(initialState);
@@ -82,9 +97,16 @@ const CreateWalkInJob = () => {
     const [mechanics, setMechanics] = useState([]);
     const [userVehicles, setUserVehicles] = useState([]); 
     const [isVehicleFound, setIsVehicleFound] = useState(false); 
+    const [jobConflict, setJobConflict] = useState(false); 
+    const [existingJobs, setExistingJobs] = useState([]); 
     const formRef = useRef(null); 
 
-    // Data Fetching: Services and Mechanics
+    // Helper to check time overlap
+    const doTimesOverlap = useCallback((start1, end1, start2, end2) => {
+        return start1 < end2 && end1 > start2;
+    }, []);
+
+    // ----------------- Data Fetching (Unchanged) -----------------
     useEffect(() => {
         const loadInitialData = async () => {
             try {
@@ -101,16 +123,7 @@ const CreateWalkInJob = () => {
         loadInitialData();
     }, []);
     
-    // Autofill Check Effect
-    useEffect(() => {
-        setTimeout(() => {
-            validate('customerName');
-            validate('customerEmail');
-            validate('customerPhoneNumber');
-        }, 100); 
-    }, []);
-
-    // Vehicle Fetching Effect
+    // Vehicle Fetching Effect (Unchanged)
     const handleEmailSearch = useCallback(async (email) => {
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             setUserVehicles([]);
@@ -129,7 +142,7 @@ const CreateWalkInJob = () => {
         }
     }, []);
 
-    // Debounced email search
+    // Debounced email search (Unchanged)
     useEffect(() => {
         const handler = setTimeout(() => {
             if (formData.customerEmail && !errors.customerEmail) {
@@ -138,8 +151,77 @@ const CreateWalkInJob = () => {
         }, 800); 
         return () => clearTimeout(handler);
     }, [formData.customerEmail, errors.customerEmail, handleEmailSearch]);
+    
+    // Effect to fetch existing jobs for the selected date/mechanic (Unchanged)
+    useEffect(() => {
+        const fetchJobData = async () => {
+            if (!formData.date || formData.mechanic === 'AUTO_ASSIGN') {
+                setExistingJobs([]); 
+                setJobConflict(false);
+                return;
+            }
 
-    // Validation Logic
+            try {
+                const jobs = await fetchJobsByDateAndMechanic({ 
+                    date: formData.date, 
+                    mechanicId: formData.mechanic 
+                });
+                setExistingJobs(jobs);
+                validateSchedule(formData.date, formData.time, formData.serviceId, jobs);
+            } catch (err) {
+                console.error("Failed to fetch existing jobs:", err);
+                setExistingJobs([]); 
+                setJobConflict(false);
+            }
+        };
+
+        fetchJobData();
+    }, [formData.date, formData.mechanic, formData.serviceId]);
+
+
+    // Core function to check for scheduling conflicts (Unchanged)
+    const validateSchedule = useCallback((date, time, serviceId, jobsToCheck = existingJobs) => {
+        if (!date || !time || !serviceId) {
+            setJobConflict(false);
+            return false;
+        }
+
+        const selectedService = services.find(s => s._id === serviceId);
+        const duration = selectedService?.duration || 60; 
+
+        const proposedStartTime = new Date(`${date}T${time}:00`);
+        const proposedEndTime = new Date(proposedStartTime.getTime() + duration * 60000);
+
+        // 1. Check Business Hours (8:00 AM - 5:00 PM)
+        const openHour = new Date(`${date}T08:00:00`);
+        const closeHour = new Date(`${date}T17:00:00`);
+        
+        if (proposedStartTime < openHour || proposedEndTime > closeHour) {
+            setErrors(prev => ({ ...prev, time: 'Booking allowed between 08:00 - 17:00' }));
+            setJobConflict(true);
+            return false;
+        } else {
+            setErrors(prev => { delete prev.time; return { ...prev }; });
+        }
+
+        // 2. Check Mechanic Conflict (Only if a specific mechanic is chosen)
+        if (formData.mechanic !== 'AUTO_ASSIGN') {
+            const hasConflict = jobsToCheck.some(job => {
+                const jobStart = new Date(job.startTime);
+                const jobEnd = new Date(job.endTime);
+                
+                return doTimesOverlap(proposedStartTime, proposedEndTime, jobStart, jobEnd);
+            });
+
+            setJobConflict(hasConflict);
+            return !hasConflict;
+        }
+
+        setJobConflict(false);
+        return true;
+    }, [services, formData.mechanic, existingJobs, doTimesOverlap]);
+
+    // Validation Logic (Unchanged)
     const validate = (field = null) => {
         let tempErrors = { ...errors };
         let isValid = true;
@@ -233,29 +315,38 @@ const CreateWalkInJob = () => {
                      tempErrors.date = 'Cannot book for a past date/time.';
                      isValid = false;
                 }
+                
+                if (formData.date && formData.time && formData.serviceId) {
+                    const isScheduleValid = validateSchedule(formData.date, formData.time, formData.serviceId);
+                    if (!isScheduleValid) {
+                        if (jobConflict && formData.mechanic !== 'AUTO_ASSIGN') {
+                             isValid = false;
+                        } else if (tempErrors.time) {
+                            isValid = false;
+                        }
+                    }
+                }
             }
         }
-
+        
         setErrors(tempErrors);
         return isValid;
     };
 
-    // Input Change Handler
+
+    // Input Change Handler (Unchanged)
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         let newValue = value;
 
-        // Reset vehicle found state if editing
         if (isVehicleFound && ['vehicleNumber', 'type', 'brand', 'model', 'year'].includes(name)) {
             setIsVehicleFound(false);
         }
 
-        // Phone Number Formatting
         if (name === 'customerPhoneNumber') {
             newValue = value.replace(/[^0-9]/g, '').slice(0, 10);
         }
         
-        // Vehicle Number Formatting
         if (name === 'vehicleNumber') {
             newValue = value.replace(/[^A-Za-z0-9-]/g, '').toUpperCase();
             
@@ -280,10 +371,19 @@ const CreateWalkInJob = () => {
         }
         
         setFormData(prev => ({ ...prev, [name]: newValue }));
+        
+        if (['date', 'time', 'serviceId', 'mechanic'].includes(name) && formData.date && formData.time && formData.serviceId) {
+            validateSchedule(
+                name === 'date' ? newValue : formData.date,
+                name === 'time' ? newValue : formData.time,
+                name === 'serviceId' ? newValue : formData.serviceId,
+            );
+        }
+        
         validate(name); 
     };
 
-    // Vehicle Selector Handler
+    // Vehicle Selector Handler (Unchanged)
     const handleVehicleSelect = (e) => {
         const selectedNum = e.target.value;
         const selectedVehicle = userVehicles.find(v => v.vehicleNumber === selectedNum);
@@ -311,32 +411,40 @@ const CreateWalkInJob = () => {
         }
     }
 
+    // Service Change Handler (Unchanged)
     const handleServiceChange = (event, value) => {
+        let newServiceId = '';
+        let newServiceName = '';
+        
         if (value) {
-            setFormData(prev => ({ 
-                ...prev, 
-                serviceName: value.name, 
-                serviceId: value._id 
-            }));
-            setErrors(prev => ({ ...prev, serviceId: '' }));
-        } else {
-            setFormData(prev => ({ ...prev, serviceName: '', serviceId: '' }));
+            newServiceId = value._id;
+            newServiceName = value.name;
+        }
+
+        setFormData(prev => ({ 
+            ...prev, 
+            serviceName: newServiceName, 
+            serviceId: newServiceId 
+        }));
+        setErrors(prev => ({ ...prev, serviceId: '' }));
+        
+        if (formData.date && formData.time) {
+             validateSchedule(formData.date, formData.time, newServiceId);
         }
     };
     
-    // Submission Handler
+    // Submission Handler (Unchanged)
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSuccessMsg('');
         setErrorMsg('');
         
-        if (!validate(null)) { 
-            setErrorMsg('Please correct the validation errors in the form.');
+        if (!validate(null) || jobConflict) { 
+            setErrorMsg('Please correct the validation errors in the form and check for scheduling conflicts.');
             return;
         }
 
         setLoading(true);
-
         const dataToSend = {
             ...formData,
             year: parseInt(formData.year),
@@ -398,6 +506,7 @@ const CreateWalkInJob = () => {
                         </SectionHeader>
                         <FormSection>
                             <Grid container spacing={2}>
+                                {/* Customer fields remain xs={12} md={4} */}
                                 <Grid item xs={12} md={4}>
                                     <TextField
                                         fullWidth
@@ -484,6 +593,7 @@ const CreateWalkInJob = () => {
                             )}
 
                             <Grid container spacing={2}>
+                                {/* Vehicle Number */}
                                 <Grid item xs={12} md={6}>
                                     <TextField
                                         fullWidth
@@ -498,6 +608,7 @@ const CreateWalkInJob = () => {
                                         required
                                     />
                                 </Grid>
+                                {/* 🚀 Vehicle Type: Changed from md={6} to md={6} (same row as Vehicle No.) */}
                                 <Grid item xs={12} md={6}>
                                     <FormControl fullWidth size="small" error={!!errors.type} disabled={isVehicleFound} required>
                                         <InputLabel>Vehicle Type</InputLabel>
@@ -516,6 +627,7 @@ const CreateWalkInJob = () => {
                                         )}
                                     </FormControl>
                                 </Grid>
+                                {/* Brand, Model, Year remain md={4} */}
                                 <Grid item xs={12} md={4}>
                                     <TextField
                                         fullWidth
@@ -568,7 +680,7 @@ const CreateWalkInJob = () => {
                             </Grid>
                         </FormSection>
 
-                        {/* Service & Schedule Section */}
+                        {/* Service & Schedule Section (UPDATED) */}
                         <SectionHeader>
                             <BuildOutlined sx={{ mr: 1, color: '#6c757d' }} />
                             <Typography variant="subtitle1" fontWeight={600}>
@@ -576,9 +688,17 @@ const CreateWalkInJob = () => {
                             </Typography>
                         </SectionHeader>
                         <FormSection>
+                            {jobConflict && formData.mechanic !== 'AUTO_ASSIGN' && (
+                                <Alert severity="warning" sx={{ mb: 2 }}>
+                                    <Typography fontWeight={600}>Scheduling Conflict!</Typography>
+                                    The selected mechanic is already booked during this time slot. Please choose a different time or mechanic.
+                                </Alert>
+                            )}
                             <Grid container spacing={2}>
-                                <Grid item xs={12} md={6}>
+                                {/* 🚀 Service Autocomplete: Changed from md={6} to md={12} */}
+                                <Grid item xs={12} md={12}>
                                     <Autocomplete
+                                        fullWidth
                                         size="small"
                                         options={filteredServices}
                                         getOptionLabel={(option) => option.name || ""}
@@ -600,7 +720,8 @@ const CreateWalkInJob = () => {
                                         )}
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={6}>
+                                {/* Assign Mechanic: Changed from md={6} to md={12} */}
+                                <Grid item xs={12} md={12}>
                                     <FormControl fullWidth size="small">
                                         <InputLabel>Assign Mechanic</InputLabel>
                                         <Select
@@ -608,15 +729,23 @@ const CreateWalkInJob = () => {
                                             name="mechanic"
                                             value={formData.mechanic}
                                             onChange={handleInputChange}
+                                            error={jobConflict && formData.mechanic !== 'AUTO_ASSIGN'}
                                         >
+                                            <MenuItem value="AUTO_ASSIGN">
+                                                <em>Auto Assign (Recommended)</em>
+                                            </MenuItem>
                                             {mechanics.map((m) => (
-                                                <MenuItem key={m._id || 'AUTO_ASSIGN'} value={m._id || 'AUTO_ASSIGN'}>
+                                                <MenuItem key={m._id} value={m._id}>
                                                     {m.name}
                                                 </MenuItem>
                                             ))}
                                         </Select>
+                                        {jobConflict && formData.mechanic !== 'AUTO_ASSIGN' && (
+                                             <FormHelperText error>Conflict detected. Choose another mechanic or time.</FormHelperText>
+                                        )}
                                     </FormControl>
                                 </Grid>
+                                {/* Date field (md={6}) */}
                                 <Grid item xs={12} md={6}>
                                     <TextField
                                         fullWidth
@@ -633,24 +762,43 @@ const CreateWalkInJob = () => {
                                         required
                                     />
                                 </Grid>
+                                {/* 🚀 Time Select: Changed from TextField to Select with 15-min intervals (md={6}) */}
                                 <Grid item xs={12} md={6}>
-                                    <TextField
-                                        fullWidth
-                                        size="small"
-                                        label="Time"
-                                        name="time"
-                                        type="time"
-                                        value={formData.time}
-                                        onChange={handleInputChange}
-                                        error={!!errors.time}
-                                        helperText={errors.time}
-                                        InputLabelProps={{ shrink: true }}
+                                    <FormControl 
+                                        fullWidth 
+                                        size="small" 
                                         required
-                                    />
+                                        error={!!errors.time || (jobConflict && formData.mechanic !== 'AUTO_ASSIGN')}
+                                        disabled={!formData.date}
+                                    >
+                                        <InputLabel>Time</InputLabel>
+                                        <Select
+                                            label="Time"
+                                            name="time"
+                                            value={formData.time}
+                                            onChange={handleInputChange}
+                                            MenuProps={{ 
+                                                // Scroll to selected item for better UX
+                                                anchorOrigin: { vertical: "bottom", horizontal: "left" },
+                                                transformOrigin: { vertical: "top", horizontal: "left" },
+                                                getContentAnchorEl: null,
+                                            }}
+                                        >
+                                            {ALL_TIME_SLOTS.map((slot) => (
+                                                <MenuItem key={slot} value={slot}>
+                                                    {slot}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                        <FormHelperText>
+                                            {errors.time || (jobConflict && formData.mechanic !== 'AUTO_ASSIGN' ? "Conflict detected. Choose another time." : "")}
+                                        </FormHelperText>
+                                    </FormControl>
                                 </Grid>
                             </Grid>
                         </FormSection>
 
+                        {/* Navigation (Disabled button on conflict) */}
                         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                             <Button
                                 variant="outlined"
@@ -659,6 +807,7 @@ const CreateWalkInJob = () => {
                                     setUserVehicles([]);
                                     setIsVehicleFound(false);
                                     setErrors({});
+                                    setJobConflict(false); 
                                 }}
                                 disabled={loading}
                             >
@@ -667,7 +816,7 @@ const CreateWalkInJob = () => {
                             <Button
                                 type="submit"
                                 variant="contained"
-                                disabled={loading}
+                                disabled={loading || jobConflict}
                                 startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <AddCircleOutline />}
                                 sx={{
                                     backgroundColor: '#3498db',

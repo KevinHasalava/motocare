@@ -3,6 +3,10 @@ import axios from 'axios';
 // Set the base URL for the Job API routes
 const API_URL = 'http://localhost:5000/api/jobs'; 
 
+// ---------------------------------------------------------------------
+//  1. JOB CREATION
+// ---------------------------------------------------------------------
+
 /**
  * 1. Create a Walk-In Job (Manual Job)
  * POST /api/jobs/walkin
@@ -16,6 +20,10 @@ export const createWalkInJob = async (jobData) => {
         throw error.response.data;
     }
 };
+
+// ---------------------------------------------------------------------
+//  2. JOB RETRIEVAL & MANAGEMENT
+// ---------------------------------------------------------------------
 
 /**
  * 2. Get All Jobs (For Admin Dashboard)
@@ -66,5 +74,96 @@ export const getJobsByMechanic = async (mechanicId) => {
         return response.data;
     } catch (error) {
         throw error.response.data;
+    }
+};
+
+/**
+ * 6. Get Active Jobs by Date and Mechanic (For conflict check in CreateWalkInJob.jsx)
+ * GET /api/jobs/schedule?date=...&mechanicId=...
+ */
+export const fetchJobsByDateAndMechanic = async ({ date, mechanicId }) => {
+    try {
+        const response = await axios.get(`${API_URL}/schedule`, {
+            params: { date, mechanicId }
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+};
+
+// ---------------------------------------------------------------------
+// 3. JOB VIEW/EDIT FUNCTIONS
+// ---------------------------------------------------------------------
+
+/**
+ * 7. Fetch Single Job Details (For View/Edit)
+ * GET /api/jobs/:id
+ */
+export const fetchJobDetails = async (jobId) => {
+    try {
+        // This hits the backend controller function getJobDetails
+        const response = await axios.get(`${API_URL}/${jobId}`);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+};
+
+/**
+ * 8. Update Job Details (Full Edit)
+ * PUT /api/jobs/:id
+ */
+export const updateJob = async (jobId, updateData) => {
+    try {
+        // This hits the backend controller function updateJob
+        const response = await axios.put(`${API_URL}/${jobId}`, updateData);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+};
+
+// ---------------------------------------------------------------------
+// 9. NEW FUNCTION: DOWNLOAD PDF
+// ---------------------------------------------------------------------
+
+/**
+ * 9. Download Job Details PDF (For Admin/Mechanic)
+ * GET /api/jobs/:id/download-pdf
+ * * @param {string} jobId - The MongoDB _id of the job
+ * @returns {Promise<Object>} - The Axios response object containing the PDF Blob
+ */
+export const downloadJobPdf = async (jobId) => {
+    try {
+        // Ensure the token is included in the request headers
+        const token = localStorage.getItem('token');
+        
+        const response = await axios.get(
+            `${API_URL}/${jobId}/download-pdf`, 
+            {
+                responseType: 'blob', // CRITICAL: Expect a binary file stream (PDF)
+                headers: {
+                    Authorization: token ? `Bearer ${token}` : ''
+                }
+            }
+        );
+        return response; // response.data is the Blob
+    } catch (error) {
+        // Handle error where the server sends an error message (often as JSON/Text)
+        if (error.response && error.response.data instanceof Blob) {
+             // Read the error blob as text to extract the JSON error message
+             const errorText = await error.response.data.text();
+             let errorMessage = 'Server error while fetching PDF.';
+             try {
+                const errorJson = JSON.parse(errorText);
+                errorMessage = errorJson.message || errorMessage;
+             } catch (e) {
+                 // Ignore if not valid JSON
+             }
+             throw new Error(errorMessage);
+        }
+        // Handle standard non-blob errors
+        throw error;
     }
 };

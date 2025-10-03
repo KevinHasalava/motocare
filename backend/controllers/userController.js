@@ -1,10 +1,10 @@
 const User = require("../models/User");
-const bcrypt = require("bcryptjs");
+// const bcrypt = require("bcryptjs"); // ❌ Hashing mechanism removed
 const jwt = require("jsonwebtoken");
 
-
-
-
+/**
+ * Register a new user with plain text password.
+ */
 const registerUser = async (req, res) => {
   try {
     const { name, email, phone, password, userType } = req.body;
@@ -44,7 +44,9 @@ const registerUser = async (req, res) => {
   }
 };
 
-// get all users (for testing)
+/**
+ * Get all users (for testing)
+ */
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({}, 'name email phone userType createdAt').sort({ createdAt: -1 });
@@ -56,7 +58,9 @@ const getUsers = async (req, res) => {
   }
 };
 
-
+/**
+ * Login user by comparing plain text password.
+ */
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
