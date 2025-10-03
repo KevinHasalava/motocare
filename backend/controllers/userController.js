@@ -1,5 +1,5 @@
 const User = require("../models/User");
-// const bcrypt = require("bcryptjs"); // ❌ Hashing mechanism removed
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 /**

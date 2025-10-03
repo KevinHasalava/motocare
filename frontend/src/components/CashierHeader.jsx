@@ -187,6 +187,13 @@ const CashierHeader = () => {
           >
             Create Walk-in Job
           </Button>
+          <Button 
+            startIcon={<AddTaskIcon />} 
+            onClick={() => navigate("/admin/jobs")} 
+            sx={navButtonStyle}
+          >
+            Jobs
+          </Button>
         </Stack>
 
         {/* Right: Profile Chip + Logout */}

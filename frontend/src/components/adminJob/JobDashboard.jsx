@@ -12,6 +12,8 @@ import {
     HistoryToggleOffOutlined, CancelOutlined, PlayCircleOutline, SearchOutlined // 💡 Search icon
 } from '@mui/icons-material';
 import { getAllJobs, updateJobStatus, deleteJob } from '../../api/job'; 
+import CashierHeader from '../CashierHeader';
+
 
 // --- Styled Components (Unchanged) ---
 const AdminContainer = styled(Box)(({ theme }) => ({
@@ -165,13 +167,14 @@ const JobDashboard = () => {
 
     return (
         <AdminContainer>
+            <CashierHeader />
             <AdminPaper>
-                <AdminHeader>
+                <AdminHeader sx={{ mt: 8, opacity: 0.9 }}>
                     <Typography variant="h5" fontWeight={600}>
                         All Service Jobs Dashboard
                     </Typography>
                     
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mt: { xs: 1, md: 0 } }}>
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mt: { xs: 4, md: 0 } }}>
                         {/* NEW: Search Input Field */}
                         <TextField
                             variant="outlined"

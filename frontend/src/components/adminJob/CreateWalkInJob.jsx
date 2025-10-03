@@ -734,9 +734,9 @@ const CreateWalkInJob = () => {
                                             onChange={handleInputChange}
                                             error={jobConflict && formData.mechanic !== 'AUTO_ASSIGN'}
                                         >
-                                            <MenuItem value="AUTO_ASSIGN">
+                                            {/* <MenuItem value="AUTO_ASSIGN">
                                                 <em>Auto Assign (Recommended)</em>
-                                            </MenuItem>
+                                            </MenuItem> */}
                                             {mechanics.map((m) => (
                                                 <MenuItem key={m._id} value={m._id}>
                                                     {m.name}

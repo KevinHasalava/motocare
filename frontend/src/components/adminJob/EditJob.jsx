@@ -11,6 +11,7 @@ import {
 } from '@mui/icons-material'; // 💡 GetApp icon added
 import { fetchJobDetails, updateJob, downloadJobPdf } from '../../api/job'; // 💡 downloadJobPdf imported
 import { fetchServices, fetchMechanics } from '../../api/data'; 
+import CashierHeader from '../CashierHeader';
 
 // --- Styled Components (Unchanged) ---
 const AdminContainer = styled(Box)(({ theme }) => ({
@@ -278,8 +279,9 @@ const EditJob = ({ isViewMode = false }) => {
 
     return (
         <AdminContainer>
+            <CashierHeader/>
             <AdminPaper>
-                <AdminHeader>
+                <AdminHeader sx={{ mt: 8, opacity: 0.9 }}>
                     {/* Left side: Title and Job ID */}
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <Typography variant="h5" fontWeight={600}>
