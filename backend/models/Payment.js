@@ -85,7 +85,7 @@ const paymentSchema = new mongoose.Schema({
     },
     paymentStatus: {
         type: String,
-        enum: ['Pending', 'Paid', 'Refunded'],
+        enum: ['Pending', 'Paid', 'Verified', 'Refunded'],
         default: 'Pending'
     },
     cashier: {
@@ -110,8 +110,19 @@ const paymentSchema = new mongoose.Schema({
         },
         status: {
             type: String,
-            enum: ['Under Review', 'Approved', 'Rejected'],
+            enum: ['Under Review', 'Approved', 'Rejected', 'Verified'],
             default: 'Under Review'
+        },
+        verifiedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        verifiedAt: {
+            type: Date
+        },
+        verificationNotes: {
+            type: String,
+            default: ''
         }
     },
     createdAt: {

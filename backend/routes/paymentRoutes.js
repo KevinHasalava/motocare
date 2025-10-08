@@ -13,7 +13,9 @@ const {
     getPaymentByInvoiceId,
     getAllPayments,
     getUserPayments,
-    uploadPaymentSlip
+    uploadPaymentSlip,
+    getPaymentsWithSlips,
+    verifyPaymentSlip
 } = require('../controllers/paymentController');
 const authMiddleware = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
@@ -43,5 +45,9 @@ router.get('/:paymentId', getPayment);
 
 // Payment slip upload (with file upload middleware)
 router.post('/upload-slip', upload.single('slip'), uploadPaymentSlip);
+
+// Payment slip verification (cashier only)
+router.get('/slips/pending', getPaymentsWithSlips);
+router.put('/:paymentId/verify-slip', verifyPaymentSlip);
 
 module.exports = router;

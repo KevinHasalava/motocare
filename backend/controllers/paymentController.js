@@ -206,7 +206,8 @@ const createPayment = async (req, res) => {
             discount, 
             discountPercentage, 
             paymentMethod, 
-            notes 
+            notes,
+            paymentStatus
         } = req.body;
 
         // Validate required fields
@@ -379,7 +380,7 @@ const createPayment = async (req, res) => {
             discountPercentage: Number(discountPercentage) || 0,
             totalAmount: Number(totalAmount),
             paymentMethod: paymentMethod || 'Cash',
-            paymentStatus: 'Paid',
+            paymentStatus: paymentStatus || 'Pending',
             cashier: req.user.id,
             notes: String(notes || '')
         };
@@ -850,16 +851,154 @@ const deletePayment = async (req, res) => {
     }
 };
 
+// Get payments with uploaded slips (for cashier verification)
+const getPaymentsWithSlips = async (req, res) => {
+    try {
+        console.log('=== GET PAYMENTS WITH SLIPS REQUEST ===');
+        console.log('User:', req.user);
+
+        // Check if user is cashier/admin
+        const user = await User.findById(req.user.id);
+        if (!user || !['admin', 'cashier', 'Admin', 'Cashier'].includes(user.userType)) {
+            console.log('Access denied for user:', user?.userType);
+            return res.status(403).json({ message: 'Access denied. Cashier privileges required.' });
+        }
+
+        const { status, page = 1, limit = 10 } = req.query;
+        const skip = (page - 1) * limit;
+
+        let query = { paymentSlip: { $exists: true } };
+        if (status) {
+            query['paymentSlip.status'] = status;
+        }
+
+        console.log('Query object:', query);
+
+        const payments = await Payment.find(query)
+            .populate({
+                path: 'customer',
+                select: 'name email phone',
+                options: { strictPopulate: false }
+            })
+            .populate({
+                path: 'vehicle',
+                select: 'vehicleNumber type brand model',
+                options: { strictPopulate: false }
+            })
+            .populate({
+                path: 'service',
+                select: 'name price',
+                options: { strictPopulate: false }
+            })
+            .populate({
+                path: 'cashier',
+                select: 'name',
+                options: { strictPopulate: false }
+            })
+            .sort({ 'paymentSlip.uploadedAt': -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        console.log('Found payments with slips:', payments.length);
+
+        const total = await Payment.countDocuments(query);
+        console.log('Total payments with slips:', total);
+
+        res.status(200).json({
+            payments,
+            pagination: {
+                currentPage: parseInt(page),
+                totalPages: Math.ceil(total / limit),
+                totalItems: total,
+                itemsPerPage: parseInt(limit)
+            }
+        });
+    } catch (error) {
+        console.error('=== GET PAYMENTS WITH SLIPS ERROR ===');
+        console.error('Error fetching payments with slips:', error);
+        console.error('Error stack:', error.stack);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+// Verify payment slip (approve/reject)
+const verifyPaymentSlip = async (req, res) => {
+    try {
+        console.log('=== VERIFY PAYMENT SLIP REQUEST ===');
+        console.log('Payment ID:', req.params.paymentId);
+        console.log('User:', req.user);
+
+        const { paymentId } = req.params;
+        const { action, verificationNotes } = req.body; // action: 'approve' or 'reject'
+
+        // Check if user is cashier/admin
+        const user = await User.findById(req.user.id);
+        if (!user || !['admin', 'cashier', 'Admin', 'Cashier'].includes(user.userType)) {
+            console.log('Access denied for user:', user?.userType);
+            return res.status(403).json({ message: 'Access denied. Cashier privileges required.' });
+        }
+
+        // Find payment
+        const payment = await Payment.findById(paymentId)
+            .populate('customer', 'name email')
+            .populate('vehicle', 'vehicleNumber');
+
+        if (!payment) {
+            console.log('Payment not found:', paymentId);
+            return res.status(404).json({ message: 'Payment not found' });
+        }
+
+        if (!payment.paymentSlip) {
+            return res.status(400).json({ message: 'No payment slip found for this payment' });
+        }
+
+        // Update slip verification
+        let slipStatus, paymentStatus;
+        if (action === 'approve') {
+            slipStatus = 'Verified';
+            paymentStatus = 'Verified';
+        } else if (action === 'reject') {
+            slipStatus = 'Rejected';
+            paymentStatus = 'Pending'; // Keep payment as pending for re-upload
+        } else {
+            return res.status(400).json({ message: 'Invalid action. Must be "approve" or "reject"' });
+        }
+
+        payment.paymentSlip.status = slipStatus;
+        payment.paymentSlip.verifiedBy = req.user.id;
+        payment.paymentSlip.verifiedAt = new Date();
+        payment.paymentSlip.verificationNotes = verificationNotes || '';
+
+        payment.paymentStatus = paymentStatus;
+        payment.updatedAt = new Date();
+
+        await payment.save();
+
+        console.log(`Payment slip ${action}d successfully for payment:`, payment.invoiceId);
+
+        res.status(200).json({
+            message: `Payment slip ${action}d successfully`,
+            payment: payment
+        });
+
+    } catch (error) {
+        console.error('=== VERIFY PAYMENT SLIP ERROR ===');
+        console.error('Error verifying payment slip:', error);
+        console.error('Error stack:', error.stack);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 // Upload payment slip for a specific payment
 const uploadPaymentSlip = async (req, res) => {
     try {
-        const { paymentId, notes } = req.body;
+        const { paymentId, notes, vehicleNumber, customerName, paidAmount } = req.body;
         const userId = req.user.id;
 
         // Find payment and verify it belongs to the user
-        const payment = await Payment.findOne({ 
-            _id: paymentId, 
-            customer: userId 
+        const payment = await Payment.findOne({
+            _id: paymentId,
+            customer: userId
         });
 
         if (!payment) {
@@ -878,7 +1017,10 @@ const uploadPaymentSlip = async (req, res) => {
             url: slipUrl,
             uploadedAt: new Date(),
             notes: notes || '',
-            status: 'Under Review'
+            status: 'Under Review',
+            vehicleNumber: vehicleNumber,
+            customerName: customerName,
+            paidAmount: paidAmount
         };
 
         await payment.save();
@@ -906,5 +1048,7 @@ module.exports = {
     getPaymentByInvoiceId,
     getAllPayments,
     getUserPayments,
-    uploadPaymentSlip
+    uploadPaymentSlip,
+    getPaymentsWithSlips,
+    verifyPaymentSlip
 };
