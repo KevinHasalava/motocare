@@ -45,6 +45,10 @@ import { styled } from '@mui/material/styles';
 import { getPaymentsWithSlips, verifyPaymentSlip } from '../../api/paymentApi';
 import CashierHeader from '../CashierHeader';
 
+// Get backend base URL for file access
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+const BACKEND_BASE_URL = API_BASE_URL.replace('/api', '');
+
 // Styled Components
 const CashierContainer = styled(Box)(({ theme }) => ({
     backgroundColor: '#f5f7fa',
@@ -306,7 +310,7 @@ const CashierSlipVerification = () => {
                                                                 <IconButton
                                                                     color="primary"
                                                                     size="small"
-                                                                    onClick={() => window.open(payment.paymentSlip.url, '_blank')}
+                                                                    onClick={() => window.open(`${BACKEND_BASE_URL}${payment.paymentSlip.url}`, '_blank')}
                                                                 >
                                                                     <ViewIcon />
                                                                 </IconButton>
