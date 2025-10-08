@@ -41,6 +41,7 @@ import EditJob from "./components/adminJob/EditJob";
 // 💰 NEW IMPORT: Cashier Portal Components
 import CashierPortal from "./components/Cashier/CashierPortal";
 import PaymentHistory from "./components/Cashier/PaymentHistory";
+import CashierSlipVerification from "./components/Cashier/CashierSlipVerification";
 import CashierDashboard from "./pages/CashierDashboard";
 import MyPayments from "./pages/MyPayments"; 
 
@@ -80,6 +81,7 @@ export default function App() {
         <Route path="/cashier-dashboard" element={<CashierDashboard />} />
         <Route path="/cashier" element={<CashierPortal />} />
         <Route path="/payment-history" element={<PaymentHistory />} />
+        <Route path="/cashier/slip-verification" element={<CashierSlipVerification />} />
         
         {/* 💳 User Payment Routes */}
         <Route path="/my-payments" element={<MyPayments />} />

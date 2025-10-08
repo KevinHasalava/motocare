@@ -61,6 +61,13 @@ const CashierDashboard = () => {
             color: '#1976d2'
         },
         {
+            title: 'Verify Payment Slips',
+            description: 'Review and approve uploaded payment slips',
+            icon: <Receipt sx={{ fontSize: 48, color: '#ff9800' }} />,
+            path: '/cashier/slip-verification',
+            color: '#ff9800'
+        },
+        {
             title: 'Payment History',
             description: 'View transaction records and invoice history',
             icon: <Receipt sx={{ fontSize: 48, color: '#2e7d32' }} />,
@@ -73,13 +80,6 @@ const CashierDashboard = () => {
             icon: <Add sx={{ fontSize: 48, color: '#ed6c02' }} />,
             path: '/admin/walkinjob',
             color: '#ed6c02'
-        },
-        {
-            title: 'View All Jobs',
-            description: 'Monitor job status and service progress',
-            icon: <Assessment sx={{ fontSize: 48, color: '#9c27b0' }} />,
-            path: '/admin-job-view',
-            color: '#9c27b0'
         }
     ];
 

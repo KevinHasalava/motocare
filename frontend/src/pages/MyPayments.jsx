@@ -122,6 +122,9 @@ const MyPayments = () => {
     // Upload states
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploadNotes, setUploadNotes] = useState('');
+    const [vehicleNumber, setVehicleNumber] = useState('');
+    const [customerName, setCustomerName] = useState('');
+    const [paidAmount, setPaidAmount] = useState('');
     const [uploading, setUploading] = useState(false);
     
     // Statistics
@@ -227,6 +230,12 @@ const MyPayments = () => {
     const handleUploadSlip = (payment) => {
         setSelectedPayment(payment);
         setSlipUploadDialog(true);
+        
+        // Pre-fill form fields with payment data
+        setVehicleNumber(payment.vehicle?.vehicleNumber || '');
+        setCustomerName(payment.customer?.name || '');
+        setPaidAmount(payment.totalAmount?.toString() || '');
+        setUploadNotes('');
     };
 
     const handleFileSelect = (event) => {
@@ -267,18 +276,29 @@ const MyPayments = () => {
             return;
         }
 
+        if (!vehicleNumber || !customerName || !paidAmount) {
+            setError('Please fill in all required fields');
+            return;
+        }
+
         setUploading(true);
         try {
             const formData = new FormData();
             formData.append('slip', selectedFile);
             formData.append('paymentId', selectedPayment._id);
             formData.append('notes', uploadNotes);
+            formData.append('vehicleNumber', vehicleNumber);
+            formData.append('customerName', customerName);
+            formData.append('paidAmount', paidAmount);
 
             await uploadPaymentSlip(formData);
             setSuccess('Payment slip uploaded successfully');
             setSlipUploadDialog(false);
             setSelectedFile(null);
             setUploadNotes('');
+            setVehicleNumber('');
+            setCustomerName('');
+            setPaidAmount('');
             fetchUserPayments(); // Refresh the list
         } catch (error) {
             console.error('Error uploading slip:', error);
@@ -581,6 +601,43 @@ const MyPayments = () => {
                             </Box>
                         )}
                     </UploadArea>
+
+                    <Grid container spacing={2} sx={{ mt: 2 }}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Vehicle Number"
+                                value={vehicleNumber}
+                                onChange={(e) => setVehicleNumber(e.target.value)}
+                                placeholder="Enter vehicle registration number"
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Customer Name"
+                                value={customerName}
+                                onChange={(e) => setCustomerName(e.target.value)}
+                                placeholder="Enter customer name"
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Paid Amount"
+                                type="number"
+                                value={paidAmount}
+                                onChange={(e) => setPaidAmount(e.target.value)}
+                                placeholder="Enter paid amount"
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start">LKR</InputAdornment>,
+                                }}
+                                required
+                            />
+                        </Grid>
+                    </Grid>
 
                     <TextField
                         fullWidth

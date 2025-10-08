@@ -221,3 +221,46 @@ export const uploadPaymentSlip = async (formData) => {
         throw error.response?.data || error.message;
     }
 };
+
+// Get payments with slips for cashier verification
+export const getPaymentsWithSlips = async (status = '', page = 1, limit = 10) => {
+    try {
+        const params = new URLSearchParams();
+        params.append('page', page.toString());
+        params.append('limit', limit.toString());
+        if (status) {
+            params.append('status', status);
+        }
+
+        const response = await axios.get(
+            `${API_BASE_URL}/payments/slips/pending?${params.toString()}`,
+            createAuthHeaders()
+        );
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error.message;
+    }
+};
+
+// Verify payment slip (approve/reject)
+export const verifyPaymentSlip = async (paymentId, action, verificationNotes = '') => {
+    try {
+        console.log('Verifying payment slip:', { paymentId, action, verificationNotes });
+        const response = await axios.put(
+            `${API_BASE_URL}/payments/${paymentId}/verify-slip`,
+            { action, verificationNotes },
+            createAuthHeaders()
+        );
+        console.log('Verify payment slip API response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Verify payment slip API error:', error);
+        if (error.response?.data) {
+            throw error.response.data;
+        } else if (error.message) {
+            throw new Error(error.message);
+        } else {
+            throw new Error('Network error occurred');
+        }
+    }
+};

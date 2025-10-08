@@ -124,6 +124,7 @@ const CashierPortal = () => {
     const [discount, setDiscount] = useState(0);
     const [discountPercentage, setDiscountPercentage] = useState(0);
     const [paymentMethod, setPaymentMethod] = useState('Cash');
+    const [paymentStatus, setPaymentStatus] = useState('Paid');
     const [notes, setNotes] = useState('');
     
     const [loading, setLoading] = useState(false);
@@ -304,6 +305,7 @@ const CashierPortal = () => {
                 discount: discount || 0,
                 discountPercentage: discountPercentage || 0,
                 paymentMethod: paymentMethod || 'Cash',
+                paymentStatus: paymentStatus || 'Pending',
                 notes: notes || ''
             });
 
@@ -682,6 +684,18 @@ const CashierPortal = () => {
                                                     <MenuItem value="Card">Card</MenuItem>
                                                     <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
                                                     <MenuItem value="Other">Other</MenuItem>
+                                                </TextField>
+                                            </Grid>
+                                            <Grid item xs={12} sm={6} md={3}>
+                                                <TextField
+                                                    select
+                                                    label="Payment Status"
+                                                    value={paymentStatus}
+                                                    onChange={(e) => setPaymentStatus(e.target.value)}
+                                                    fullWidth
+                                                >
+                                                    <MenuItem value="Paid">Paid</MenuItem>
+                                                    <MenuItem value="Pending">Pending (Customer Offline)</MenuItem>
                                                 </TextField>
                                             </Grid>
                                             <Grid item xs={12} sm={6} md={3}>
