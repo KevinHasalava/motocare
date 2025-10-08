@@ -32,6 +32,7 @@ import { getUserProfile, updateUserProfile } from '../api/userProfile';
 import { theme, backgroundKeyframes } from '../utils/theme';
 import HeaderWrapper from '../components/HeaderWrapper';
 import Footer from '../components/Footer';
+import { validatePhoneNumber, handlePhoneInput } from '../utils/validationUtils';
 
 const UserProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -137,9 +138,16 @@ const UserProfilePage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    let processedValue = value;
+
+    // Handle phone input filtering
+    if (name === 'phone') {
+      processedValue = handlePhoneInput(value);
+    }
+
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: processedValue
     }));
   };
 
@@ -167,10 +175,10 @@ const UserProfilePage = () => {
       }
 
       // Phone validation (optional)
-      if (formData.phoneNumber && formData.phoneNumber.trim()) {
-        const phoneRegex = /^[0-9+\-\s()]+$/;
-        if (!phoneRegex.test(formData.phoneNumber)) {
-          setError('Please enter a valid phone number');
+      if (formData.phone && formData.phone.trim()) {
+        const phoneValidation = validatePhoneNumber(formData.phone);
+        if (!phoneValidation.isValid) {
+          setError(phoneValidation.error);
           return;
         }
       }
@@ -536,12 +544,18 @@ const UserProfilePage = () => {
                         <TextField
                           fullWidth
                           label="Phone Number"
-                          name="phoneNumber"
-                          value={formData.phoneNumber}
+                          name="phone"
+                          value={formData.phone}
                           onChange={handleInputChange}
                           disabled={!editing}
                           variant="outlined"
                           placeholder="Enter your phone number"
+                          inputProps={{
+                            maxLength: 10,
+                            inputMode: 'numeric',
+                            pattern: "0[0-9]{9}"
+                          }}
+                          helperText={editing ? "Must be 10 digits and start with 0 (optional)" : ""}
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               background: editing ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.05)',

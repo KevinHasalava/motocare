@@ -28,6 +28,7 @@ import axios from "axios";
 // Import Header and Footer
 import AdminHeader from "../../components/AdminHeader";
 import AdminFooter from "../../components/AdminFooter";
+import { validatePhoneNumber, handlePhoneInput } from '../../utils/validationUtils';
 
 const defaultFormState = {
   name: "",
@@ -69,6 +70,26 @@ const UserManagement = () => {
 
   const handleAddUser = async () => {
     try {
+      // Validation
+      if (!formData.name.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.password.trim()) {
+        setError("All fields are required");
+        return;
+      }
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        setError("Invalid email address");
+        return;
+      }
+
+      // Phone validation
+      const phoneValidation = validatePhoneNumber(formData.phone);
+      if (!phoneValidation.isValid) {
+        setError(phoneValidation.error);
+        return;
+      }
+
       const token = localStorage.getItem("token");
       await axios.post("http://localhost:5000/api/users/register", formData, {
         headers: { "x-auth-token": token },
@@ -84,6 +105,26 @@ const UserManagement = () => {
 
   const handleEditUser = async () => {
     try {
+      // Validation
+      if (!formData.name.trim() || !formData.email.trim() || !formData.phone.trim()) {
+        setError("Name, email, and phone are required");
+        return;
+      }
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        setError("Invalid email address");
+        return;
+      }
+
+      // Phone validation
+      const phoneValidation = validatePhoneNumber(formData.phone);
+      if (!phoneValidation.isValid) {
+        setError(phoneValidation.error);
+        return;
+      }
+
       const token = localStorage.getItem("token");
       await axios.put(`http://localhost:5000/api/users/${editUserId}`, formData, {
         headers: { "x-auth-token": token },
@@ -125,7 +166,15 @@ const UserManagement = () => {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let processedValue = value;
+
+    // Handle phone input filtering
+    if (name === 'phone') {
+      processedValue = handlePhoneInput(value);
+    }
+
+    setFormData({ ...formData, [name]: processedValue });
     setError("");
     setSuccess("");
   };
@@ -344,6 +393,11 @@ const UserManagement = () => {
               type={field === "password" ? "password" : field === "email" ? "email" : "text"}
               value={formData[field]}
               onChange={handleChange}
+              inputProps={field === "phone" ? {
+                maxLength: 10,
+                inputMode: 'numeric',
+                pattern: "0[0-9]{9}"
+              } : undefined}
             />
           ))}
           <TextField
@@ -381,6 +435,11 @@ const UserManagement = () => {
               type={field === "password" ? "password" : field === "email" ? "email" : "text"}
               value={formData[field]}
               onChange={handleChange}
+              inputProps={field === "phone" ? {
+                maxLength: 10,
+                inputMode: 'numeric',
+                pattern: "0[0-9]{9}"
+              } : undefined}
             />
           ))}
           <TextField

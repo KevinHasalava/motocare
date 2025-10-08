@@ -48,7 +48,7 @@ import {
     calculatePayment,
     createPayment
 } from '../../api/paymentApi';
-import CashierHeader from '../CashierHeader';
+import HeaderWrapper from '../HeaderWrapper';
 
 // Custom debounce function to avoid lodash dependency
 const debounce = (func, wait) => {
@@ -354,7 +354,7 @@ const CashierPortal = () => {
 
     return (
         <>
-            <CashierHeader />
+            <HeaderWrapper />
             <CashierContainer>
             <MainPaper>
                 <HeaderSection>

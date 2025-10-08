@@ -7,9 +7,7 @@ import { theme, backgroundKeyframes, gradientText, mockData } from '../utils/the
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import handleBookServiceClick from '../pages/VehiclePage';
-    
-
-
+import { validatePhoneNumber, handlePhoneInput } from '../utils/validationUtils';
 
 import axios from "axios";
 
@@ -27,7 +25,15 @@ const Register = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let processedValue = value;
+
+    // Handle phone input filtering
+    if (name === 'phone') {
+      processedValue = handlePhoneInput(value);
+    }
+
+    setForm({ ...form, [name]: processedValue });
   };
 
   const handleRegister = async (e) => {
@@ -46,9 +52,10 @@ const Register = () => {
       return;
     }
 
-    // 📞 Phone Validation (exact 10 digits, adjust as needed)
-    if (!/^[0-9]{10}$/.test(form.phone)) {
-      setError("❌ Phone number must be exactly 10 digits");
+    // 📞 Phone Validation
+    const phoneValidation = validatePhoneNumber(form.phone);
+    if (!phoneValidation.isValid) {
+      setError(`❌ ${phoneValidation.error}`);
       return;
     }
 
@@ -154,6 +161,12 @@ const Register = () => {
                   value={form.phone}
                   onChange={handleChange}
                   required
+                  inputProps={{
+                    maxLength: 10,
+                    inputMode: 'numeric',
+                    pattern: "0[0-9]{9}"
+                  }}
+                  helperText="Must be 10 digits and start with 0 (e.g., 071xxxxxxx)"
                 />
                 <TextField
                   fullWidth

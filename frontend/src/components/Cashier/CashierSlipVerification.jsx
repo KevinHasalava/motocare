@@ -43,7 +43,7 @@ import {
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { getPaymentsWithSlips, verifyPaymentSlip } from '../../api/paymentApi';
-import CashierHeader from '../CashierHeader';
+import HeaderWrapper from '../HeaderWrapper';
 
 // Get backend base URL for file access
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
@@ -189,7 +189,7 @@ const CashierSlipVerification = () => {
 
     return (
         <>
-            <CashierHeader />
+            <HeaderWrapper />
             <CashierContainer>
                 <MainPaper>
                     <HeaderSection>

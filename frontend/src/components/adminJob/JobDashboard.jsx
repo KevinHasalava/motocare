@@ -12,7 +12,7 @@ import {
     HistoryToggleOffOutlined, CancelOutlined, PlayCircleOutline, SearchOutlined // 💡 Search icon
 } from '@mui/icons-material';
 import { getAllJobs, updateJobStatus, deleteJob } from '../../api/job'; 
-import CashierHeader from '../CashierHeader';
+import HeaderWrapper from '../HeaderWrapper';
 
 
 // --- Styled Components (Unchanged) ---
@@ -167,7 +167,7 @@ const JobDashboard = () => {
 
     return (
         <AdminContainer>
-            <CashierHeader />
+            <HeaderWrapper />
             <AdminPaper>
                 <AdminHeader sx={{ mt: 8, opacity: 0.9 }}>
                     <Typography variant="h5" fontWeight={600}>

@@ -45,6 +45,11 @@ import CashierSlipVerification from "./components/Cashier/CashierSlipVerificatio
 import CashierDashboard from "./pages/CashierDashboard";
 import MyPayments from "./pages/MyPayments"; 
 
+// --- NEW ADMIN MANAGEMENT IMPORTS ---
+import AdminVehicleManagement from "./pages/admin/AdminVehicleManagement";
+import AdminPaymentManagement from "./pages/admin/AdminPaymentManagement";
+// ------------------------------------
+
 export default function App() {
   return (
     <Router>
@@ -95,6 +100,8 @@ export default function App() {
         <Route path="/admin-dashboard" element={< AdminDashboard/>} />
         <Route path="/admin-users" element={< UserManagement/>} />
         <Route path="/admin/bookings" element={< AdminBookingManagement/>} />
+        <Route path="/admin/vehicles" element={<AdminVehicleManagement />} />
+        <Route path="/admin/payments" element={<AdminPaymentManagement />} />
 
         <Route path="/forgot-password" element={<ForgotPassword />} />
   <Route path="/reset-password" element={<ResetPassword />} />

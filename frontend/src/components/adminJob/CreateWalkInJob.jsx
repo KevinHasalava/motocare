@@ -10,7 +10,8 @@ import {
 } from '@mui/icons-material';
 import { createWalkInJob, fetchJobsByDateAndMechanic } from '../../api/job'; // Assuming you added this
 import { fetchServices, fetchMechanics, fetchVehiclesByEmail } from '../../api/data'; 
-import CashierHeader from '../CashierHeader';
+import HeaderWrapper from '../HeaderWrapper';
+import { validatePhoneNumber, handlePhoneInput } from '../../utils/validationUtils';
 
 // --- Styled Components (No changes) ---
 const AdminContainer = styled(Box)(({ theme }) => ({
@@ -262,12 +263,10 @@ const CreateWalkInJob = () => {
         // Phone Number Validation
         if (field === 'customerPhoneNumber' || field === null) {
             const phone = formData.customerPhoneNumber;
-            if (phone) {
-                if (!/^0\d{9}$/.test(phone)) {
-                    tempErrors.customerPhoneNumber = 'Must be exactly 10 digits starting with 0.';
-                    isValid = false;
-                } else if (!phonePrefixes.some(prefix => phone.startsWith(prefix))) {
-                    tempErrors.customerPhoneNumber = 'Invalid mobile or landline prefix.';
+            if (phone && phone.trim()) {
+                const phoneValidation = validatePhoneNumber(phone);
+                if (!phoneValidation.isValid) {
+                    tempErrors.customerPhoneNumber = phoneValidation.error;
                     isValid = false;
                 } else {
                     delete tempErrors.customerPhoneNumber;
@@ -345,7 +344,7 @@ const CreateWalkInJob = () => {
         }
 
         if (name === 'customerPhoneNumber') {
-            newValue = value.replace(/[^0-9]/g, '').slice(0, 10);
+            newValue = handlePhoneInput(value);
         }
         
         if (name === 'vehicleNumber') {
@@ -474,7 +473,7 @@ const CreateWalkInJob = () => {
 
     return (
         <AdminContainer>
-            <CashierHeader />
+            <HeaderWrapper />
             {/* <AdminHeader/> */}
             <AdminPaper>
                 <AdminHeader>
@@ -546,9 +545,13 @@ const CreateWalkInJob = () => {
                                         value={formData.customerPhoneNumber}
                                         onChange={handleInputChange}
                                         error={!!errors.customerPhoneNumber}
-                                        helperText={errors.customerPhoneNumber}
+                                        helperText={errors.customerPhoneNumber || "Must be 10 digits starting with 0 (optional)"}
                                         type="tel"
-                                        inputProps={{ maxLength: 10 }}
+                                        inputProps={{
+                                            maxLength: 10,
+                                            inputMode: 'numeric',
+                                            pattern: "0[0-9]{9}"
+                                        }}
                                     />
                                 </Grid>
                             </Grid>
