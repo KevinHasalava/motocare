@@ -156,9 +156,9 @@ const BookingPage = () => {
         navigate("/my-bookings");
     };
 
-    // 👈 =================== මෙතන සම්පූර්ණයෙන්ම වෙනස් කර ඇත ===================
+    // 👈
     const handleDownloadPdf = async () => {
-        // PDF එකට අවශ්‍ය HTML content එක සහ CSS styles මෙතැනදී නිර්මාණය කරයි
+        // PDF html content
         const getPdfContent = () => {
             // Helper function for creating rows, to avoid repetition
             const createRow = (label, value) => `
@@ -296,7 +296,7 @@ const BookingPage = () => {
                     {/* ... Loading dialog content ... */}
                 </Dialog>
                 
-                {/* 👈 Success Dialog එක සරල කර ඇත */}
+                {/* 👈 Success Dialog*/}
                 <Dialog open={successDialogOpen} onClose={handleNavigateToBookings} fullWidth maxWidth="xs">
                     <DialogTitle sx={{ color: 'black', textAlign: 'center', pb: 0 }}>
                         <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#10b981' }}>
