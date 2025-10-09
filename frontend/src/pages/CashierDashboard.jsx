@@ -80,6 +80,14 @@ const CashierDashboard = () => {
             icon: <Add sx={{ fontSize: 48, color: '#ed6c02' }} />,
             path: '/admin/walkinjob',
             color: '#ed6c02'
+        },
+
+        {
+            title: 'Review Payments',
+            description: 'Review Payments / Transactions',
+            icon: <Add sx={{ fontSize: 48, color: '#023dedff' }} />,
+            path: '/cashier/slip-verification',
+            color: '#ed6c02'
         }
     ];
 
