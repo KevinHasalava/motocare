@@ -210,7 +210,7 @@ const createPayment = async (req, res) => {
             paymentStatus
         } = req.body;
 
-        // Validate required fields
+        // Simple Payment Validations
         if (!jobId) {
             return res.status(400).json({ message: 'Job ID is required' });
         }
@@ -222,6 +222,26 @@ const createPayment = async (req, res) => {
 
         if (!req.user || !req.user.id) {
             return res.status(401).json({ message: 'User authentication required' });
+        }
+
+        // Validate payment method
+        const validPaymentMethods = ['Cash', 'Card', 'Bank Transfer', 'Online'];
+        if (paymentMethod && !validPaymentMethods.includes(paymentMethod)) {
+            return res.status(400).json({ message: 'Invalid payment method. Allowed: Cash, Card, Bank Transfer, Online' });
+        }
+
+        // Validate discount values
+        if (discount && (typeof discount !== 'number' || discount < 0)) {
+            return res.status(400).json({ message: 'Discount must be a positive number' });
+        }
+
+        if (discountPercentage && (typeof discountPercentage !== 'number' || discountPercentage < 0 || discountPercentage > 100)) {
+            return res.status(400).json({ message: 'Discount percentage must be between 0 and 100' });
+        }
+
+        // Validate notes length
+        if (notes && notes.length > 500) {
+            return res.status(400).json({ message: 'Notes cannot exceed 500 characters' });
         }
 
         // Check if user exists and has proper role
@@ -265,6 +285,11 @@ const createPayment = async (req, res) => {
             console.log('Extra items is not an array:', typeof extraItems);
             return res.status(400).json({ message: 'Extra items must be an array' });
         }
+
+        // Simple validation for extra items
+        if (extraItems && extraItems.length > 20) {
+            return res.status(400).json({ message: 'Cannot add more than 20 extra items' });
+        }
         
         console.log('Extra items length:', extraItems?.length || 0);
         extraItems.forEach((item, index) => {
@@ -285,6 +310,11 @@ const createPayment = async (req, res) => {
             
             if (!item.quantity || typeof item.quantity !== 'number' || item.quantity <= 0) {
                 return res.status(400).json({ message: 'Extra item missing valid quantity' });
+            }
+
+            // Simple quantity validation
+            if (item.quantity > 100) {
+                return res.status(400).json({ message: 'Quantity cannot exceed 100 per item' });
             }
             
             // Validate inventory item ID format
@@ -335,6 +365,15 @@ const createPayment = async (req, res) => {
         const subtotal = serviceAmount + extraItemsTotal;
         const discountAmount = discount || (subtotal * (discountPercentage || 0) / 100);
         const totalAmount = subtotal - discountAmount;
+
+        // Simple payment amount validations
+        if (totalAmount < 0) {
+            return res.status(400).json({ message: 'Total amount cannot be negative' });
+        }
+
+        if (totalAmount > 1000000) {
+            return res.status(400).json({ message: 'Total amount cannot exceed 1,000,000' });
+        }
 
         // Validate required data before creating payment
         if (!job.vehicle || !job.vehicle._id) {
@@ -642,6 +681,24 @@ const updatePayment = async (req, res) => {
         // Validate payment ID
         if (!mongoose.Types.ObjectId.isValid(paymentId)) {
             return res.status(400).json({ message: 'Invalid payment ID format' });
+        }
+
+        // Simple validation for update data
+        if (discount && (typeof discount !== 'number' || discount < 0)) {
+            return res.status(400).json({ message: 'Discount must be a positive number' });
+        }
+
+        if (discountPercentage && (typeof discountPercentage !== 'number' || discountPercentage < 0 || discountPercentage > 100)) {
+            return res.status(400).json({ message: 'Discount percentage must be between 0 and 100' });
+        }
+
+        if (notes && notes.length > 500) {
+            return res.status(400).json({ message: 'Notes cannot exceed 500 characters' });
+        }
+
+        const validPaymentMethods = ['Cash', 'Card', 'Bank Transfer', 'Online'];
+        if (paymentMethod && !validPaymentMethods.includes(paymentMethod)) {
+            return res.status(400).json({ message: 'Invalid payment method' });
         }
 
         // Check if user is cashier/admin
@@ -994,6 +1051,27 @@ const uploadPaymentSlip = async (req, res) => {
     try {
         const { paymentId, notes, vehicleNumber, customerName, paidAmount } = req.body;
         const userId = req.user.id;
+
+        // Simple validations for payment slip upload
+        if (!paymentId) {
+            return res.status(400).json({ message: 'Payment ID is required' });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(paymentId)) {
+            return res.status(400).json({ message: 'Invalid payment ID format' });
+        }
+
+        if (notes && notes.length > 300) {
+            return res.status(400).json({ message: 'Notes cannot exceed 300 characters' });
+        }
+
+        if (paidAmount && (typeof paidAmount !== 'number' || paidAmount <= 0)) {
+            return res.status(400).json({ message: 'Paid amount must be a positive number' });
+        }
+
+        if (customerName && customerName.length > 100) {
+            return res.status(400).json({ message: 'Customer name too long' });
+        }
 
         // Find payment and verify it belongs to the user
         const payment = await Payment.findOne({
