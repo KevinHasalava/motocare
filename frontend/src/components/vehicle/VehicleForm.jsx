@@ -39,15 +39,13 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
     }
   }, [editingVehicle]);
 
-  // Validation function similar to walk-in job form
+  // Simple validation function for vehicle form
   const validate = (field = null) => {
     let tempErrors = { ...errors };
     let isValid = true;
 
-    const requiredFields = ['vehicleNumber', 'type', 'brand', 'model', 'year'];
-
     const checkRequired = (name, message) => {
-      if (requiredFields.includes(name) && !formData[name]) {
+      if (!formData[name] || (typeof formData[name] === 'string' && !formData[name].trim())) {
         tempErrors[name] = message;
         return false;
       } else {
@@ -59,39 +57,65 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
     // Vehicle Number Validation
     if (field === 'vehicleNumber' || field === null) {
       if (checkRequired('vehicleNumber', 'Vehicle Number is required.')) {
-        if (formData.vehicleNumber && !/^([A-Za-z]{2,3}-\d{4})$/.test(formData.vehicleNumber)) {
-          tempErrors.vehicleNumber = 'Format: LL-NNNN or LLL-NNNN (e.g., WP-1234).';
+        // Sri Lankan vehicle number format: XX-XXXX or XXX-XXXX
+        const vehicleNumberRegex = /^([A-Za-z]{2,3}-\d{4})$/;
+        if (formData.vehicleNumber && !vehicleNumberRegex.test(formData.vehicleNumber)) {
+          tempErrors.vehicleNumber = 'Format: AB-1234 or ABC-1234 (e.g., WP-1234)';
           isValid = false;
         }
-      } else { isValid = false; }
+      } else { 
+        isValid = false; 
+      }
     }
 
     // Vehicle Type Validation
     if (field === 'type' || field === null) {
-      if (!checkRequired('type', 'Vehicle Type is required.')) { isValid = false; }
+      if (!checkRequired('type', 'Vehicle Type is required.')) { 
+        isValid = false; 
+      }
     }
 
     // Brand Validation
     if (field === 'brand' || field === null) {
-      if (!checkRequired('brand', 'Brand is required.')) { isValid = false; }
+      if (checkRequired('brand', 'Brand is required.')) {
+        // Only letters and spaces allowed for brand
+        if (formData.brand && !/^[A-Za-z\s]+$/.test(formData.brand.trim())) {
+          tempErrors.brand = 'Brand must contain only letters and spaces';
+          isValid = false;
+        }
+      } else { 
+        isValid = false; 
+      }
     }
 
     // Model Validation
     if (field === 'model' || field === null) {
-      if (!checkRequired('model', 'Model is required.')) { isValid = false; }
+      if (checkRequired('model', 'Model is required.')) {
+        // Letters, numbers, spaces, and common symbols allowed for model
+        if (formData.model && !/^[A-Za-z0-9\s\-\.]+$/.test(formData.model.trim())) {
+          tempErrors.model = 'Model can contain letters, numbers, spaces, hyphens, and dots';
+          isValid = false;
+        }
+      } else { 
+        isValid = false; 
+      }
     }
 
     // Year Validation
     if (field === 'year' || field === null) {
       if (checkRequired('year', 'Year is required.')) {
         if (formData.year) {
+          const currentYear = new Date().getFullYear();
           const yearValue = formData.year.year ? formData.year.year() : formData.year;
-          if (yearValue < 1990 || yearValue > 2025) {
-            tempErrors.year = `Invalid year (1990-2025).`;
+          
+          if (yearValue < 1990 || yearValue > currentYear) {
+            tempErrors.year = `Year must be between 1990 and ${currentYear}`;
             isValid = false;
           }
         }
-      } else { isValid = false; }
+      } else { 
+        isValid = false; 
+      }
     }
 
     setErrors(tempErrors);
@@ -102,31 +126,49 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
     const { name, value } = e.target;
     let newValue = value;
 
-    // Input filtering for vehicle number
+    // Input formatting and filtering
     if (name === 'vehicleNumber') {
+      // Format vehicle number as user types (XX-XXXX or XXX-XXXX)
       newValue = value.replace(/[^A-Za-z0-9-]/g, '').toUpperCase();
-
-      let letters = newValue.match(/^[A-Z]{2,3}/)?.[0] || '';
-      let numbers = newValue.match(/\d{1,4}$/)?.[0] || '';
-
-      if (letters.length > 0 && newValue.indexOf('-') === -1) {
-        const combined = newValue.slice(letters.length);
-        if (combined) {
-          numbers = combined.slice(0, 4);
-          newValue = `${letters}-${numbers}`;
+      
+      // Auto-format with hyphen
+      if (newValue.length >= 2 && !newValue.includes('-')) {
+        const letters = newValue.match(/^[A-Z]{2,3}/)?.[0] || '';
+        const numbers = newValue.slice(letters.length).replace(/[^0-9]/g, '');
+        if (numbers.length > 0) {
+          newValue = `${letters}-${numbers.slice(0, 4)}`;
         } else {
           newValue = letters;
         }
-      } else if (newValue.indexOf('-') > -1) {
+      } else if (newValue.includes('-')) {
         const parts = newValue.split('-');
-        if (parts.length > 1) {
-          parts[1] = parts[1].slice(0, 4);
-          newValue = parts.join('-');
-        }
+        const letters = parts[0].slice(0, 3); // Max 3 letters
+        const numbers = (parts[1] || '').replace(/[^0-9]/g, '').slice(0, 4); // Max 4 numbers
+        newValue = numbers ? `${letters}-${numbers}` : letters;
+      }
+      
+      // Limit total length
+      if (newValue.length > 8) {
+        newValue = newValue.slice(0, 8);
       }
     }
 
+    if (name === 'brand') {
+      // Only allow letters and spaces for brand
+      newValue = value.replace(/[^A-Za-z\s]/g, '');
+    }
+
+    if (name === 'model') {
+      // Allow letters, numbers, spaces, hyphens, and dots for model
+      newValue = value.replace(/[^A-Za-z0-9\s\-\.]/g, '');
+    }
+
     setFormData({ ...formData, [name]: newValue });
+    
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   // Add onBlur handler for validation when user leaves a field
@@ -140,6 +182,16 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
 
   const handleYearChange = (newYear) => {
     setFormData({ ...formData, year: newYear });
+    
+    // Clear year error when user selects a year
+    if (errors.year) {
+      setErrors(prev => ({ ...prev, year: '' }));
+    }
+    
+    // Validate year immediately after selection
+    setTimeout(() => {
+      validate('year');
+    }, 100);
   };
 
   const handleSubmit = async (e) => {
@@ -348,18 +400,28 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                 {!editingVehicle && (
                   <Box sx={{ mb: 4 }}>
                     <Typography sx={{ color: 'rgba(255, 255, 255, 0.9)', mb: 2, fontWeight: 600 }}>
-                      Select Vehicle Type
+                      Select Vehicle Type *
                     </Typography>
                     <Grid container spacing={2}>
                       {vehicleTypes.map((type) => (
                         <Grid item xs={6} sm={3} key={type.value}>
                           <Box
-                            onClick={() => setFormData({ ...formData, type: type.value })}
+                            onClick={() => {
+                              setFormData({ ...formData, type: type.value });
+                              // Clear type error when user selects a type
+                              if (errors.type) {
+                                setErrors(prev => ({ ...prev, type: '' }));
+                              }
+                            }}
                             sx={{
                               p: 2,
                               borderRadius: '16px',
                               border: '2px solid',
-                              borderColor: formData.type === type.value ? type.color : 'rgba(255, 255, 255, 0.1)',
+                              borderColor: errors.type 
+                                ? '#f44336' 
+                                : formData.type === type.value 
+                                  ? type.color 
+                                  : 'rgba(255, 255, 255, 0.1)',
                               background: formData.type === type.value 
                                 ? alpha(type.color, 0.1) 
                                 : 'rgba(255, 255, 255, 0.02)',
@@ -385,6 +447,18 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                         </Grid>
                       ))}
                     </Grid>
+                    {errors.type && (
+                      <Typography 
+                        sx={{ 
+                          color: '#f44336', 
+                          fontSize: '0.75rem', 
+                          mt: 1,
+                          textAlign: 'center' 
+                        }}
+                      >
+                        {errors.type}
+                      </Typography>
+                    )}
                   </Box>
                 )}
 
