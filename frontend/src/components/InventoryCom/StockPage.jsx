@@ -97,7 +97,7 @@ const StockPage = () => {
       doc.setFontSize(20);
       doc.text("Stock Movement Report", 14, 22);
       doc.setFontSize(10);
-      doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
+      doc.text(`Generated Date: ${new Date().toLocaleDateString()}`, 14, 30);
       
       const tableColumn = ["Date", "Part ID", "Item Name", "Type", "Quantity", "Buying Price (LKR)", "Sales Price (LKR)", "Supplier", "Job ID", "Notes"];
       const tableRows = movementsData.map(movement => [

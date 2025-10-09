@@ -56,7 +56,7 @@ const SupplierPage = () => {
   };
 
   // -------------------------------------------------------------------
-  // **FIXED IMPLEMENTATION:** PDF Download Handler using jsPDF
+  // PDF Download Handler using jsPDF
   // -------------------------------------------------------------------
   const handleDownloadPdf = () => {
     const doc = new jsPDF();
@@ -79,10 +79,14 @@ const SupplierPage = () => {
     // Add title
     doc.setFontSize(18);
     doc.text("Supplier List Report", 14, 20);
+    
+    // Add generated date
+    doc.setFontSize(10);
+    doc.text(`Generated Date: ${new Date().toLocaleDateString()}`, 14, 28);
 
     // Generate table using jspdf-autotable
     doc.autoTable({
-        startY: 25, // Start table below the title
+        startY: 35, // Start table below the title and date
         head: head,
         body: body,
         theme: 'striped',

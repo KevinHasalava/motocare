@@ -184,10 +184,14 @@ const InventoryPage = () => {
     // Add title
     doc.setFontSize(16);
     doc.text("Inventory Stock Report", 14, 20);
+    
+    // Add generated date
+    doc.setFontSize(10);
+    doc.text(`Generated Date: ${new Date().toLocaleDateString()}`, 14, 28);
 
     // Generate table using jspdf-autotable
     doc.autoTable({
-        startY: 25, 
+        startY: 35, 
         head: head,
         body: body,
         theme: 'striped',
