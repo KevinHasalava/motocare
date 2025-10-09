@@ -59,11 +59,10 @@ const Register = () => {
       return;
     }
 
-    // 🔑 Strong Password Check
-    const strongPasswordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!strongPasswordRegex.test(form.password)) {
-      setError("❌ Password must be at least 8 characters, include upper & lower case letters, a number, and a special character");
+    // 🔑 Password Validation (improved - more user-friendly)
+    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
+    if (!passwordRegex.test(form.password)) {
+      setError("❌ Password must be at least 6 characters long and contain at least one letter and one number");
       return;
     }
 
@@ -177,7 +176,7 @@ const Register = () => {
                   value={form.password}
                   onChange={handleChange}
                   required
-                  helperText="Must include uppercase, lowercase, number, special char, 8+ chars"
+                  helperText="Must be at least 6 characters with at least one letter and one number"
                 />
                 <TextField
                   fullWidth

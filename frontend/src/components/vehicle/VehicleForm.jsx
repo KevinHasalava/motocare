@@ -25,6 +25,8 @@ const initialFormState = {
 const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }) => {
   const [formData, setFormData] = useState(initialFormState);
   const [hoveredField, setHoveredField] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (editingVehicle) {
@@ -37,8 +39,103 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
     }
   }, [editingVehicle]);
 
+  // Validation function similar to walk-in job form
+  const validate = (field = null) => {
+    let tempErrors = { ...errors };
+    let isValid = true;
+
+    const requiredFields = ['vehicleNumber', 'type', 'brand', 'model', 'year'];
+
+    const checkRequired = (name, message) => {
+      if (requiredFields.includes(name) && !formData[name]) {
+        tempErrors[name] = message;
+        return false;
+      } else {
+        delete tempErrors[name];
+        return true;
+      }
+    };
+
+    // Vehicle Number Validation
+    if (field === 'vehicleNumber' || field === null) {
+      if (checkRequired('vehicleNumber', 'Vehicle Number is required.')) {
+        if (formData.vehicleNumber && !/^([A-Za-z]{2,3}-\d{4})$/.test(formData.vehicleNumber)) {
+          tempErrors.vehicleNumber = 'Format: LL-NNNN or LLL-NNNN (e.g., WP-1234).';
+          isValid = false;
+        }
+      } else { isValid = false; }
+    }
+
+    // Vehicle Type Validation
+    if (field === 'type' || field === null) {
+      if (!checkRequired('type', 'Vehicle Type is required.')) { isValid = false; }
+    }
+
+    // Brand Validation
+    if (field === 'brand' || field === null) {
+      if (!checkRequired('brand', 'Brand is required.')) { isValid = false; }
+    }
+
+    // Model Validation
+    if (field === 'model' || field === null) {
+      if (!checkRequired('model', 'Model is required.')) { isValid = false; }
+    }
+
+    // Year Validation
+    if (field === 'year' || field === null) {
+      if (checkRequired('year', 'Year is required.')) {
+        if (formData.year) {
+          const yearValue = formData.year.year ? formData.year.year() : formData.year;
+          if (yearValue < 1990 || yearValue > 2025) {
+            tempErrors.year = `Invalid year (1990-2025).`;
+            isValid = false;
+          }
+        }
+      } else { isValid = false; }
+    }
+
+    setErrors(tempErrors);
+    return isValid;
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let newValue = value;
+
+    // Input filtering for vehicle number
+    if (name === 'vehicleNumber') {
+      newValue = value.replace(/[^A-Za-z0-9-]/g, '').toUpperCase();
+
+      let letters = newValue.match(/^[A-Z]{2,3}/)?.[0] || '';
+      let numbers = newValue.match(/\d{1,4}$/)?.[0] || '';
+
+      if (letters.length > 0 && newValue.indexOf('-') === -1) {
+        const combined = newValue.slice(letters.length);
+        if (combined) {
+          numbers = combined.slice(0, 4);
+          newValue = `${letters}-${numbers}`;
+        } else {
+          newValue = letters;
+        }
+      } else if (newValue.indexOf('-') > -1) {
+        const parts = newValue.split('-');
+        if (parts.length > 1) {
+          parts[1] = parts[1].slice(0, 4);
+          newValue = parts.join('-');
+        }
+      }
+    }
+
+    setFormData({ ...formData, [name]: newValue });
+  };
+
+  // Add onBlur handler for validation when user leaves a field
+  const handleInputBlur = (e) => {
+    const { name } = e.target;
+    // Only validate specific fields on blur to avoid premature errors
+    if (['vehicleNumber', 'type', 'brand', 'model', 'year'].includes(name)) {
+      validate(name);
+    }
   };
 
   const handleYearChange = (newYear) => {
@@ -47,12 +144,20 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate all fields before submission
+    if (!validate(null)) {
+      console.log('Validation failed');
+      return;
+    }
+
     const loggedUser = JSON.parse(localStorage.getItem("user"));
     if (!loggedUser) {
       alert("❌ Please log in to add vehicles");
       return;
     }
 
+    setLoading(true);
     const dataToSend = {
       ...formData,
       year: formData.year ? formData.year.year() : "",
@@ -69,13 +174,17 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
         onVehicleAdded();
       }
       setFormData(initialFormState);
+      setErrors({}); // Clear errors on success
     } catch (err) {
       console.error("Vehicle Save Error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleCancel = () => {
     setFormData(initialFormState);
+    setErrors({}); // Clear errors on cancel
     onUpdateComplete();
   };
 
@@ -308,6 +417,9 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                         label="Vehicle Number"
                         value={formData.vehicleNumber}
                         onChange={handleChange}
+                        onBlur={handleInputBlur}
+                        error={!!errors.vehicleNumber}
+                        helperText={errors.vehicleNumber}
                         fullWidth
                         required
                         disabled={!!editingVehicle}
@@ -351,6 +463,9 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                         label="Vehicle Type"
                         value={formData.type}
                         onChange={handleChange}
+                        onBlur={handleInputBlur}
+                        error={!!errors.type}
+                        helperText={errors.type}
                         fullWidth
                         required
                         InputProps={{ 
@@ -418,6 +533,9 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                         label="Brand"
                         value={formData.brand}
                         onChange={handleChange}
+                        onBlur={handleInputBlur}
+                        error={!!errors.brand}
+                        helperText={errors.brand}
                         fullWidth
                         required
                         InputProps={{ 
@@ -458,6 +576,9 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                       label="Model"
                       value={formData.model}
                       onChange={handleChange}
+                      onBlur={handleInputBlur}
+                      error={!!errors.model}
+                      helperText={errors.model}
                       fullWidth
                       required
                       InputProps={{ 
@@ -504,6 +625,8 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                           {...params} 
                           fullWidth 
                           required
+                          error={!!errors.year}
+                          helperText={errors.year}
                           InputProps={{
                             ...params.InputProps,
                             startAdornment: (
@@ -546,6 +669,7 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                     variant="contained" 
                     fullWidth
                     size="large"
+                    disabled={loading}
                     startIcon={editingVehicle ? <SaveIcon /> : <AddIcon />}
                     sx={{ 
                       py: 2,
@@ -561,10 +685,14 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                       '&:hover': {
                         transform: 'translateY(-2px)',
                         boxShadow: '0 15px 40px rgba(102, 126, 234, 0.4)',
+                      },
+                      '&:disabled': {
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        color: 'rgba(255, 255, 255, 0.5)',
                       }
                     }}
                   >
-                    {editingVehicle ? 'Save Changes' : 'Add Vehicle'}
+                    {loading ? 'Saving...' : (editingVehicle ? 'Save Changes' : 'Add Vehicle')}
                   </Button>
                   
                   {editingVehicle && (

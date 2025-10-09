@@ -77,6 +77,7 @@ const initialState = {
     brand: '',
     model: '',
     year: '',
+    vehicleFrom: '', // Added vehicleFrom field
     serviceId: '', 
     serviceName: '', 
     date: '',
@@ -228,7 +229,7 @@ const CreateWalkInJob = () => {
         let tempErrors = { ...errors };
         let isValid = true;
         
-        const requiredFields = ['customerName', 'customerEmail', 'vehicleNumber', 'type', 'brand', 'model', 'year', 'serviceId', 'date', 'time'];
+        const requiredFields = ['customerName', 'customerEmail', 'vehicleNumber', 'type', 'brand', 'model', 'year', 'vehicleFrom', 'serviceId', 'date', 'time'];
         
         const checkRequired = (name, message) => {
             if (requiredFields.includes(name) && !formData[name]) {
@@ -300,6 +301,16 @@ const CreateWalkInJob = () => {
                 }
             } else { isValid = false; }
         }
+
+        // Vehicle From Validation
+        if (field === 'vehicleFrom' || field === null) {
+            if (checkRequired('vehicleFrom', 'Vehicle From is required.')) {
+                if (formData.vehicleFrom && !/^[A-Za-z\s]+$/.test(formData.vehicleFrom.trim())) {
+                    tempErrors.vehicleFrom = 'Vehicle From must contain only letters and spaces.';
+                    isValid = false;
+                }
+            } else { isValid = false; }
+        }
         
         // Service ID Validation
         if (field === 'serviceId' || field === null) { if (!checkRequired('serviceId', 'Service Type is required.')) { isValid = false; } }
@@ -339,7 +350,7 @@ const CreateWalkInJob = () => {
         const { name, value } = e.target;
         let newValue = value;
 
-        if (isVehicleFound && ['vehicleNumber', 'type', 'brand', 'model', 'year'].includes(name)) {
+        if (isVehicleFound && ['vehicleNumber', 'type', 'brand', 'model', 'year', 'vehicleFrom'].includes(name)) {
             setIsVehicleFound(false);
         }
 
@@ -388,7 +399,7 @@ const CreateWalkInJob = () => {
     const handleInputBlur = (e) => {
         const { name } = e.target;
         // Only validate specific fields on blur to avoid premature errors
-        if (['customerName', 'customerEmail', 'vehicleNumber', 'type', 'brand', 'model', 'year'].includes(name)) {
+        if (['customerName', 'customerEmail', 'vehicleNumber', 'type', 'brand', 'model', 'year', 'vehicleFrom'].includes(name)) {
             validate(name);
         }
     };
@@ -406,17 +417,18 @@ const CreateWalkInJob = () => {
                 type: selectedVehicle.type,
                 brand: selectedVehicle.brand,
                 model: selectedVehicle.model,
-                year: String(selectedVehicle.year)
+                year: String(selectedVehicle.year),
+                vehicleFrom: selectedVehicle.vehicleFrom || '' // Include vehicleFrom in autofill
             }));
             setErrors(prev => ({
                 ...prev,
-                vehicleNumber: '', type: '', brand: '', model: '', year: ''
+                vehicleNumber: '', type: '', brand: '', model: '', year: '', vehicleFrom: ''
             }));
         } else {
             setIsVehicleFound(false); 
             setFormData(prev => ({
                 ...prev,
-                vehicleNumber: '', type: '', brand: '', model: '', year: ''
+                vehicleNumber: '', type: '', brand: '', model: '', year: '', vehicleFrom: ''
             }));
         }
     }
@@ -460,6 +472,7 @@ const CreateWalkInJob = () => {
             year: parseInt(formData.year),
             service: formData.serviceId, 
             mechanic: formData.mechanic === 'AUTO_ASSIGN' ? null : formData.mechanic, 
+            vehicleFrom: formData.vehicleFrom.trim() // Include vehicleFrom in the data sent to backend
         };
 
         try {
@@ -646,8 +659,8 @@ const CreateWalkInJob = () => {
                                         )}
                                     </FormControl>
                                 </Grid>
-                                {/* Brand, Model, Year remain md={4} */}
-                                <Grid item xs={12} md={4}>
+                                {/* Brand, Model, Year, Vehicle From - adjusted to md={3} for better fit */}
+                                <Grid item xs={12} md={3}>
                                     <TextField
                                         fullWidth
                                         size="small"
@@ -662,7 +675,7 @@ const CreateWalkInJob = () => {
                                         required
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={4}>
+                                <Grid item xs={12} md={3}>
                                     <TextField
                                         fullWidth
                                         size="small"
@@ -677,7 +690,7 @@ const CreateWalkInJob = () => {
                                         required
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={4}>
+                                <Grid item xs={12} md={3}>
                                     <TextField
                                         fullWidth
                                         size="small"
@@ -697,6 +710,22 @@ const CreateWalkInJob = () => {
                                                 max: currentYear 
                                             }
                                         }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={3}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        label="Vehicle From"
+                                        name="vehicleFrom"
+                                        value={formData.vehicleFrom}
+                                        onChange={handleInputChange}
+                                        onBlur={handleInputBlur}
+                                        error={!!errors.vehicleFrom}
+                                        helperText={errors.vehicleFrom}
+                                        disabled={isVehicleFound}
+                                        placeholder="e.g., Colombo, Kandy"
+                                        required
                                     />
                                 </Grid>
                             </Grid>
