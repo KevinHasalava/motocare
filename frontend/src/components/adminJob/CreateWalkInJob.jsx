@@ -21,7 +21,7 @@ const AdminContainer = styled(Box)(({ theme }) => ({
 }));
 
 const AdminPaper = styled(Paper)(({ theme }) => ({
-    maxWidth: 1200,
+    maxWidth: 1400, // Increased from 1200 to give more space
     margin: '0 auto',
     borderRadius: '4px',
     boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
@@ -334,7 +334,7 @@ const CreateWalkInJob = () => {
     };
 
 
-    // Input Change Handler (Unchanged)
+    // Input Change Handler - Updated to remove real-time validation
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         let newValue = value;
@@ -346,13 +346,13 @@ const CreateWalkInJob = () => {
         if (name === 'customerPhoneNumber') {
             newValue = handlePhoneInput(value);
         }
-        
+
         if (name === 'vehicleNumber') {
             newValue = value.replace(/[^A-Za-z0-9-]/g, '').toUpperCase();
-            
+
             let letters = newValue.match(/^[A-Z]{2,3}/)?.[0] || '';
             let numbers = newValue.match(/\d{1,4}$/)?.[0] || '';
-            
+
             if (letters.length > 0 && newValue.indexOf('-') === -1) {
                 const combined = newValue.slice(letters.length);
                 if (combined) {
@@ -369,9 +369,9 @@ const CreateWalkInJob = () => {
                 }
             }
         }
-        
+
         setFormData(prev => ({ ...prev, [name]: newValue }));
-        
+
         if (['date', 'time', 'serviceId', 'mechanic'].includes(name) && formData.date && formData.time && formData.serviceId) {
             validateSchedule(
                 name === 'date' ? newValue : formData.date,
@@ -379,8 +379,18 @@ const CreateWalkInJob = () => {
                 name === 'serviceId' ? newValue : formData.serviceId,
             );
         }
-        
-        validate(name); 
+
+        // Remove the validate(name) call that was causing real-time validation errors
+        // validate(name); // <-- Removed this line
+    };
+
+    // Add onBlur handler for validation when user leaves a field
+    const handleInputBlur = (e) => {
+        const { name } = e.target;
+        // Only validate specific fields on blur to avoid premature errors
+        if (['customerName', 'customerEmail', 'vehicleNumber', 'type', 'brand', 'model', 'year'].includes(name)) {
+            validate(name);
+        }
     };
 
     // Vehicle Selector Handler (Unchanged)
@@ -485,7 +495,7 @@ const CreateWalkInJob = () => {
                     </Typography>
                 </AdminHeader>
 
-                <Box sx={{ p: 10 }}>
+                <Box sx={{ p: 4 }}> {/* Reduced padding from p: 10 to p: 4 */}
                     {successMsg && (
                         <Alert severity="success" onClose={() => setSuccessMsg('')} sx={{ mb: 2 }}>
                             {successMsg}
@@ -517,6 +527,7 @@ const CreateWalkInJob = () => {
                                         name="customerName"
                                         value={formData.customerName}
                                         onChange={handleInputChange}
+                                        onBlur={handleInputBlur}
                                         error={!!errors.customerName}
                                         helperText={errors.customerName}
                                         required
@@ -530,6 +541,7 @@ const CreateWalkInJob = () => {
                                         name="customerEmail"
                                         value={formData.customerEmail}
                                         onChange={handleInputChange}
+                                        onBlur={handleInputBlur}
                                         error={!!errors.customerEmail}
                                         helperText={errors.customerEmail || "Auto-searches existing records"}
                                         type="email"
@@ -608,6 +620,7 @@ const CreateWalkInJob = () => {
                                         name="vehicleNumber"
                                         value={formData.vehicleNumber}
                                         onChange={handleInputChange}
+                                        onBlur={handleInputBlur}
                                         error={!!errors.vehicleNumber}
                                         helperText={errors.vehicleNumber}
                                         disabled={isVehicleFound}
@@ -642,6 +655,7 @@ const CreateWalkInJob = () => {
                                         name="brand"
                                         value={formData.brand}
                                         onChange={handleInputChange}
+                                        onBlur={handleInputBlur}
                                         error={!!errors.brand}
                                         helperText={errors.brand}
                                         disabled={isVehicleFound}
@@ -656,6 +670,7 @@ const CreateWalkInJob = () => {
                                         name="model"
                                         value={formData.model}
                                         onChange={handleInputChange}
+                                        onBlur={handleInputBlur}
                                         error={!!errors.model}
                                         helperText={errors.model}
                                         disabled={isVehicleFound}
@@ -670,6 +685,7 @@ const CreateWalkInJob = () => {
                                         name="year"
                                         value={formData.year}
                                         onChange={handleInputChange}
+                                        onBlur={handleInputBlur}
                                         error={!!errors.year}
                                         helperText={errors.year}
                                         type="number"
