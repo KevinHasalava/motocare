@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
 
 });
 
-// ⚠️ IMPORTANT: Hash password before saving (Security Enhancement)
+// Hash password before saving (Security Enhancement)
 userSchema.pre("save", async function(next) {
     if (!this.isModified("password")) {
         return next();

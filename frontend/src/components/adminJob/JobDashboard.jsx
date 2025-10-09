@@ -61,7 +61,7 @@ const JobDashboard = () => {
     const [statusUpdatingId, setStatusUpdatingId] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
     
-    // 💡 NEW STATE: Search
+    // NEW STATE: Search
     const [searchText, setSearchText] = useState('');
 
     const navigate = useNavigate();
