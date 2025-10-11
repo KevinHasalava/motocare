@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Stock = require('../models/stock');
 const Inventory = require('../models/inventory');
+const { validateInventoryStock, validateSupplier, validatePricing } = require('../utils/inventoryValidationUtils');
 
 // Helper function to find the latest buying and sales price for an inventory item
 const getLatestPrices = async (inventoryId, session) => {
@@ -42,7 +43,8 @@ exports.createStockMovement = async (req, res) => {
     session.startTransaction();
     try {
         const { inventory, supplier, type, quantity, buyingPrice, salesPrice } = req.body;
-        
+
+        // Validate inventory item exists
         const inv = await Inventory.findById(inventory).session(session);
         if (!inv) {
             await session.abortTransaction();
@@ -50,43 +52,62 @@ exports.createStockMovement = async (req, res) => {
             return res.status(404).json({ message: 'Inventory item not found.' });
         }
 
-        const stockData = { ...req.body };
-        if (type === 'IN') {
-            if (buyingPrice === undefined || salesPrice === undefined) {
+        // Validate supplier for stock-in operations
+        if (type === 'IN' && supplier) {
+            const supplierValidation = await validateSupplier(supplier, session);
+            if (!supplierValidation.isValid) {
                 await session.abortTransaction();
                 session.endSession();
-                return res.status(400).json({ message: 'Buying price and sales price are required for a stock-in transaction.' });
+                return res.status(400).json({ message: supplierValidation.message });
             }
-            // --- FIX: Convert quantity to a number before adding it ---
+        }
+
+        // Validate pricing
+        if (type === 'IN') {
+            const pricingValidation = validatePricing(buyingPrice, salesPrice, 'stock_in');
+            if (!pricingValidation.isValid) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ message: pricingValidation.message });
+            }
+        }
+
+        const stockData = { ...req.body };
+
+        if (type === 'IN') {
+            // Stock-in operation
             inv.quantity += Number(quantity);
-            // --- The original logic below is correct ---
             inv.buyingPrice = buyingPrice;
             inv.salesPrice = salesPrice;
 
         } else if (type === 'OUT') {
+            // Validate sufficient stock for stock-out
+            const stockValidation = await validateInventoryStock(inventory, quantity, session);
+            if (!stockValidation.isValid) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ message: stockValidation.message });
+            }
+
+            // Get latest prices for stock-out
             const prices = await getLatestPrices(inventory, session);
             stockData.buyingPrice = prices.buyingPrice;
             stockData.salesPrice = prices.salesPrice;
-            
-            if (inv.quantity < quantity) {
-                await session.abortTransaction();
-                session.endSession();
-                return res.status(400).json({ message: 'Not enough stock to fulfill this request.' });
-            }
+
             inv.quantity -= quantity;
         } else {
             await session.abortTransaction();
             session.endSession();
             return res.status(400).json({ message: 'Invalid stock type. Must be IN or OUT.' });
         }
-        
+
         const newStockMovement = new Stock(stockData);
         await newStockMovement.save({ session });
         await inv.save({ session });
-        
+
         await session.commitTransaction();
         session.endSession();
-        
+
         res.status(201).json(newStockMovement);
 
     } catch (err) {
@@ -153,6 +174,9 @@ exports.updateStockMovement = async (req, res) => {
         if (err.name === 'ValidationError') {
             return res.status(400).json({ message: err.message });
         }
+        if (err.name === 'CastError') {
+            return res.status(400).json({ message: 'Invalid stock movement ID format.' });
+        }
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 };
@@ -198,6 +222,9 @@ exports.deleteStockMovement = async (req, res) => {
     } catch (err) {
         await session.abortTransaction();
         session.endSession();
+        if (err.name === 'CastError') {
+            return res.status(400).json({ message: 'Invalid stock movement ID format.' });
+        }
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 };
@@ -215,27 +242,61 @@ exports.deductParts = async (req, res) => {
     session.startTransaction();
 
     try {
-        const deductedParts = [];
-
+        // Validate all parts before processing any
+        const validationResults = [];
         for (const part of parts) {
             const { partId, qty } = part;
-            const inventoryItem = await Inventory.findOne({ partId: partId }).session(session);
 
+            // Find inventory item by partId
+            const inventoryItem = await Inventory.findOne({ partId: partId.toUpperCase() }).session(session);
             if (!inventoryItem) {
-                await session.abortTransaction();
-                session.endSession();
-                return res.status(404).json({ message: `Part with ID '${partId}' not found.` });
+                validationResults.push({
+                    partId,
+                    isValid: false,
+                    message: 'Part not found in inventory'
+                });
+                continue;
             }
 
             if (inventoryItem.quantity < qty) {
-                await session.abortTransaction();
-                session.endSession();
-                return res.status(400).json({ message: `Insufficient stock for part '${partId}'. Available: ${inventoryItem.quantity}, Requested: ${qty}` });
+                validationResults.push({
+                    partId,
+                    isValid: false,
+                    message: `Insufficient stock. Available: ${inventoryItem.quantity}, Required: ${qty}`
+                });
+            } else {
+                validationResults.push({
+                    partId,
+                    isValid: true,
+                    item: inventoryItem
+                });
             }
+        }
+
+        // Check if any validations failed
+        const failedValidations = validationResults.filter(result => !result.isValid);
+        if (failedValidations.length > 0) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({
+                message: 'Stock validation failed for some parts.',
+                failedParts: failedValidations
+            });
+        }
+
+        const deductedParts = [];
+
+        // Process all deductions
+        for (let i = 0; i < parts.length; i++) {
+            const part = parts[i];
+            const { partId, qty } = part;
+            const validationResult = validationResults[i];
+
+            const inventoryItem = validationResult.item;
 
             inventoryItem.quantity -= qty;
             await inventoryItem.save({ session });
-            
+
             const prices = await getLatestPrices(inventoryItem._id, session);
 
             const stockMovement = new Stock({

@@ -31,6 +31,9 @@ exports.getInventoryItemById = async (req, res) => {
         }
         res.status(200).json(item);
     } catch (err) {
+        if (err.name === 'CastError') {
+            return res.status(400).json({ message: 'Invalid inventory item ID format.' });
+        }
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 };
@@ -70,6 +73,9 @@ exports.updateInventoryItem = async (req, res) => {
         if (err.name === 'ValidationError') {
             return res.status(400).json({ message: err.message });
         }
+        if (err.name === 'CastError') {
+            return res.status(400).json({ message: 'Invalid inventory item ID format.' });
+        }
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 };
@@ -83,6 +89,9 @@ exports.deleteInventoryItem = async (req, res) => {
         }
         res.status(200).json({ message: 'Inventory item deleted successfully.' });
     } catch (err) {
+        if (err.name === 'CastError') {
+            return res.status(400).json({ message: 'Invalid inventory item ID format.' });
+        }
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 };
