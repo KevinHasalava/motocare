@@ -6,6 +6,7 @@ const {
   updateJobStatus,
   updateJob,
   getJobsByMechanic,
+  getJobsByDateAndMechanic,
   createWalkInJob, 
   deleteJobOnly,
   
@@ -14,7 +15,10 @@ const {
   updateJobDetails, // Handles PUT /api/jobs/:id
   
   // 💡 NEW IMPORT: PDF Generation Function
-  generateJobPdf // Handles GET /api/jobs/:id/download-pdf
+  generateJobPdf, // Handles GET /api/jobs/:id/download-pdf
+
+  // 🔄 AUTO COMPLETE PAST JOBS
+  autoCompletePastJobs // Handles POST /api/jobs/auto-complete-past
 } = require("../controllers/jobController");
 
 const auth = require("../middleware/authMiddleware");
@@ -24,6 +28,9 @@ router.get("/", getJobs);
 
 // Mechanic-specific jobs - GET /api/jobs/mechanic/:mechanicId
 router.get("/mechanic/:mechanicId", getJobsByMechanic);
+
+// Schedule check for date and mechanic - GET /api/jobs/schedule?date=...&mechanicId=...
+router.get("/schedule", getJobsByDateAndMechanic);
 
 // ------------------- NEW ADMIN/CASHIER ROUTES (CRUD) -------------------
 
@@ -43,6 +50,11 @@ router.get("/:id", getJobDetails);
 
 // ✏️ Update Job (Full Edit) - PUT /api/jobs/:id
 router.put("/:id", updateJobDetails);
+
+// ------------------- AUTO COMPLETE PAST JOBS -------------------
+
+// 🔄 Auto Complete Past Jobs - POST /api/jobs/auto-complete-past
+router.post("/auto-complete-past", autoCompletePastJobs);
 
 // ------------------- 🚀 NEW: PDF DOWNLOAD ROUTE -------------------
 

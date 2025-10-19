@@ -2,14 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
     Box, Paper, Typography, TextField, Button, Grid, MenuItem, Alert, CircularProgress, 
-    FormControl, InputLabel, Select, Chip, FormHelperText
+    FormControl, InputLabel, Select, Chip, FormHelperText, alpha, Stack
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { 
     PersonOutline, DirectionsCarOutlined, BuildOutlined, CalendarTodayOutlined, 
-    EngineeringOutlined, SaveOutlined, ErrorOutline, VisibilityOutlined, GetApp 
-} from '@mui/icons-material'; // 💡 GetApp icon added
-import { fetchJobDetails, updateJob, downloadJobPdf } from '../../api/job'; // 💡 downloadJobPdf imported
+    EngineeringOutlined, SaveOutlined, ErrorOutline, VisibilityOutlined, GetApp, AccessTime as AccessTimeIcon
+} from '@mui/icons-material';
+import { fetchJobDetails, updateJob, downloadJobPdf, fetchJobsByDateAndMechanic } from '../../api/job';
 import { fetchServices, fetchMechanics } from '../../api/data'; 
 import HeaderWrapper from '../HeaderWrapper';
 
@@ -72,6 +72,20 @@ const formatTime = (dateString) => {
     });
 };
 
+// --- Time Slot Generator ---
+const generateTimeSlots = () => {
+    const slots = [];
+    // From 8:00 AM to 5:00 PM (17:00)
+    for (let hour = 8; hour < 17; hour++) {
+        for (let minute = 0; minute < 60; minute += 15) {
+            slots.push(`${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`);
+        }
+    }
+    return slots;
+};
+
+const ALL_TIME_SLOTS = generateTimeSlots();
+
 const getStatusColor = (status) => {
     switch (status) {
         case 'Booked': return 'primary';
@@ -97,6 +111,8 @@ const EditJob = ({ isViewMode = false }) => {
     const [services, setServices] = useState([]);
     const [mechanics, setMechanics] = useState([]);
     const [errors, setErrors] = useState({});
+    const [existingJobs, setExistingJobs] = useState([]);
+    const [jobConflict, setJobConflict] = useState(false);
 
     const isCustomerInfoDisabled = true;
     const currentMode = isViewMode ? 'View' : 'Edit';
@@ -188,6 +204,81 @@ const EditJob = ({ isViewMode = false }) => {
     useEffect(() => {
         loadJobAndData();
     }, [loadJobAndData]);
+
+    // Effect to fetch existing jobs for the selected date/mechanic (for conflict detection)
+    useEffect(() => {
+        const fetchJobData = async () => {
+            if (!formData.date || formData.mechanic === 'AUTO_ASSIGN' || isViewMode) {
+                setExistingJobs([]);
+                setJobConflict(false);
+                return;
+            }
+
+            try {
+                const jobs = await fetchJobsByDateAndMechanic({ 
+                    date: formData.date, 
+                    mechanicId: formData.mechanic 
+                });
+                // Filter out the current job being edited from conflicts
+                const otherJobs = jobs.filter(job => job._id !== jobId);
+                setExistingJobs(otherJobs);
+                validateSchedule(formData.date, formData.time, formData.service, otherJobs);
+            } catch (err) {
+                console.error("Failed to fetch existing jobs:", err);
+                setExistingJobs([]);
+                setJobConflict(false);
+            }
+        };
+
+        fetchJobData();
+    }, [formData.date, formData.mechanic, formData.service, jobId, isViewMode]);
+    
+    // Helper to check time overlap
+    const doTimesOverlap = useCallback((start1, end1, start2, end2) => {
+        return start1 < end2 && end1 > start2;
+    }, []);
+
+    // Core function to check for scheduling conflicts
+    const validateSchedule = useCallback((date, time, serviceId, jobsToCheck = existingJobs) => {
+        if (!date || !time || !serviceId) {
+            setJobConflict(false);
+            return false;
+        }
+
+        const selectedService = services.find(s => s._id === serviceId);
+        const duration = selectedService?.duration || 60; 
+
+        const proposedStartTime = new Date(`${date}T${time}:00`);
+        const proposedEndTime = new Date(proposedStartTime.getTime() + duration * 60000);
+
+        // 1. Check Business Hours (8:00 AM - 5:00 PM)
+        const openHour = new Date(`${date}T08:00:00`);
+        const closeHour = new Date(`${date}T17:00:00`);
+        
+        if (proposedStartTime < openHour || proposedEndTime > closeHour) {
+            setErrors(prev => ({ ...prev, time: 'Booking allowed between 08:00 - 17:00' }));
+            setJobConflict(true);
+            return false;
+        } else {
+            setErrors(prev => { delete prev.time; return { ...prev }; });
+        }
+
+        // 2. Check Mechanic Conflict (Only if a specific mechanic is chosen)
+        if (formData.mechanic !== 'AUTO_ASSIGN') {
+            const hasConflict = jobsToCheck.some(job => {
+                const jobStart = new Date(job.startTime);
+                const jobEnd = new Date(job.endTime);
+                
+                return doTimesOverlap(proposedStartTime, proposedEndTime, jobStart, jobEnd);
+            });
+
+            setJobConflict(hasConflict);
+            return !hasConflict;
+        }
+
+        setJobConflict(false);
+        return true;
+    }, [services, formData.mechanic, existingJobs, doTimesOverlap]);
     
     // Simple Validation (Unchanged)
     const validate = () => {
@@ -438,6 +529,12 @@ const EditJob = ({ isViewMode = false }) => {
                             </Typography>
                         </SectionHeader>
                         <FormSection>
+                            {jobConflict && formData.mechanic !== 'AUTO_ASSIGN' && !isViewMode && (
+                                <Alert severity="warning" sx={{ mb: 2 }}>
+                                    <Typography fontWeight={600}>Scheduling Conflict!</Typography>
+                                    The selected mechanic is already booked during this time slot. Please choose a different time or mechanic.
+                                </Alert>
+                            )}
                             <Grid container spacing={2}>
                                 <Grid item xs={12} md={4}>
                                     <FormControl fullWidth size="small" error={!!errors.service} disabled={isViewMode || saving} required>
@@ -508,21 +605,75 @@ const EditJob = ({ isViewMode = false }) => {
                                         required
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <TextField
-                                        fullWidth
-                                        size="small"
-                                        label="Time"
-                                        name="time"
-                                        type="time"
-                                        value={formData.time || ''}
-                                        onChange={handleInputChange}
-                                        error={!!errors.time}
-                                        helperText={errors.time}
-                                        InputLabelProps={{ shrink: true }}
-                                        disabled={isViewMode || saving}
-                                        required
-                                    />
+                                {/* Time Slots Grid - NEW */}
+                                <Grid item xs={12} md={12}>
+                                    {formData.date && formData.mechanic !== undefined && !isViewMode && (
+                                        <Paper sx={{ p: 2, maxHeight: 500, overflow: "auto" }}>
+                                            <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+                                                <AccessTimeIcon />
+                                                <Typography>
+                                                    Select Time {!formData.date && " (Select date first)"}
+                                                </Typography>
+                                            </Stack>
+                                            
+                                            <Grid container spacing={1}>
+                                                {ALL_TIME_SLOTS.map((slot) => {
+                                                    const isBooked = existingJobs.some(job => {
+                                                        const jobStart = new Date(job.startTime);
+                                                        const jobEnd = new Date(job.endTime);
+                                                        const slotStart = new Date(`${formData.date}T${slot}:00`);
+                                                        const slotEnd = new Date(slotStart.getTime() + 15 * 60000); // 15 minutes later
+                                                        
+                                                        // Check if this slot overlaps with any booked job
+                                                        return slotStart < jobEnd && slotEnd > jobStart;
+                                                    });
+                                                    
+                                                    const isSelected = formData.time === slot;
+                                                    const isPast = new Date(`${formData.date}T${slot}:00`) < new Date();
+                                                    const isAvailable = !isBooked && !isPast;
+                                                    
+                                                    return (
+                                                        <Grid item xs={6} key={slot}>
+                                                            <Button
+                                                                fullWidth
+                                                                variant={isSelected ? "contained" : "outlined"}
+                                                                disabled={!formData.date || !isAvailable || saving}
+                                                                onClick={() => {
+                                                                    if (isAvailable) {
+                                                                        setFormData(prev => ({ ...prev, time: slot }));
+                                                                        // Trigger validation
+                                                                        if (formData.service) {
+                                                                            validateSchedule(formData.date, slot, formData.service);
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                sx={{
+                                                                    borderColor: !formData.date ? "#64748b" : isAvailable ? "#10b981" : "#ef4444",
+                                                                    color: isSelected ? "white" : (isAvailable ? "#10b981" : "#ef4444"),
+                                                                    backgroundColor: isSelected && isAvailable ? "#10b981" : "transparent",
+                                                                    "&:hover": {
+                                                                        backgroundColor: isAvailable && !isSelected ? alpha("#10b981", 0.1) : undefined
+                                                                    },
+                                                                    "&.Mui-disabled": {
+                                                                        borderColor: !formData.date ? "#64748b" : "#ef4444",
+                                                                        color: !formData.date ? "#64748b" : "#ef4444"
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {slot}
+                                                            </Button>
+                                                        </Grid>
+                                                    );
+                                                })}
+                                            </Grid>
+                                            
+                                            {formData.time && (
+                                                <Typography variant="body2" sx={{ mt: 2, color: "#10b981", fontWeight: 500, textAlign: "center" }}>
+                                                    Selected: {formData.time}
+                                                </Typography>
+                                            )}
+                                        </Paper>
+                                    )}
                                 </Grid>
                             </Grid>
                         </FormSection>
@@ -541,7 +692,7 @@ const EditJob = ({ isViewMode = false }) => {
                                 <Button
                                     type="submit"
                                     variant="contained"
-                                    disabled={saving || !jobData || downloading}
+                                    disabled={saving || !jobData || downloading || jobConflict}
                                     startIcon={saving ? <CircularProgress size={18} color="inherit" /> : <SaveOutlined />}
                                     sx={{
                                         backgroundColor: '#2ecc71',

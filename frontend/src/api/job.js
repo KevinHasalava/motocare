@@ -124,9 +124,18 @@ export const updateJob = async (jobId, updateData) => {
     }
 };
 
-// ---------------------------------------------------------------------
-// 9. NEW FUNCTION: DOWNLOAD PDF
-// ---------------------------------------------------------------------
+/**
+ * 10. Auto Complete Past Jobs
+ * POST /api/jobs/auto-complete-past
+ */
+export const autoCompletePastJobs = async () => {
+    try {
+        const response = await axios.post(`${API_URL}/auto-complete-past`);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+};
 
 /**
  * 9. Download Job Details PDF (For Admin/Mechanic)

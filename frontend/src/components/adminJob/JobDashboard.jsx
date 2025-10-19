@@ -11,7 +11,7 @@ import {
     DeleteOutline, EditOutlined, RefreshOutlined, CheckCircleOutline, 
     HistoryToggleOffOutlined, CancelOutlined, PlayCircleOutline, SearchOutlined // 💡 Search icon
 } from '@mui/icons-material';
-import { getAllJobs, updateJobStatus, deleteJob } from '../../api/job'; 
+import { getAllJobs, updateJobStatus, deleteJob, autoCompletePastJobs } from '../../api/job'; 
 import HeaderWrapper from '../HeaderWrapper';
 
 
@@ -60,6 +60,9 @@ const JobDashboard = () => {
     const [errorMsg, setErrorMsg] = useState('');
     const [statusUpdatingId, setStatusUpdatingId] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
+    
+    // NEW STATE: Auto-complete past jobs
+    const [autoCompleting, setAutoCompleting] = useState(false);
     
     // NEW STATE: Search
     const [searchText, setSearchText] = useState('');
@@ -124,6 +127,35 @@ const JobDashboard = () => {
             console.error(err);
         } finally {
             setDeletingId(null);
+        }
+    };
+
+    // --- Auto Complete Past Jobs Handler ---
+    const handleAutoCompletePastJobs = async () => {
+        if (!window.confirm('Are you sure you want to automatically complete all past jobs? This will mark all jobs that have ended as "Completed".')) {
+            return;
+        }
+
+        setAutoCompleting(true);
+        setErrorMsg('');
+        try {
+            const result = await autoCompletePastJobs();
+            console.log('Auto-complete result:', result);
+            
+            if (result.updatedCount > 0) {
+                // Refresh the jobs list to show updated statuses
+                await fetchJobs();
+                setErrorMsg(''); // Clear any existing error
+                // Show success message
+                alert(`✅ Successfully completed ${result.updatedCount} past jobs!`);
+            } else {
+                alert('ℹ️ No past jobs found to complete.');
+            }
+        } catch (err) {
+            console.error('Auto-complete failed:', err);
+            setErrorMsg('Failed to auto-complete past jobs. Please try again.');
+        } finally {
+            setAutoCompleting(false);
         }
     };
 
@@ -196,6 +228,16 @@ const JobDashboard = () => {
                         <Tooltip title="Refresh Data">
                             <IconButton color="inherit" onClick={fetchJobs} disabled={loading}>
                                 <RefreshOutlined />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Auto Complete Past Jobs">
+                            <IconButton 
+                                color="inherit" 
+                                onClick={handleAutoCompletePastJobs} 
+                                disabled={autoCompleting || loading}
+                                sx={{ mr: 1 }}
+                            >
+                                {autoCompleting ? <CircularProgress size={20} color="inherit" /> : <CheckCircleOutline />}
                             </IconButton>
                         </Tooltip>
                         <Button 

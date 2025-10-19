@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
     Box, Paper, Typography, TextField, Button, Grid, MenuItem, Alert, CircularProgress, 
-    FormControl, InputLabel, Select, Autocomplete, Chip, FormHelperText
+    FormControl, InputLabel, Select, Autocomplete, Chip, FormHelperText, alpha, Stack
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { 
     PersonOutline, DirectionsCarOutlined,
-    BuildOutlined, AddCircleOutline
+    BuildOutlined, AddCircleOutline, AccessTime as AccessTimeIcon
 } from '@mui/icons-material';
 import { createWalkInJob, fetchJobsByDateAndMechanic } from '../../api/job'; // Assuming you added this
 import { fetchServices, fetchMechanics, fetchVehiclesByEmail } from '../../api/data'; 
@@ -228,7 +228,7 @@ const CreateWalkInJob = () => {
         let tempErrors = { ...errors };
         let isValid = true;
         
-        const requiredFields = ['customerName', 'customerEmail', 'vehicleNumber', 'type', 'brand', 'model', 'year', 'serviceId', 'date', 'time'];
+        const requiredFields = ['customerName', 'customerEmail', 'vehicleNumber', 'type', 'brand', 'model', 'year', 'serviceId', 'date'];
         
         const checkRequired = (name, message) => {
             if (requiredFields.includes(name) && !formData[name]) {
@@ -307,7 +307,13 @@ const CreateWalkInJob = () => {
         // Date/Time Validation
         if (field === 'date' || field === 'time' || field === null) {
             if (!checkRequired('date', 'Date is required.')) { isValid = false; }
-            if (!checkRequired('time', 'Time is required.')) { isValid = false; }
+            
+            if (formData.date && !formData.time) {
+                tempErrors.time = 'Please select a time slot.';
+                isValid = false;
+            } else if (formData.time) {
+                delete tempErrors.time;
+            }
             
             if (formData.date && formData.time) {
                 const selectedDateTime = new Date(`${formData.date}T${formData.time}`);
@@ -772,6 +778,7 @@ const CreateWalkInJob = () => {
                                         )}
                                     </FormControl>
                                 </Grid>
+
                                 {/* Date field (md={6}) */}
                                 <Grid item xs={12} md={6}>
                                     <TextField
@@ -789,38 +796,75 @@ const CreateWalkInJob = () => {
                                         required
                                     />
                                 </Grid>
-                                {/* 🚀 Time Select: Changed from TextField to Select with 15-min intervals (md={6}) */}
-                                <Grid item xs={12} md={6}>
-                                    <FormControl 
-                                        fullWidth 
-                                        size="small" 
-                                        required
-                                        error={!!errors.time || (jobConflict && formData.mechanic !== 'AUTO_ASSIGN')}
-                                        disabled={!formData.date}
-                                    >
-                                        <InputLabel>Time</InputLabel>
-                                        <Select
-                                            label="Time"
-                                            name="time"
-                                            value={formData.time}
-                                            onChange={handleInputChange}
-                                            MenuProps={{ 
-                                                // Scroll to selected item for better UX
-                                                anchorOrigin: { vertical: "bottom", horizontal: "left" },
-                                                transformOrigin: { vertical: "top", horizontal: "left" },
-                                                getContentAnchorEl: null,
-                                            }}
-                                        >
-                                            {ALL_TIME_SLOTS.map((slot) => (
-                                                <MenuItem key={slot} value={slot}>
-                                                    {slot}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                        <FormHelperText>
-                                            {errors.time || (jobConflict && formData.mechanic !== 'AUTO_ASSIGN' ? "Conflict detected. Choose another time." : "")}
-                                        </FormHelperText>
-                                    </FormControl>
+                                {/* Time Slots Grid - NEW */}
+                                <Grid item xs={12} md={12}>
+                                    {formData.mechanic && formData.date && (
+                                        <Paper sx={{ p: 2, maxHeight: 500, overflow: "auto" }}>
+                                            <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+                                                <AccessTimeIcon />
+                                                <Typography>
+                                                    Select Time {!formData.date && " (Select date first)"}
+                                                </Typography>
+                                            </Stack>
+                                            
+                                            <Grid container spacing={1}>
+                                                {ALL_TIME_SLOTS.map((slot) => {
+                                                    const isBooked = existingJobs.some(job => {
+                                                        const jobStart = new Date(job.startTime);
+                                                        const jobEnd = new Date(job.endTime);
+                                                        const slotStart = new Date(`${formData.date}T${slot}:00`);
+                                                        const slotEnd = new Date(slotStart.getTime() + 15 * 60000); // 15 minutes later
+                                                        
+                                                        // Check if this slot overlaps with any booked job
+                                                        return slotStart < jobEnd && slotEnd > jobStart;
+                                                    });
+                                                    
+                                                    const isSelected = formData.time === slot;
+                                                    const isPast = new Date(`${formData.date}T${slot}:00`) < new Date();
+                                                    const isAvailable = !isBooked && !isPast;
+                                                    
+                                                    return (
+                                                        <Grid item xs={6} key={slot}>
+                                                            <Button
+                                                                fullWidth
+                                                                variant={isSelected ? "contained" : "outlined"}
+                                                                disabled={!formData.date || !isAvailable}
+                                                                onClick={() => {
+                                                                    if (isAvailable) {
+                                                                        setFormData(prev => ({ ...prev, time: slot }));
+                                                                        // Trigger validation
+                                                                        if (formData.serviceId) {
+                                                                            validateSchedule(formData.date, slot, formData.serviceId);
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                sx={{
+                                                                    borderColor: !formData.date ? "#64748b" : isAvailable ? "#10b981" : "#ef4444",
+                                                                    color: isSelected ? "white" : (isAvailable ? "#10b981" : "#ef4444"),
+                                                                    backgroundColor: isSelected && isAvailable ? "#10b981" : "transparent",
+                                                                    "&:hover": {
+                                                                        backgroundColor: isAvailable && !isSelected ? alpha("#10b981", 0.1) : undefined
+                                                                    },
+                                                                    "&.Mui-disabled": {
+                                                                        borderColor: !formData.date ? "#64748b" : "#ef4444",
+                                                                        color: !formData.date ? "#64748b" : "#ef4444"
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {slot}
+                                                            </Button>
+                                                        </Grid>
+                                                    );
+                                                })}
+                                            </Grid>
+                                            
+                                            {formData.time && (
+                                                <Typography variant="body2" sx={{ mt: 2, color: "#10b981", fontWeight: 500, textAlign: "center" }}>
+                                                    Selected: {formData.time}
+                                                </Typography>
+                                            )}
+                                        </Paper>
+                                    )}
                                 </Grid>
                             </Grid>
                         </FormSection>

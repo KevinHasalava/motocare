@@ -164,7 +164,7 @@ const getJobsByDateAndMechanic = async (req, res) => {
       mechanic: mechanicId,
       startTime: { $gte: dayStart, $lte: dayEnd },
       status: { $in: ["Booked", "Ongoing"] }
-    }).select('startTime endTime status'); 
+    }).select('_id startTime endTime status'); 
 
     res.status(200).json(jobs);
   } catch (err) {
@@ -194,6 +194,7 @@ const createWalkInJob = async (req, res) => {
     if (
       !customerEmail ||
       !customerName ||
+      !customerPhoneNumber ||
       !service ||
       !date ||
       !time ||
@@ -212,7 +213,7 @@ const createWalkInJob = async (req, res) => {
       customer = new User({
         name: customerName,
         email: customerEmail,
-        phoneNumber: customerPhoneNumber,
+        phone: customerPhoneNumber,
         password: "WalkInUser_" + Date.now(),
         userType: "customer",
       });
@@ -388,6 +389,26 @@ const updateJobDetails = async (req, res) => {
         if (!job.date || job.date.getTime() !== newDate.getTime()) {
              job.date = newDate;
              job.timeSlot = `${date} ${time}`;
+             
+             // Also update startTime and endTime
+             // Get service ID from populated object or string
+             const serviceId = service || (job.service && job.service._id ? job.service._id : job.service);
+             const selectedService = await Service.findById(serviceId);
+             const duration = selectedService?.duration || 60;
+             console.log('Backend updateJobDetails: Service lookup:', {
+                 serviceId,
+                 selectedService: selectedService ? { name: selectedService.name, duration: selectedService.duration } : null,
+                 duration
+             });
+             job.startTime = newDate;
+             job.endTime = new Date(newDate.getTime() + duration * 60000);
+             console.log('Backend updateJobDetails: Time calculations:', {
+                 newDate,
+                 startTime: job.startTime,
+                 endTime: job.endTime,
+                 duration
+             });
+             
              isTimeUpdated = true;
         }
     }
@@ -402,7 +423,7 @@ const updateJobDetails = async (req, res) => {
       await User.findByIdAndUpdate(job.user, {
         name: customerName,
         email: customerEmail,
-        phoneNumber: customerPhoneNumber,
+        phone: customerPhoneNumber,
       });
     }
 
@@ -446,7 +467,59 @@ const updateJobDetails = async (req, res) => {
   }
 };
 
-// ------------------- NEW: PDF GENERATION CONTROLLER -------------------
+// ------------------- AUTO COMPLETE PAST JOBS -------------------
+
+const autoCompletePastJobs = async (req, res) => {
+  try {
+    const now = new Date();
+    
+    // Find all jobs that have ended and are still active
+    const pastJobs = await Job.find({
+      endTime: { $lt: now },
+      status: { $in: ["Booked", "Ongoing"] }
+    }).populate('service', 'name').populate('mechanic', 'name').populate('user', 'name email');
+
+    if (pastJobs.length === 0) {
+      return res.status(200).json({ 
+        message: "No past jobs found to complete",
+        updatedCount: 0 
+      });
+    }
+
+    // Update all past jobs to completed
+    const updateResult = await Job.updateMany(
+      {
+        endTime: { $lt: now },
+        status: { $in: ["Booked", "Ongoing"] }
+      },
+      { 
+        status: "Completed",
+        workHours: "Auto-completed" // Optional: mark as auto-completed
+      }
+    );
+
+    console.log(`Auto-completed ${updateResult.modifiedCount} past jobs`);
+
+    // Log details of completed jobs
+    const completedJobs = pastJobs.map(job => ({
+      jobId: job.jobId,
+      service: job.service?.name,
+      mechanic: job.mechanic?.name,
+      user: job.user?.name,
+      endTime: job.endTime
+    }));
+
+    res.status(200).json({
+      message: `✅ Successfully completed ${updateResult.modifiedCount} past jobs`,
+      updatedCount: updateResult.modifiedCount,
+      completedJobs: completedJobs
+    });
+
+  } catch (err) {
+    console.error('Error auto-completing past jobs:', err);
+    res.status(500).json({ message: "Error auto-completing past jobs: " + err.message });
+  }
+};
 
 /**
  * Generates and streams a PDF document containing the job details.
@@ -554,5 +627,6 @@ module.exports = {
   deleteJobOnly,
   getJobDetails,
   updateJobDetails,
+  autoCompletePastJobs,
   generateJobPdf,
 };
