@@ -22,7 +22,14 @@ import {
   MenuItem,
   InputAdornment,
 } from "@mui/material";
-import { Edit as EditIcon, Delete as DeleteIcon, PersonAdd, Search } from "@mui/icons-material";
+import { 
+  Edit as EditIcon, 
+  Delete as DeleteIcon, 
+  PersonAdd, 
+  Search, 
+  Download as DownloadIcon,
+  PictureAsPdf as PdfIcon
+} from "@mui/icons-material";
 import axios from "axios";
 
 // Import Header and Footer
@@ -179,6 +186,68 @@ const UserManagement = () => {
     setSuccess("");
   };
 
+  // Download all users PDF
+  const handleDownloadAllUsersPDF = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/users/download-all-users-pdf', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/pdf',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `AllUsers_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      setSuccess('All users PDF downloaded successfully!');
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      setError('Failed to download PDF. Please try again.');
+    }
+  };
+
+  // Download single user PDF
+  const handleDownloadUserPDF = async (userId, userName) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/users/download-user-pdf/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/pdf',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `User_${userName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      setSuccess(`User profile PDF for ${userName} downloaded successfully!`);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      setError('Failed to download PDF. Please try again.');
+    }
+  };
+
   if (loading)
     return (
       <CircularProgress
@@ -241,23 +310,43 @@ const UserManagement = () => {
 
             {/* Action Buttons */}
             <Box sx={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 2, mb: 2 }}>
-              <Button
-                startIcon={<PersonAdd />}
-                onClick={() => {
-                  setFormData(defaultFormState); // 👈 reset BEFORE opening
-                  setOpenAddDialog(true);
-                }}
-                sx={{
-                  background: "linear-gradient(90deg,#6366f1,#a855f7)",
-                  color: "white",
-                  borderRadius: "50px",
-                  px: 3,
-                  py: 1.2,
-                  fontWeight: 600,
-                }}
-              >
-                Add New User
-              </Button>
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Button
+                  startIcon={<PersonAdd />}
+                  onClick={() => {
+                    setFormData(defaultFormState); // 👈 reset BEFORE opening
+                    setOpenAddDialog(true);
+                  }}
+                  sx={{
+                    background: "linear-gradient(90deg,#6366f1,#a855f7)",
+                    color: "white",
+                    borderRadius: "50px",
+                    px: 3,
+                    py: 1.2,
+                    fontWeight: 600,
+                  }}
+                >
+                  Add New User
+                </Button>
+                
+                <Button
+                  startIcon={<DownloadIcon />}
+                  onClick={handleDownloadAllUsersPDF}
+                  sx={{
+                    background: "linear-gradient(90deg,#10b981,#059669)",
+                    color: "white",
+                    borderRadius: "50px",
+                    px: 3,
+                    py: 1.2,
+                    fontWeight: 600,
+                    "&:hover": {
+                      background: "linear-gradient(90deg,#059669,#047857)",
+                    }
+                  }}
+                >
+                  Download All Users PDF
+                </Button>
+              </Box>
 
               {/* Filter and Search Controls */}
               <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
@@ -356,10 +445,17 @@ const UserManagement = () => {
                           {new Date(u.createdAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <IconButton onClick={() => handleOpenEditDialog(u)} size="small">
+                          <IconButton 
+                            onClick={() => handleDownloadUserPDF(u._id, u.name)} 
+                            size="small"
+                            title="Download PDF"
+                          >
+                            <PdfIcon sx={{ color: "#10b981" }} />
+                          </IconButton>
+                          <IconButton onClick={() => handleOpenEditDialog(u)} size="small" title="Edit User">
                             <EditIcon sx={{ color: "#60a5fa" }} />
                           </IconButton>
-                          <IconButton onClick={() => handleDeleteUser(u._id)} size="small">
+                          <IconButton onClick={() => handleDeleteUser(u._id)} size="small" title="Delete User">
                             <DeleteIcon sx={{ color: "#f87171" }} />
                           </IconButton>
                         </TableCell>

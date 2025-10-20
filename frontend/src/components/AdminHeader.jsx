@@ -9,6 +9,12 @@ import {
   Avatar,
   Chip,
   Box,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Badge,
 } from "@mui/material";
 import {
   Logout as LogoutIcon,
@@ -20,6 +26,12 @@ import {
   Payment,
   Build,
   Menu as MenuIcon,
+  KeyboardArrowDown,
+  DirectionsCar,
+  MiscellaneousServices,
+  LocalShipping,
+  Store,
+  Assessment,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Logo from "./Landing_Page/Logo"; // ✅ Logo import
@@ -27,6 +39,8 @@ import Logo from "./Landing_Page/Logo"; // ✅ Logo import
 const AdminHeader = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [managementAnchor, setManagementAnchor] = useState(null);
+  const [inventoryAnchor, setInventoryAnchor] = useState(null);
 
   // ✅ Load user on mount
   useEffect(() => {
@@ -38,6 +52,24 @@ const AdminHeader = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     navigate("/login");
+  };
+
+  const handleManagementClick = (event) => {
+    setManagementAnchor(event.currentTarget);
+  };
+
+  const handleInventoryClick = (event) => {
+    setInventoryAnchor(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setManagementAnchor(null);
+    setInventoryAnchor(null);
+  };
+
+  const handleMenuItemClick = (path) => {
+    navigate(path);
+    handleClose();
   };
 
   // ✅ Reusable nav button style (same hover effect as public header)
@@ -104,31 +136,179 @@ const AdminHeader = () => {
           </Typography>
         </Stack>
 
-        {/* ✅ Center: Nav (desktop only) */}
+        {/* ✅ Center: Simplified Nav (desktop only) */}
         <Stack
           direction="row"
-          spacing={2}
+          spacing={1}
           sx={{ display: { xs: "none", md: "flex" } }}
         >
-          <Button startIcon={<People />} onClick={() => navigate("/admin-users")} sx={navButtonStyle}>
-            Users
+          {/* Dashboard */}
+          <Button 
+            startIcon={<DashboardIcon />} 
+            onClick={() => navigate("/admin-dashboard")} 
+            sx={navButtonStyle}
+          >
+            Dashboard
           </Button>
-          <Button startIcon={<BookOnline />} onClick={() => navigate("/admin/bookings")} sx={navButtonStyle}>
-            Bookings
+
+          {/* Management Dropdown */}
+          <Button 
+            endIcon={<KeyboardArrowDown />}
+            onClick={handleManagementClick}
+            sx={navButtonStyle}
+          >
+            Management
           </Button>
-          <Button startIcon={<Inventory />} onClick={() => navigate("/admin/jobs")} sx={navButtonStyle}>
-            Jobs
-          </Button>
-          <Button startIcon={<Build />} onClick={() => navigate("/admin/vehicles")} sx={navButtonStyle}>
-            Vehicles
-          </Button>
-          <Button startIcon={<Inventory />} onClick={() => navigate("/admin-service")} sx={navButtonStyle}>
-            Services
-          </Button>
-          <Button startIcon={<Assignment />} onClick={() => navigate("/inventory")} sx={navButtonStyle}>
+          <Menu
+            anchorEl={managementAnchor}
+            open={Boolean(managementAnchor)}
+            onClose={handleClose}
+            PaperProps={{
+              sx: {
+                mt: 1,
+                background: 'linear-gradient(135deg, #1a1f2e 0%, #0a0e1a 100%)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 2,
+                minWidth: 200,
+              }
+            }}
+          >
+            <MenuItem 
+              onClick={() => handleMenuItemClick("/admin-users")}
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                '&:hover': { 
+                  background: 'rgba(99, 102, 241, 0.1)',
+                  color: 'white'
+                }
+              }}
+            >
+              <ListItemIcon><People sx={{ color: '#6366f1' }} /></ListItemIcon>
+              <ListItemText>Users</ListItemText>
+            </MenuItem>
+            <MenuItem 
+              onClick={() => handleMenuItemClick("/admin/bookings")}
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                '&:hover': { 
+                  background: 'rgba(139, 92, 246, 0.1)',
+                  color: 'white'
+                }
+              }}
+            >
+              <ListItemIcon><BookOnline sx={{ color: '#8b5cf6' }} /></ListItemIcon>
+              <ListItemText>Bookings</ListItemText>
+            </MenuItem>
+            <MenuItem 
+              onClick={() => handleMenuItemClick("/admin/jobs")}
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                '&:hover': { 
+                  background: 'rgba(16, 185, 129, 0.1)',
+                  color: 'white'
+                }
+              }}
+            >
+              <ListItemIcon><Assignment sx={{ color: '#10b981' }} /></ListItemIcon>
+              <ListItemText>Jobs</ListItemText>
+            </MenuItem>
+            <MenuItem 
+              onClick={() => handleMenuItemClick("/admin/vehicles")}
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                '&:hover': { 
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  color: 'white'
+                }
+              }}
+            >
+              <ListItemIcon><DirectionsCar sx={{ color: '#3b82f6' }} /></ListItemIcon>
+              <ListItemText>Vehicles</ListItemText>
+            </MenuItem>
+            <MenuItem 
+              onClick={() => handleMenuItemClick("/admin-service")}
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                '&:hover': { 
+                  background: 'rgba(245, 158, 11, 0.1)',
+                  color: 'white'
+                }
+              }}
+            >
+              <ListItemIcon><MiscellaneousServices sx={{ color: '#f59e0b' }} /></ListItemIcon>
+              <ListItemText>Services</ListItemText>
+            </MenuItem>
+          </Menu>
+
+          {/* Inventory Dropdown */}
+          <Button 
+            endIcon={<KeyboardArrowDown />}
+            onClick={handleInventoryClick}
+            sx={navButtonStyle}
+          >
             Inventory
           </Button>
-          <Button startIcon={<Payment />} onClick={() => navigate("/admin/payments")} sx={navButtonStyle}>
+          <Menu
+            anchorEl={inventoryAnchor}
+            open={Boolean(inventoryAnchor)}
+            onClose={handleClose}
+            PaperProps={{
+              sx: {
+                mt: 1,
+                background: 'linear-gradient(135deg, #1a1f2e 0%, #0a0e1a 100%)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 2,
+                minWidth: 200,
+              }
+            }}
+          >
+            <MenuItem 
+              onClick={() => handleMenuItemClick("/inventory")}
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                '&:hover': { 
+                  background: 'rgba(16, 185, 129, 0.1)',
+                  color: 'white'
+                }
+              }}
+            >
+              <ListItemIcon><Inventory sx={{ color: '#10b981' }} /></ListItemIcon>
+              <ListItemText>Items</ListItemText>
+            </MenuItem>
+            <MenuItem 
+              onClick={() => handleMenuItemClick("/stock")}
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                '&:hover': { 
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  color: 'white'
+                }
+              }}
+            >
+              <ListItemIcon><LocalShipping sx={{ color: '#3b82f6' }} /></ListItemIcon>
+              <ListItemText>Stock Movement</ListItemText>
+            </MenuItem>
+            <MenuItem 
+              onClick={() => handleMenuItemClick("/suppliers")}
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                '&:hover': { 
+                  background: 'rgba(245, 158, 11, 0.1)',
+                  color: 'white'
+                }
+              }}
+            >
+              <ListItemIcon><Store sx={{ color: '#f59e0b' }} /></ListItemIcon>
+              <ListItemText>Suppliers</ListItemText>
+            </MenuItem>
+          </Menu>
+
+          {/* Payments */}
+          <Button 
+            startIcon={<Payment />} 
+            onClick={() => navigate("/admin/payments")} 
+            sx={navButtonStyle}
+          >
             Payments
           </Button>
         </Stack>

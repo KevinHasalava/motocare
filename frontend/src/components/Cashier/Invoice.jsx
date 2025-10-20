@@ -155,40 +155,42 @@ const Invoice = ({ invoiceId, open, onClose }) => {
             <Grid container spacing={3} sx={{ mb: 3 }}>
                 <Grid item xs={12} sm={6}>
                     <SectionTitle>Bill To:</SectionTitle>
-                    <Typography variant="h6">{payment.customer.name}</Typography>
-                    <Typography variant="body2">{payment.customer.email}</Typography>
-                    <Typography variant="body2">{payment.customer.phone}</Typography>
+                    <Typography variant="h6">{payment.customer?.name || 'N/A'}</Typography>
+                    <Typography variant="body2">{payment.customer?.email || 'N/A'}</Typography>
+                    <Typography variant="body2">{payment.customer?.phone || 'N/A'}</Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <SectionTitle>Vehicle Details:</SectionTitle>
                     <Typography variant="body1">
-                        <strong>Vehicle No:</strong> {payment.vehicle.vehicleNumber}
+                        <strong>Vehicle No:</strong> {payment.vehicle?.vehicleNumber || 'N/A'}
                     </Typography>
                     <Typography variant="body1">
-                        <strong>Vehicle:</strong> {payment.vehicle.brand} {payment.vehicle.model}
+                        <strong>Vehicle:</strong> {payment.vehicle?.brand || 'N/A'} {payment.vehicle?.model || ''}
                     </Typography>
                     <Typography variant="body1">
-                        <strong>Type:</strong> {payment.vehicle.type}
+                        <strong>Type:</strong> {payment.vehicle?.type || 'N/A'}
                     </Typography>
                     <Typography variant="body1">
-                        <strong>Year:</strong> {payment.vehicle.year}
+                        <strong>Year:</strong> {payment.vehicle?.year || 'N/A'}
                     </Typography>
                 </Grid>
             </Grid>
 
             {/* Job Details */}
-            <Box sx={{ mb: 3 }}>
-                <SectionTitle>Job Information:</SectionTitle>
-                <Typography variant="body1">
-                    <strong>Job ID:</strong> {payment.job.jobId}
-                </Typography>
-                <Typography variant="body1">
-                    <strong>Service:</strong> {payment.service.name}
-                </Typography>
-                <Typography variant="body1">
-                    <strong>Status:</strong> {payment.job.status}
-                </Typography>
-            </Box>
+            {payment.job && (
+                <Box sx={{ mb: 3 }}>
+                    <SectionTitle>Job Information:</SectionTitle>
+                    <Typography variant="body1">
+                        <strong>Job ID:</strong> {payment.job.jobId || 'N/A'}
+                    </Typography>
+                    <Typography variant="body1">
+                        <strong>Service:</strong> {payment.service?.name || 'N/A'}
+                    </Typography>
+                    <Typography variant="body1">
+                        <strong>Status:</strong> {payment.job.status || 'N/A'}
+                    </Typography>
+                </Box>
+            )}
 
             {/* Services & Items Table */}
             <TableContainer component={Box} sx={{ mb: 3 }}>
@@ -203,23 +205,25 @@ const Invoice = ({ invoiceId, open, onClose }) => {
                     </TableHead>
                     <TableBody>
                         {/* Service Row */}
-                        <TableRow>
-                            <TableCell>
-                                <Typography variant="body1">
-                                    <strong>{payment.service.name}</strong>
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    Service Duration: {payment.service.duration} minutes
-                                </Typography>
-                            </TableCell>
-                            <TableCell align="center">1</TableCell>
-                            <TableCell align="right">
-                                {payment.serviceAmount.toLocaleString()}
-                            </TableCell>
-                            <TableCell align="right">
-                                <strong>{payment.serviceAmount.toLocaleString()}</strong>
-                            </TableCell>
-                        </TableRow>
+                        {payment.service && (
+                            <TableRow>
+                                <TableCell>
+                                    <Typography variant="body1">
+                                        <strong>{payment.service.name || 'Service'}</strong>
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Service Duration: {payment.service.duration || 'N/A'} minutes
+                                    </Typography>
+                                </TableCell>
+                                <TableCell align="center">1</TableCell>
+                                <TableCell align="right">
+                                    {(payment.serviceAmount || 0).toLocaleString()}
+                                </TableCell>
+                                <TableCell align="right">
+                                    <strong>{(payment.serviceAmount || 0).toLocaleString()}</strong>
+                                </TableCell>
+                            </TableRow>
+                        )}
 
                         {/* Extra Items */}
                         {payment.extraItems && payment.extraItems.map((item, index) => (
@@ -260,16 +264,18 @@ const Invoice = ({ invoiceId, open, onClose }) => {
                                 <strong>Notes:</strong> {payment.notes}
                             </Typography>
                         )}
-                        <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                            Processed by: {payment.cashier.name}
-                        </Typography>
+                        {payment.cashier && (
+                            <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                                Processed by: {payment.cashier.name || 'N/A'}
+                            </Typography>
+                        )}
                     </Grid>
                     <Grid item xs={12} sm={4}>
                         <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1 }}>
                             <Box display="flex" justifyContent="space-between">
                                 <Typography variant="body1">Subtotal:</Typography>
                                 <Typography variant="body1">
-                                    LKR {payment.subtotal.toLocaleString()}
+                                    LKR {(payment.subtotal || 0).toLocaleString()}
                                 </Typography>
                             </Box>
                             {payment.discount > 0 && (
@@ -278,7 +284,7 @@ const Invoice = ({ invoiceId, open, onClose }) => {
                                         Discount {payment.discountPercentage > 0 ? `(${payment.discountPercentage}%)` : ''}:
                                     </Typography>
                                     <Typography variant="body1">
-                                        -LKR {payment.discount.toLocaleString()}
+                                        -LKR {(payment.discount || 0).toLocaleString()}
                                     </Typography>
                                 </Box>
                             )}
@@ -288,7 +294,7 @@ const Invoice = ({ invoiceId, open, onClose }) => {
                                     Total Amount:
                                 </Typography>
                                 <Typography variant="h6" fontWeight="bold" color="primary">
-                                    LKR {payment.totalAmount.toLocaleString()}
+                                    LKR {(payment.totalAmount || 0).toLocaleString()}
                                 </Typography>
                             </Box>
                         </Box>

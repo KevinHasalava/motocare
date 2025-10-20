@@ -7,6 +7,9 @@ const Vehicle = require("../models/Vehicle");
 // 💡 NEW IMPORT: PDF Library
 const PDFDocument = require("pdfkit");
 const dayjs = require("dayjs");
+const fs = require("fs");
+const path = require("path");
+const { createPDFWithLetterhead, addPDFFooter, finalizePDF } = require('../utils/pdfUtils');
 
 // Import only the Email Service
 const { sendBookingConfirmationEmail, sendJobUpdateEmail } = require('../utils/emailService');
@@ -301,6 +304,7 @@ const createWalkInJob = async (req, res) => {
       startTime,
       endTime,
       status: "Booked",
+      type: "walkin", // Mark as walk-in job
     });
 
     await job.save(); // jobId will be generated here by the pre-save hook
@@ -539,59 +543,98 @@ const generateJobPdf = async (req, res) => {
             return res.status(404).json({ message: "Job not found" });
         }
 
-        // --- PDF Setup ---
-        const doc = new PDFDocument({ margin: 50 });
-        const filename = `JobReport_${job.jobId}.pdf`;
-
-        // Setting response headers
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-
-        // Pipe the PDF document stream to the response stream
-        doc.pipe(res);
+        // --- PDF Setup with Letterhead Template ---
+        const doc = createPDFWithLetterhead({
+            filename: `JobReport_${job.jobId}.pdf`,
+            res,
+            useTemplateBackground: true
+        });
 
         // --- PDF Content Generation ---
         
-        // Header
-        doc.fontSize(20).fillColor('#3498db').text('Job Service Report', { align: 'center' });
-        doc.fontSize(12).fillColor('#555').text(`Report Generated: ${dayjs().format('YYYY-MM-DD HH:mm:ss')}`, { align: 'center' });
-        doc.moveDown(1);
+        // Content starts at Y=160 (set in pdfUtils) - closer to template header
         
-        // Job Overview
-        doc.fontSize(16).fillColor('#2c3e50').text(`JOB ID: ${job.jobId}`, { underline: true });
-        doc.moveDown(0.5);
+        // Report Title Section
+        doc.fontSize(20).fillColor('#1a365d').text('JOB REPORT', { align: 'center' });
+        doc.moveDown(0.2);
         
-        // Use job.date with dayjs for formatting, dayjs handles null/undefined gracefully
-        const jobDateFormatted = job.date ? dayjs(job.date).format('YYYY-MM-DD') : 'N/A';
-        const jobTimeFormatted = job.date ? dayjs(job.date).format('hh:mm A') : 'N/A';
+        // Decorative line under title
+        doc.strokeColor('#1a365d').lineWidth(2);
+        doc.moveTo(150, doc.y).lineTo(doc.page.width - 150, doc.y).stroke();
+        doc.moveDown(0.4);
+        
+        // Job Information Box
+        const infoBoxY = doc.y;
+        doc.rect(50, infoBoxY, doc.page.width - 100, 70).fillAndStroke('#f8f9fa', '#e9ecef');
+        
+        // Job Details inside box - Left side
+        doc.fillColor('#2c3e50').fontSize(11);
+        doc.text(`Job ID: ${job.jobId}`, 60, infoBoxY + 12);
+        doc.text(`Report Generated: ${dayjs().format('dddd, MMMM DD, YYYY')}`, 60, infoBoxY + 28);
+        doc.text(`Generation Time: ${dayjs().format('hh:mm A')}`, 60, infoBoxY + 44);
+        
+        // Job Status - Right side with better alignment
+        const statusColor = job.status === 'COMPLETED' ? '#28a745' : job.status === 'IN_PROGRESS' ? '#ffc107' : '#17a2b8';
+        doc.fontSize(10).fillColor(statusColor);
+        doc.text(`✓ STATUS: ${job.status}`, doc.page.width - 180, infoBoxY + 12);
+        doc.fillColor('#17a2b8');
+        doc.text('✓ OFFICIAL JOB REPORT', doc.page.width - 180, infoBoxY + 28);
+        doc.fillColor('#6c757d');
+        doc.text('✓ AUTOMATED GENERATION', doc.page.width - 180, infoBoxY + 44);
+        
+        doc.y = infoBoxY + 80;
+        doc.moveDown(0.3);
+        
+        // Use job.startTime or job.date for formatting, dayjs handles null/undefined gracefully
+        const jobDateFormatted = job.startTime ? dayjs(job.startTime).format('YYYY-MM-DD') : (job.date ? dayjs(job.date).format('YYYY-MM-DD') : 'N/A');
+        const jobTimeFormatted = job.startTime ? dayjs(job.startTime).format('HH:mm') : (job.date ? dayjs(job.date).format('HH:mm') : 'N/A');
 
-        doc.fontSize(12).fillColor('#333')
-           .text(`Status: ${job.status}`, { continued: true })
-           .text(` | Date: ${jobDateFormatted}`, { continued: true })
-           .text(` | Time: ${jobTimeFormatted}`);
-        doc.moveDown(1);
+        // Determine job type from the type field
+        const jobType = job.type === 'walkin' ? 'Walk-in Job' : 'System Booking';
+
+        // Professional Job Details Section
+        doc.fontSize(14).fillColor('#1a365d').text('JOB DETAILS', 50);
+        doc.moveDown(0.3);
         
-        // Customer Details (Conditional checks added for safety, though Mongoose populate usually ensures existence)
-        doc.fontSize(14).fillColor('#2c3e50').text('Customer Details', { underline: true });
-        doc.moveDown(0.5);
-        doc.fontSize(10)
-           .text(`Name: ${job.user?.name || 'N/A'}`)
-           .text(`Email: ${job.user?.email || 'N/A'}`)
-           .text(`Phone: ${job.user?.phoneNumber || 'N/A'}`);
-        doc.moveDown(1);
+        // Job Overview Box
+        const jobOverviewY = doc.y;
+        doc.rect(50, jobOverviewY, doc.page.width - 100, 40).fillAndStroke('#e8f4fd', '#1a365d');
+        doc.fillColor('#2c3e50').fontSize(10);
+        doc.text(`Type: ${jobType}`, 60, jobOverviewY + 8);
+        doc.text(`Date: ${jobDateFormatted}`, 200, jobOverviewY + 8);
+        doc.text(`Time: ${jobTimeFormatted}`, 350, jobOverviewY + 8);
+        doc.text(`Priority: ${job.priority || 'Normal'}`, 60, jobOverviewY + 24);
+        doc.text(`Duration: ${job.service?.duration || 'N/A'}`, 200, jobOverviewY + 24);
+        doc.text(`Mechanic: ${job.mechanic?.name || 'Unassigned'}`, 350, jobOverviewY + 24);
         
-        // Vehicle Details
-        doc.fontSize(14).fillColor('#2c3e50').text('Vehicle Details', { underline: true });
+        doc.y = jobOverviewY + 50;
         doc.moveDown(0.5);
-        doc.fontSize(10)
-           .text(`Number: ${job.vehicle?.vehicleNumber || 'N/A'}`)
-           .text(`Brand / Model: ${job.vehicle?.brand || 'N/A'} ${job.vehicle?.model || 'N/A'}`)
-           .text(`Type / Year: ${job.vehicle?.type || 'N/A'} (${job.vehicle?.year || 'N/A'})`);
-        doc.moveDown(1);
         
-        // Service Details
-        doc.fontSize(14).fillColor('#2c3e50').text('Service & Assignment', { underline: true });
+        // Customer Details Section
+        doc.fontSize(12).fillColor('#1a365d').text('CUSTOMER INFORMATION', 50);
+        doc.moveDown(0.2);
+        const customerY = doc.y;
+        doc.rect(50, customerY, (doc.page.width - 120) / 2, 50).fillAndStroke('#f8f9fa', '#e9ecef');
+        doc.fillColor('#2c3e50').fontSize(10);
+        doc.text(`Name: ${job.user?.name || 'N/A'}`, 60, customerY + 8);
+        doc.text(`Email: ${job.user?.email || 'N/A'}`, 60, customerY + 22);
+        doc.text(`Phone: ${job.user?.phoneNumber || 'N/A'}`, 60, customerY + 36);
+        
+        // Vehicle Details Section
+        const vehicleX = 50 + (doc.page.width - 120) / 2 + 20;
+        doc.fontSize(12).fillColor('#1a365d').text('VEHICLE INFORMATION', vehicleX);
+        doc.rect(vehicleX, customerY, (doc.page.width - 120) / 2, 50).fillAndStroke('#f8f9fa', '#e9ecef');
+        doc.fillColor('#2c3e50').fontSize(10);
+        doc.text(`Number: ${job.vehicle?.vehicleNumber || 'N/A'}`, vehicleX + 10, customerY + 8);
+        doc.text(`Brand: ${job.vehicle?.brand || 'N/A'}`, vehicleX + 10, customerY + 22);
+        doc.text(`Model: ${job.vehicle?.model || 'N/A'}`, vehicleX + 10, customerY + 36);
+        
+        doc.y = customerY + 60;
         doc.moveDown(0.5);
+        
+        // Service Details Section
+        doc.fontSize(12).fillColor('#1a365d').text('SERVICE INFORMATION', 50);
+        doc.moveDown(0.2);
         doc.fontSize(10)
            .text(`Service Name: ${job.service?.name || 'N/A'}`)
            .text(`Estimated Duration: ${job.service?.duration || 'N/A'} minutes`)
@@ -599,13 +642,10 @@ const generateJobPdf = async (req, res) => {
         doc.moveDown(1);
 
         // Footer
-        doc.fontSize(8).fillColor('#888').text('This is an official Job Service Report. Please retain this document for your records.', 50, doc.page.height - 50, {
-            align: 'center',
-            width: doc.page.width - 100
-        });
+        addPDFFooter(doc, 'This is an official Job Service Report. Please retain this document for your records.');
 
         // Finalize the PDF and end the stream
-        doc.end();
+        finalizePDF(doc);
 
     } catch (err) {
         console.error("Error generating PDF:", err.message);

@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 //inventory
 import './App.css';
@@ -50,15 +50,35 @@ import AdminVehicleManagement from "./pages/admin/AdminVehicleManagement";
 import AdminPaymentManagement from "./pages/admin/AdminPaymentManagement";
 // ------------------------------------
 
+// Component to handle default route based on user type
+const DefaultRoute = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const token = localStorage.getItem('token');
+
+  // If user is logged in, redirect based on their role
+  if (token && user.userType) {
+    if (user.userType === 'admin') {
+      return <Navigate to="/admin-dashboard" replace />;
+    } else if (user.userType === 'cashier') {
+      return <Navigate to="/cashier-dashboard" replace />;
+    } else if (user.userType === 'mechanic') {
+      return <Navigate to="/mechanic-portal" replace />;
+    }
+  }
+  
+  // Default to landing page for customers or non-logged-in users
+  return <Landing />;
+};
+
 export default function App() {
   return (
     <Router>
       <Routes>
-        {/* 🏠 Default route → Landing page */}
-        <Route path="/" element={<Landing />} />
+        {/* 🏠 Default route → Redirects admin/cashier to dashboard, customers to landing */}
+        <Route path="/" element={<DefaultRoute />} />
 
         {/* --- Public/Customer Routes --- */}
-        <Route path="/home" element={<Landing />} />
+        <Route path="/home" element={<DefaultRoute />} />
         <Route path="/VehiclePage" element={<VehiclePage />} />
         <Route path="/services" element={<CustomerServicesPage />} />
         <Route path="/Login" element={<Login />} />

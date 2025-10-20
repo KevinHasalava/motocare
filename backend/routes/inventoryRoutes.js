@@ -7,8 +7,12 @@ const {
     createInventoryItem,
     updateInventoryItem,
     deleteInventoryItem,
+    generateInventoryReportPdf
 } = require('../controllers/inventoryController');
 const { validateInventoryData } = require('../middleware/validationMiddleware');
+
+// PDF Report route (must be before :id route)
+router.get('/download-report-pdf', generateInventoryReportPdf);
 
 router.get('/', getInventoryItems);
 router.get('/:id', getInventoryItemById);

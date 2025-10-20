@@ -7,10 +7,9 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { getSuppliers, deleteSupplier } from '../../api/supplierApi';
 import DataTable from '../DataTable'; 
 import AddEditSupplierDialog from './AddEditSupplierDialog';
+import AdminHeader from '../AdminHeader';
 
-// Import the PDF libraries
-import jsPDF from 'jspdf';
-import 'jspdf-autotable'; // This extends jsPDF with the autoTable method
+// PDF generation now handled by backend API with custom letterhead template
 
 const SupplierPage = () => {
   const [suppliers, setSuppliers] = useState([]);
@@ -56,46 +55,49 @@ const SupplierPage = () => {
   };
 
   // -------------------------------------------------------------------
-  // PDF Download Handler using jsPDF
+  // UPDATED FUNCTION: PDF Download Handler (Using Backend API with Template)
   // -------------------------------------------------------------------
-  const handleDownloadPdf = () => {
-    const doc = new jsPDF();
-    
-    const head = [['Supplier ID', 'Name', 'Phone', 'Email']];
-    
-    // Prepare data body from filtered suppliers
-    const body = filteredSuppliers.map(s => [
-        s.supplierId || '-',
-        s.name,
-        s.contact?.phone || '-',
-        s.contact?.email || '-'
-    ]);
+  const handleDownloadPdf = async () => {
+    try {
+      setError(''); // Clear any previous errors
+      
+      // Build query parameters for filtering
+      const queryParams = new URLSearchParams();
+      if (searchTerm) {
+        queryParams.append('search', searchTerm);
+      }
+      
+      // Call backend API to generate PDF with template
+      const response = await fetch(`/api/suppliers/download-report-pdf?${queryParams.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/pdf',
+        },
+      });
 
-    if (body.length === 0) {
-        alert("No suppliers to download.");
-        return;
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF report');
+      }
+
+      // Get the PDF blob
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `SupplierReport_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      setError('Failed to download PDF report. Please try again.');
     }
-
-    // Add title
-    doc.setFontSize(18);
-    doc.text("Supplier List Report", 14, 20);
-    
-    // Add generated date
-    doc.setFontSize(10);
-    doc.text(`Generated Date: ${new Date().toLocaleDateString()}`, 14, 28);
-
-    // Generate table using jspdf-autotable
-    doc.autoTable({
-        startY: 35, // Start table below the title and date
-        head: head,
-        body: body,
-        theme: 'striped',
-        headStyles: { fillColor: [52, 73, 94] }, // Dark header background
-        styles: { fontSize: 10, cellPadding: 2, overflow: 'linebreak' }
-    });
-
-    // Save the PDF file
-    doc.save('Supplier_List.pdf');
   };
   // -------------------------------------------------------------------
 
@@ -122,51 +124,54 @@ const SupplierPage = () => {
   );
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
-        Supplier Management
-      </Typography>
-      
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mb: 2 }}>
-        <Button
-          variant="outlined"
-          startIcon={<DownloadIcon />}
-          onClick={handleDownloadPdf}
-          disabled={loading || filteredSuppliers.length === 0}
-        >
-          Download PDF
-        </Button>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-        >
-          Add Supplier
-        </Button>
-      </Box>
-      
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress />
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 10 }}>
+      <AdminHeader />
+      <Container maxWidth="xl">
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
+          Supplier Management
+        </Typography>
+        
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mb: 2 }}>
+          <Button
+            variant="outlined"
+            startIcon={<DownloadIcon />}
+            onClick={handleDownloadPdf}
+            disabled={loading || filteredSuppliers.length === 0}
+          >
+            Download PDF
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenDialog()}
+          >
+            Add Supplier
+          </Button>
         </Box>
-      ) : error ? (
-        <Alert severity="error">{error}</Alert>
-      ) : (
-        <DataTable
-          title="Supplier List"
-          columns={columns}
-          data={filteredSuppliers}
-          onSearchChange={setSearchTerm}
-          searchPlaceholder="Search by name or ID..."
+        
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Alert severity="error">{error}</Alert>
+        ) : (
+          <DataTable
+            title="Supplier List"
+            columns={columns}
+            data={filteredSuppliers}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search by name or ID..."
+          />
+        )}
+        <AddEditSupplierDialog
+          open={openDialog}
+          handleClose={() => setOpenDialog(false)}
+          supplierToEdit={supplierToEdit}
+          onSave={fetchSuppliers}
         />
-      )}
-      <AddEditSupplierDialog
-        open={openDialog}
-        handleClose={() => setOpenDialog(false)}
-        supplierToEdit={supplierToEdit}
-        onSave={fetchSuppliers}
-      />
-    </Container>
+      </Container>
+    </Box>
   );
 };
 

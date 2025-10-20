@@ -47,9 +47,10 @@ const jobSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
-    notes: {
+    type: {
         type: String,
-        default: ""
+        enum: ["walkin", "booking"],
+        default: "booking"
     },
     createdAt: {
         type: Date,

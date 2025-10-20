@@ -18,9 +18,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import AdminHeader from "../../components/AdminHeader";
 
 
-// PDF Library Imports
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+// PDF generation now handled by backend API with custom letterhead template
 
 // Local Component Imports
 import StatsCards from './StatsCards';
@@ -154,54 +152,50 @@ const InventoryPage = () => {
   };
 
   // -------------------------------------------------------------------
-  // NEW FUNCTION: PDF Download Handler for Inventory
+  // UPDATED FUNCTION: PDF Download Handler for Inventory (Using Backend API with Template)
   // -------------------------------------------------------------------
-  const handleDownloadPdf = () => {
-    const doc = new jsPDF('landscape'); // Use landscape for more columns
-    
-    // Define table headers
-    const head = [
-      ['Part ID', 'Name', 'Category', 'Stock Qty', 'Min Threshold', 'Buying Price', 'Selling Price', 'Last Update']
-    ];
-    
-    // Prepare data body from filtered suppliers
-    const body = filteredItems.map(item => [
-      item.partId,
-      item.name,
-      item.category,
-      item.quantity.toString(),
-      item.lowStockThreshold.toString(),
-      `Rs. ${item.buyingPrice.toFixed(2)}`,
-      `Rs. ${item.salesPrice.toFixed(2)}`,
-      new Date(item.updatedAt || item.createdAt).toLocaleDateString()
-    ]);
+  const handleDownloadPdf = async () => {
+    try {
+      setSnackbarMessage({ open: true, message: 'Generating PDF report...', severity: 'info' });
+      
+      // Build query parameters for filtering
+      const queryParams = new URLSearchParams();
+      if (searchTerm) {
+        queryParams.append('search', searchTerm);
+      }
+      
+      // Call backend API to generate PDF with template
+      const response = await fetch(`/api/inventory/download-report-pdf?${queryParams.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/pdf',
+        },
+      });
 
-    if (body.length === 0) {
-        setSnackbarMessage({ open: true, message: 'No inventory items to download.', severity: 'info' });
-        return;
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF report');
+      }
+
+      // Get the PDF blob
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `InventoryReport_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      setSnackbarMessage({ open: true, message: 'Inventory report with letterhead downloaded successfully!', severity: 'success' });
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      setSnackbarMessage({ open: true, message: 'Failed to download PDF report. Please try again.', severity: 'error' });
     }
-
-    // Add title
-    doc.setFontSize(16);
-    doc.text("Inventory Stock Report", 14, 20);
-    
-    // Add generated date
-    doc.setFontSize(10);
-    doc.text(`Generated Date: ${new Date().toLocaleDateString()}`, 14, 28);
-
-    // Generate table using jspdf-autotable
-    doc.autoTable({
-        startY: 35, 
-        head: head,
-        body: body,
-        theme: 'striped',
-        headStyles: { fillColor: [0, 123, 255] }, // Blue header background
-        styles: { fontSize: 8, cellPadding: 1.5, overflow: 'linebreak' }
-    });
-
-    // Save the PDF file
-    doc.save('Inventory_Stock_Report.pdf');
-    setSnackbarMessage({ open: true, message: 'Inventory report downloaded successfully!', severity: 'success' });
   };
   // -------------------------------------------------------------------
 

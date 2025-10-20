@@ -6,9 +6,13 @@ const {
     createStockMovement,
     updateStockMovement,
     deleteStockMovement,
-    deductParts // Add this to import the new function
+    deductParts,
+    generateStockReportPdf
 } = require('../controllers/stockController');
 const { validateStockMovementData, validateStockDeductionData } = require('../middleware/validationMiddleware');
+
+// PDF Report route (must be before :id route)
+router.get('/download-report-pdf', generateStockReportPdf);
 
 // Existing routes
 router.get('/', getStockMovements);

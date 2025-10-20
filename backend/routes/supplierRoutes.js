@@ -7,7 +7,11 @@ const {
     createSupplier,
     updateSupplier,
     deleteSupplier,
+    generateSupplierReportPdf
 } = require('../controllers/supplierController');
+
+// PDF Report route (must be before :id route)
+router.get('/download-report-pdf', generateSupplierReportPdf);
 
 router.get('/', getSuppliers);
 router.get('/:id', getSupplierById);

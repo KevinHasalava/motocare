@@ -9,6 +9,12 @@ import {
   Avatar,
   Chip,
   Box,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Badge,
 } from "@mui/material";
 import {
   Logout as LogoutIcon,
@@ -23,6 +29,9 @@ import {
   Settings as SettingsIcon,
   Engineering as EngineeringIcon,
   Receipt as ReceiptIcon,
+  KeyboardArrowDown,
+  Assignment,
+  VerifiedUser,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Logo from "./Landing_Page/Logo";
@@ -30,6 +39,8 @@ import Logo from "./Landing_Page/Logo";
 const CashierHeader = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [paymentsAnchor, setPaymentsAnchor] = useState(null);
+  const [jobsAnchor, setJobsAnchor] = useState(null);
 
   // Load user on mount
   useEffect(() => {
@@ -41,6 +52,24 @@ const CashierHeader = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     navigate("/login");
+  };
+
+  const handlePaymentsClick = (event) => {
+    setPaymentsAnchor(event.currentTarget);
+  };
+
+  const handleJobsClick = (event) => {
+    setJobsAnchor(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setPaymentsAnchor(null);
+    setJobsAnchor(null);
+  };
+
+  const handleMenuItemClick = (path) => {
+    navigate(path);
+    handleClose();
   };
 
   // Reusable nav button style
@@ -74,48 +103,6 @@ const CashierHeader = () => {
     "&:hover::before": {
       width: "80%",
     },
-  };
-
-  const getWelcomeMessage = () => {
-    const userType = user?.userType || 'user';
-    const name = user?.name || 'User';
-    
-    switch (userType) {
-      case 'admin':
-        return `Admin Panel - Welcome, ${name}`;
-      case 'mechanic':
-        return `Mechanic Portal - Welcome, ${name}`;
-      case 'cashier':
-        return `Cashier Portal - Welcome, ${name}`;
-      default:
-        return `Dashboard - Welcome, ${name}`;
-    }
-  };
-
-  const getNavigationItems = () => {
-    const userType = user?.userType;
-    
-    switch (userType) {
-      case 'admin':
-        return [
-          { label: 'Admin Dashboard', path: '/admin-dashboard', icon: <DashboardIcon /> },
-          { label: 'Manage Services', path: '/admin-service', icon: <SettingsIcon /> },
-          { label: 'Create Walk-in Job', path: '/admin/walkinjob', icon: <BuildIcon /> }
-        ];
-      case 'mechanic':
-        return [
-          { label: 'My Jobs', path: '/mechanic-portal', icon: <EngineeringIcon /> }
-        ];
-      case 'cashier':
-        return [
-          { label: 'Dashboard', path: '/cashier-dashboard', icon: <DashboardIcon /> },
-          { label: 'Process Payments', path: '/cashier', icon: <PaymentIcon /> },
-          { label: 'Payment History', path: '/payment-history', icon: <ReceiptIcon /> },
-          { label: 'Create Walk-in Job', path: '/admin/walkinjob', icon: <BuildIcon /> }
-        ];
-      default:
-        return [];
-    }
   };
 
   if (!user) {
@@ -153,12 +140,13 @@ const CashierHeader = () => {
           </Typography>
         </Stack>
 
-        {/* Center: Cashier Navigation (desktop only) */}
+        {/* Center: Simplified Cashier Navigation (desktop only) */}
         <Stack
           direction="row"
-          spacing={2}
+          spacing={1}
           sx={{ display: { xs: "none", md: "flex" } }}
         >
+          {/* Dashboard */}
           <Button 
             startIcon={<DashboardIcon />} 
             onClick={() => navigate("/cashier-dashboard")} 
@@ -166,34 +154,119 @@ const CashierHeader = () => {
           >
             Dashboard
           </Button>
+
+          {/* Payments Dropdown */}
           <Button 
-            startIcon={<PaymentIcon />} 
-            onClick={() => navigate("/cashier")} 
+            endIcon={<KeyboardArrowDown />}
+            onClick={handlePaymentsClick}
             sx={navButtonStyle}
           >
-            Process Payments
+            Payments
           </Button>
-          <Button 
-            startIcon={<HistoryIcon />} 
-            onClick={() => navigate("/payment-history")} 
-            sx={navButtonStyle}
+          <Menu
+            anchorEl={paymentsAnchor}
+            open={Boolean(paymentsAnchor)}
+            onClose={handleClose}
+            PaperProps={{
+              sx: {
+                mt: 1,
+                background: 'linear-gradient(135deg, #1a1f2e 0%, #0a0e1a 100%)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 2,
+                minWidth: 200,
+              }
+            }}
           >
-            Payment History
-          </Button>
+            <MenuItem 
+              onClick={() => handleMenuItemClick("/cashier")}
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                '&:hover': { 
+                  background: 'rgba(16, 185, 129, 0.1)',
+                  color: 'white'
+                }
+              }}
+            >
+              <ListItemIcon><PaymentIcon sx={{ color: '#10b981' }} /></ListItemIcon>
+              <ListItemText>Process Payments</ListItemText>
+            </MenuItem>
+            <MenuItem 
+              onClick={() => handleMenuItemClick("/payment-history")}
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                '&:hover': { 
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  color: 'white'
+                }
+              }}
+            >
+              <ListItemIcon><HistoryIcon sx={{ color: '#3b82f6' }} /></ListItemIcon>
+              <ListItemText>Payment History</ListItemText>
+            </MenuItem>
+            <MenuItem 
+              onClick={() => handleMenuItemClick("/cashier/slip-verification")}
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                '&:hover': { 
+                  background: 'rgba(245, 158, 11, 0.1)',
+                  color: 'white'
+                }
+              }}
+            >
+              <ListItemIcon><VerifiedUser sx={{ color: '#f59e0b' }} /></ListItemIcon>
+              <ListItemText>Slip Verification</ListItemText>
+            </MenuItem>
+          </Menu>
+
+          {/* Jobs Dropdown */}
           <Button 
-            startIcon={<AddTaskIcon />} 
-            onClick={() => navigate("/admin/walkinjob")} 
-            sx={navButtonStyle}
-          >
-            Create Walk-in Job
-          </Button>
-          <Button 
-            startIcon={<AddTaskIcon />} 
-            onClick={() => navigate("/admin/jobs")} 
+            endIcon={<KeyboardArrowDown />}
+            onClick={handleJobsClick}
             sx={navButtonStyle}
           >
             Jobs
           </Button>
+          <Menu
+            anchorEl={jobsAnchor}
+            open={Boolean(jobsAnchor)}
+            onClose={handleClose}
+            PaperProps={{
+              sx: {
+                mt: 1,
+                background: 'linear-gradient(135deg, #1a1f2e 0%, #0a0e1a 100%)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 2,
+                minWidth: 200,
+              }
+            }}
+          >
+            <MenuItem 
+              onClick={() => handleMenuItemClick("/admin/walkinjob")}
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                '&:hover': { 
+                  background: 'rgba(16, 185, 129, 0.1)',
+                  color: 'white'
+                }
+              }}
+            >
+              <ListItemIcon><AddTaskIcon sx={{ color: '#10b981' }} /></ListItemIcon>
+              <ListItemText>Create Walk-in Job</ListItemText>
+            </MenuItem>
+            <MenuItem 
+              onClick={() => handleMenuItemClick("/admin/jobs")}
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)',
+                '&:hover': { 
+                  background: 'rgba(99, 102, 241, 0.1)',
+                  color: 'white'
+                }
+              }}
+            >
+              <ListItemIcon><Assignment sx={{ color: '#6366f1' }} /></ListItemIcon>
+              <ListItemText>View All Jobs</ListItemText>
+            </MenuItem>
+          </Menu>
         </Stack>
 
         {/* Right: Profile Chip + Logout */}

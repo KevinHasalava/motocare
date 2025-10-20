@@ -15,7 +15,8 @@ const {
     getUserPayments,
     uploadPaymentSlip,
     getPaymentsWithSlips,
-    verifyPaymentSlip
+    verifyPaymentSlip,
+    generateInvoicePdf
 } = require('../controllers/paymentController');
 const authMiddleware = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
@@ -49,5 +50,10 @@ router.post('/upload-slip', upload.single('slip'), uploadPaymentSlip);
 // Payment slip verification (cashier only)
 router.get('/slips/pending', getPaymentsWithSlips);
 router.put('/:paymentId/verify-slip', verifyPaymentSlip);
+
+// ------------------- PDF INVOICE DOWNLOAD ROUTE -------------------
+
+// 📄 Download Invoice PDF - GET /api/payments/:paymentId/download-invoice-pdf
+router.get('/:paymentId/download-invoice-pdf', generateInvoicePdf);
 
 module.exports = router;

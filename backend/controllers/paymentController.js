@@ -6,6 +6,13 @@ const User = require('../models/User');
 const Service = require('../models/Service');
 const Inventory = require('../models/inventory');
 
+// 💡 NEW IMPORT: PDF Library for invoice generation
+const PDFDocument = require("pdfkit");
+const dayjs = require("dayjs");
+const fs = require("fs");
+const path = require("path");
+const { createPDFWithLetterhead, addPDFFooter, finalizePDF } = require('../utils/pdfUtils');
+
 // Search vehicles by vehicle number (autocomplete)
 const searchVehicles = async (req, res) => {
     try {
@@ -1113,6 +1120,148 @@ const uploadPaymentSlip = async (req, res) => {
     }
 };
 
+// ------------------- PDF INVOICE GENERATION -------------------
+
+/**
+ * Generates and streams a PDF invoice document containing payment details.
+ * GET /api/payments/:paymentId/download-invoice-pdf
+ */
+const generateInvoicePdf = async (req, res) => {
+    try {
+        const paymentId = req.params.paymentId;
+
+        const payment = await Payment.findById(paymentId)
+            .populate("job", "jobId")
+            .populate("vehicle", "vehicleNumber type brand model year")
+            .populate("customer", "name email phone")
+            .populate("service", "name price duration")
+            .populate("cashier", "name")
+            .populate("extraItems.inventoryItem", "name");
+
+        if (!payment) {
+            return res.status(404).json({ message: "Payment not found" });
+        }
+
+        // --- PDF Setup with Letterhead Template ---
+        const doc = createPDFWithLetterhead({
+            filename: `Invoice_${payment.invoiceId}.pdf`,
+            res,
+            useTemplateBackground: true
+        });
+
+        // --- PDF Content Generation ---
+
+        // Content starts at Y=160 (set in pdfUtils) - closer to template header
+        
+        // Report Title Section
+        doc.fontSize(20).fillColor('#1a365d').text('PAYMENT INVOICE', { align: 'center' });
+        doc.moveDown(0.2);
+        
+        // Decorative line under title
+        doc.strokeColor('#1a365d').lineWidth(2);
+        doc.moveTo(150, doc.y).lineTo(doc.page.width - 150, doc.y).stroke();
+        doc.moveDown(0.4);
+        
+        // Invoice Information Box
+        const infoBoxY = doc.y;
+        doc.rect(50, infoBoxY, doc.page.width - 100, 70).fillAndStroke('#f8f9fa', '#e9ecef');
+        
+        // Invoice Details inside box - Left side
+        doc.fillColor('#2c3e50').fontSize(11);
+        doc.text(`Invoice ID: ${payment.invoiceId}`, 60, infoBoxY + 12);
+        doc.text(`Invoice Generated: ${dayjs().format('dddd, MMMM DD, YYYY')}`, 60, infoBoxY + 28);
+        doc.text(`Generation Time: ${dayjs().format('hh:mm A')}`, 60, infoBoxY + 44);
+        
+        // Payment Status - Right side with better alignment
+        const statusColor = payment.paymentStatus === 'PAID' ? '#28a745' : payment.paymentStatus === 'PENDING' ? '#ffc107' : '#dc3545';
+        doc.fontSize(10).fillColor(statusColor);
+        doc.text(`✓ STATUS: ${payment.paymentStatus}`, doc.page.width - 180, infoBoxY + 12);
+        doc.fillColor('#17a2b8');
+        doc.text('✓ OFFICIAL INVOICE', doc.page.width - 180, infoBoxY + 28);
+        doc.fillColor('#6c757d');
+        doc.text('✓ AUTOMATED BILLING', doc.page.width - 180, infoBoxY + 44);
+        
+        doc.y = infoBoxY + 80;
+        doc.moveDown(0.3);
+
+        // Payment Details
+        doc.fontSize(12).fillColor('#333')
+           .text(`Status: ${payment.paymentStatus}`, { continued: true })
+           .text(` | Method: ${payment.paymentMethod}`, { continued: true })
+           .text(` | Date: ${dayjs(payment.createdAt).format('YYYY-MM-DD HH:mm')}`);
+        doc.moveDown(1);
+
+        // Customer Details
+        doc.fontSize(14).fillColor('#2c3e50').text('Customer Details', { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(10)
+           .text(`Name: ${payment.customer?.name || 'N/A'}`)
+           .text(`Email: ${payment.customer?.email || 'N/A'}`)
+           .text(`Phone: ${payment.customer?.phone || 'N/A'}`);
+        doc.moveDown(1);
+
+        // Vehicle Details
+        doc.fontSize(14).fillColor('#2c3e50').text('Vehicle Details', { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(10)
+           .text(`Number: ${payment.vehicle?.vehicleNumber || 'N/A'}`)
+           .text(`Brand / Model: ${payment.vehicle?.brand || 'N/A'} ${payment.vehicle?.model || 'N/A'}`)
+           .text(`Type / Year: ${payment.vehicle?.type || 'N/A'} (${payment.vehicle?.year || 'N/A'})`);
+        doc.moveDown(1);
+
+        // Service Details
+        doc.fontSize(14).fillColor('#2c3e50').text('Service & Items', { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(10)
+           .text(`Service: ${payment.service?.name || 'N/A'}`)
+           .text(`Service Price: Rs. ${payment.serviceAmount?.toFixed(2) || '0.00'}`);
+
+        // Extra Items
+        if (payment.extraItems && payment.extraItems.length > 0) {
+            doc.moveDown(0.5);
+            doc.fontSize(10).text('Additional Items:', { underline: true });
+            payment.extraItems.forEach((item, index) => {
+                doc.fontSize(9)
+                   .text(`${index + 1}. ${item.itemName} - Qty: ${item.quantity} × Rs. ${item.unitPrice?.toFixed(2)} = Rs. ${item.totalPrice?.toFixed(2)}`);
+            });
+        }
+
+        doc.moveDown(1);
+
+        // Payment Summary
+        doc.fontSize(14).fillColor('#2c3e50').text('Payment Summary', { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(10)
+           .text(`Subtotal: Rs. ${payment.subtotal?.toFixed(2) || '0.00'}`)
+           .text(`Discount: Rs. ${payment.discount?.toFixed(2) || '0.00'}${payment.discountPercentage ? ` (${payment.discountPercentage}%)` : ''}`)
+           .text(`Total Amount: Rs. ${payment.totalAmount?.toFixed(2) || '0.00'}`, { bold: true });
+
+        doc.moveDown(1);
+
+        // Cashier Info
+        if (payment.cashier?.name) {
+            doc.fontSize(10).fillColor('#555').text(`Processed by: ${payment.cashier.name}`);
+        }
+
+        // Notes
+        if (payment.notes) {
+            doc.moveDown(0.5);
+            doc.fontSize(9).fillColor('#666').text(`Notes: ${payment.notes}`);
+        }
+
+        // Footer
+        addPDFFooter(doc, 'This is an official invoice. Please retain this document for your records.');
+
+        // Finalize the PDF and end the stream
+        finalizePDF(doc);
+
+    } catch (err) {
+        console.error("Error generating invoice PDF:", err.message);
+        // Send a proper error response if anything fails
+        res.status(500).json({ message: "Invoice PDF generation failed due to a server error." });
+    }
+};
+
 module.exports = {
     searchVehicles,
     getJobByVehicle,
@@ -1128,5 +1277,6 @@ module.exports = {
     getUserPayments,
     uploadPaymentSlip,
     getPaymentsWithSlips,
-    verifyPaymentSlip
+    verifyPaymentSlip,
+    generateInvoicePdf
 };

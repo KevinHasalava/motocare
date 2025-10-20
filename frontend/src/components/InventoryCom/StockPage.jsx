@@ -8,8 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DescriptionIcon from '@mui/icons-material/Description';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+// PDF generation now handled by backend API with custom letterhead template
 import { getStockMovements, deleteStockMovement } from '../../api/stockApi';
 import AddStockInForm from './AddStockInForm';
 import AddStockOutForm from './AddStockOutForm';
@@ -90,41 +89,64 @@ const StockPage = () => {
   const handleGeneratePDF = async () => {
     setIsGenerating(true);
     try {
-      const movementsData = filteredMovements;
+      // Build query parameters for filtering
+      const queryParams = new URLSearchParams();
+      if (searchTerm) {
+        queryParams.append('search', searchTerm);
+      }
       
-      const doc = new jsPDF();
+      // Add date filtering based on dateFilter state
+      const now = new Date();
+      switch (dateFilter) {
+        case 'today':
+          queryParams.append('startDate', now.toISOString().split('T')[0]);
+          queryParams.append('endDate', now.toISOString().split('T')[0]);
+          break;
+        case 'thisWeek':
+          const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+          const endOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() + 6);
+          queryParams.append('startDate', startOfWeek.toISOString().split('T')[0]);
+          queryParams.append('endDate', endOfWeek.toISOString().split('T')[0]);
+          break;
+        case 'thisMonth':
+          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          queryParams.append('startDate', startOfMonth.toISOString().split('T')[0]);
+          queryParams.append('endDate', endOfMonth.toISOString().split('T')[0]);
+          break;
+        // 'all' case - no date filtering
+      }
       
-      doc.setFontSize(20);
-      doc.text("Stock Movement Report", 14, 22);
-      doc.setFontSize(10);
-      doc.text(`Generated Date: ${new Date().toLocaleDateString()}`, 14, 30);
-      
-      const tableColumn = ["Date", "Part ID", "Item Name", "Type", "Quantity", "Buying Price (LKR)", "Sales Price (LKR)", "Supplier", "Job ID", "Notes"];
-      const tableRows = movementsData.map(movement => [
-        new Date(movement.date).toLocaleDateString(),
-        movement.partId || 'N/A',
-        movement.inventory?.name || 'N/A',
-        movement.type,
-        movement.quantity,
-        movement.buyingPrice ? movement.buyingPrice.toFixed(2) : '0.00',
-        movement.salesPrice ? movement.salesPrice.toFixed(2) : '0.00',
-        movement.supplier?.name || 'N/A',
-        movement.jobId || 'N/A',
-        movement.notes || '-',
-      ]);
-
-      doc.autoTable({
-        head: [tableColumn],
-        body: tableRows,
-        startY: 40,
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: '#0288D1' },
+      // Call backend API to generate PDF with template
+      const response = await fetch(`/api/stock/download-report-pdf?${queryParams.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/pdf',
+        },
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF report');
+      }
+
+      // Get the PDF blob
+      const blob = await response.blob();
       
-      doc.save(`Stock_Report_${dateFilter}_${new Date().toISOString().slice(0, 10)}.pdf`);
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `StockMovementReport_${dateFilter}_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
     } catch (err) {
       console.error("Failed to generate PDF:", err);
-      setError('Failed to generate PDF. Please try again.');
+      setError('Failed to generate PDF report. Please try again.');
     } finally {
       setIsGenerating(false);
     }
