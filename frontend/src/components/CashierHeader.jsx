@@ -284,7 +284,7 @@ const CashierHeader = () => {
                 </Avatar>
               }
               label={user.name}
-              onClick={() => navigate("/cashier/profile")} 
+              onClick={() => navigate("/profile")} 
               sx={{
                 background: "rgba(245, 158, 11, 0.1)",
                 border: "1px solid rgba(245, 158, 11, 0.3)",

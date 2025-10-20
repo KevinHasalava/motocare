@@ -335,6 +335,10 @@ const AdminHeader = () => {
                 color: "white",
                 fontWeight: 600,
                 px: 1,
+                cursor: "pointer",
+                "&:hover": {
+                  background: "rgba(16, 185, 129, 0.2)",
+                },
                 "& .MuiChip-avatar": {
                   color: "white",
                 },
