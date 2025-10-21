@@ -114,27 +114,6 @@ const MechanicHeader = () => {
           >
             Dashboard
           </Button>
-          <Button 
-            startIcon={<TaskIcon />} 
-            onClick={() => navigate("/mechanic/jobs")} 
-            sx={navButtonStyle}
-          >
-            My Jobs
-          </Button>
-          <Button 
-            startIcon={<RepairIcon />} 
-            onClick={() => navigate("/mechanic/active-jobs")} 
-            sx={navButtonStyle}
-          >
-            Active Work
-          </Button>
-          <Button 
-            startIcon={<ProgressIcon />} 
-            onClick={() => navigate("/mechanic/job-history")} 
-            sx={navButtonStyle}
-          >
-            Job History
-          </Button>
         </Stack>
 
         {/* Right: Profile Chip + Logout */}
@@ -152,7 +131,7 @@ const MechanicHeader = () => {
                 </Avatar>
               }
               label={user.name}
-              onClick={() => navigate("/mechanic/profile")} 
+              onClick={() => navigate("/profile")} 
               sx={{
                 background: "rgba(16, 185, 129, 0.1)",
                 border: "1px solid rgba(16, 185, 129, 0.3)",

@@ -21,7 +21,8 @@ const AdminContainer = styled(Box)(({ theme }) => ({
 }));
 
 const AdminPaper = styled(Paper)(({ theme }) => ({
-    maxWidth: 1400, // Increased from 1200 to give more space
+    maxWidth: '95%', // Use percentage for better responsiveness
+    width: '100%',
     margin: '0 auto',
     borderRadius: '4px',
     boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
@@ -622,8 +623,7 @@ const CreateWalkInJob = () => {
                             )}
 
                             <Grid container spacing={2}>
-                                {/* Vehicle Number */}
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={4}>
                                     <TextField
                                         fullWidth
                                         size="small"
@@ -638,15 +638,17 @@ const CreateWalkInJob = () => {
                                         required
                                     />
                                 </Grid>
-                                {/* 🚀 Vehicle Type: Changed from md={6} to md={6} (same row as Vehicle No.) */}
-                                <Grid item xs={12} md={6}>
-                                    <FormControl fullWidth size="small" error={!!errors.type} disabled={isVehicleFound} required>
-                                        <InputLabel>Vehicle Type</InputLabel>
+                                <Grid item xs={12} md={4}>
+                                    <FormControl fullWidth size="small" error={!!errors.type} disabled={isVehicleFound} required sx={{ minWidth: 120 }}>
+                                        <InputLabel id="vehicle-type-label">Vehicle Type</InputLabel>
                                         <Select
+                                            labelId="vehicle-type-label"
+                                            id="vehicle-type-select"
                                             label="Vehicle Type"
                                             name="type"
                                             value={formData.type}
                                             onChange={handleInputChange}
+                                            sx={{ width: '100%' }}
                                         >
                                             {vehicleTypes.map((type) => (
                                                 <MenuItem key={type} value={type}>{type}</MenuItem>
@@ -657,7 +659,6 @@ const CreateWalkInJob = () => {
                                         )}
                                     </FormControl>
                                 </Grid>
-                                {/* Brand, Model, Year - adjusted to md={4} each for better fit */}
                                 <Grid item xs={12} md={4}>
                                     <TextField
                                         fullWidth
@@ -728,8 +729,7 @@ const CreateWalkInJob = () => {
                                 </Alert>
                             )}
                             <Grid container spacing={2}>
-                                {/* 🚀 Service Autocomplete: Changed from md={6} to md={12} */}
-                                <Grid item xs={12} md={12}>
+                                <Grid item xs={12} md={4}>
                                     <Autocomplete
                                         fullWidth
                                         size="small"
@@ -742,6 +742,7 @@ const CreateWalkInJob = () => {
                                         onInputChange={(event, newInputValue) => {
                                             setFormData(prev => ({ ...prev, serviceName: newInputValue }));
                                         }}
+                                        sx={{ width: '100%', minWidth: 120 }}
                                         renderInput={(params) => (
                                             <TextField
                                                 {...params}
@@ -753,16 +754,17 @@ const CreateWalkInJob = () => {
                                         )}
                                     />
                                 </Grid>
-                                {/* Assign Mechanic: Changed from md={6} to md={12} */}
-                                <Grid item xs={12} md={12}>
-                                    <FormControl fullWidth size="small">
-                                        <InputLabel>Assign Mechanic</InputLabel>
+                                <Grid item xs={12} md={4}>
+                                    <FormControl fullWidth size="small" error={jobConflict && formData.mechanic !== 'AUTO_ASSIGN'} sx={{ minWidth: 120 }}>
+                                        <InputLabel id="mechanic-label">Assign Mechanic</InputLabel>
                                         <Select
+                                            labelId="mechanic-label"
+                                            id="mechanic-select"
                                             label="Assign Mechanic"
                                             name="mechanic"
                                             value={formData.mechanic}
                                             onChange={handleInputChange}
-                                            error={jobConflict && formData.mechanic !== 'AUTO_ASSIGN'}
+                                            sx={{ width: '100%' }}
                                         >
                                             {/* <MenuItem value="AUTO_ASSIGN">
                                                 <em>Auto Assign (Recommended)</em>
@@ -779,8 +781,7 @@ const CreateWalkInJob = () => {
                                     </FormControl>
                                 </Grid>
 
-                                {/* Date field (md={6}) */}
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={4}>
                                     <TextField
                                         fullWidth
                                         size="small"

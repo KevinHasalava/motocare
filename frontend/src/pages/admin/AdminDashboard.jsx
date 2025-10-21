@@ -277,7 +277,7 @@ const AdminDashboard = () => {
                  description="Spare parts stock"
                  icon={<Inventory />}
                  color="#14b8a6" // teal-ish
-                 path="/admin/inventory" // navigate ekata route
+                 path="/inventory" // Fixed: navigate to correct route
               />
               </Grid>
 
