@@ -3,6 +3,8 @@
 ## ✅ Changes Made to Fix Serverless Crashes
 
 ### 1. **server.js Updates**
+- ✅ Moved route imports before database middleware to prevent loading issues
+- ✅ Wrapped route requires in try-catch for better error handling
 - ✅ Removed `app.listen()` from production (serverless doesn't use it)
 - ✅ Added `module.exports = app` to export for Vercel
 - ✅ Added database connection middleware for API routes
@@ -15,7 +17,17 @@
 - ✅ Removed `process.exit(1)` that crashes serverless functions
 - ✅ Returns connection for reuse
 
-### 3. **vercel.json Configuration**
+### 3. **package.json Updates**
+```json
+{
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.x"
+  }
+}
+```
+
+### 4. **vercel.json Configuration**
 ```json
 {
   "version": 2,
@@ -28,16 +40,14 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "server.js"
+      "dest": "/server.js",
+      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
 ```
 
-### 4. **Files Created**
+### 5. **Files Created**
 - ✅ `.vercelignore` - Excludes unnecessary files from deployment
 - ✅ `.env.example` - Template for required environment variables
 
