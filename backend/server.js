@@ -17,7 +17,7 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:3000', // Local development
-    'https://mtcr.vercel.app/' // Production frontend
+    'https://mtcr.vercel.app' // Production frontend
   ],
   credentials: true
 })); // Enable CORS for cross-origin requests (e.g., from frontend)
