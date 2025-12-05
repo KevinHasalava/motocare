@@ -5,7 +5,7 @@ const auth = require("../middleware/authMiddleware");
 
 // Only logged-in users can add/update/delete
 router.post("/", auth, addVehicle);
-router.put("/:id", auth, updateVehicle);
+router.put("/:id", updateVehicle);
 router.delete("/:id", auth, deleteVehicle);
 
 

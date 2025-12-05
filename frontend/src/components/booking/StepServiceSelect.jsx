@@ -5,23 +5,22 @@ import {
 } from '@mui/material';
 import BuildIcon from '@mui/icons-material/Build';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import NoCrashIcon from '@mui/icons-material/NoCrash'; // අලුතින් එකතු කළ icon එක
+import NoCrashIcon from '@mui/icons-material/NoCrash'; 
 import { theme } from '../../utils/theme';
 
 
-// ❗️ 1. 'selectedVehicle' නමින් අලුත් prop එකක් මෙතනට එකතු කරන්න
+
 const StepServiceSelect = ({ services, service, setService, onNext, onBack, selectedVehicle }) => {
 
-  // ❗️ 2. වාහනයේ වර්ගය අනුව services list එක filter කිරීම
+
   const filteredServices = selectedVehicle
     ? services.filter(s => s.vehicleType === selectedVehicle.type)
-    : []; // වාහනයක් තෝරා නොමැති නම්, හිස් list එකක් පෙන්වන්න
+    : []; 
 
   return (
     <Fade in timeout={600}>
       <Box>
         <Grid container spacing={3}>
-          {/* ❗️ 3. Filter කළ විට services නොමැති නම්, පණිවිඩයක් පෙන්වීම */}
           {filteredServices.length === 0 ? (
             <Grid item xs={12}>
               <Paper sx={{ p: 4, textAlign: 'center', background: alpha('#000', 0.2) }}>
@@ -35,13 +34,11 @@ const StepServiceSelect = ({ services, service, setService, onNext, onBack, sele
               </Paper>
             </Grid>
           ) : (
-            // ❗️ 4. Filter කරන ලද 'filteredServices' list එක මෙතනදී map කිරීම
             filteredServices.map((s, index) => (
               <Grid item xs={12} sm={6} md={4} key={s._id}>
                 <Zoom in timeout={300 + index * 100}>
                   <Card
                     sx={{
-                      // ... (මෙහි style attributes වෙනස් නොවේ)
                       cursor: "pointer",
                       height: '100%',
                       background: service?._id === s._id
@@ -71,7 +68,6 @@ const StepServiceSelect = ({ services, service, setService, onNext, onBack, sele
                       <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: 'white' }}>
                         {s.name}
                       </Typography>
-                      {/* ❗️ 5. පැහැදිලි බව සඳහා වාහන වර්ගය මෙහි පෙන්වීම */}
                       <Chip label={s.vehicleType} color="primary" size="small" sx={{ mb: 2, backgroundColor: alpha(theme.palette.primary.main, 0.2), color: theme.palette.primary.light }} />
                       {s.description && (
                         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2, minHeight: '40px' }}>
@@ -79,7 +75,7 @@ const StepServiceSelect = ({ services, service, setService, onNext, onBack, sele
                         </Typography>
                         
                       )}
-                      <Chip label={`Rs. ${s.price.toFixed(2)}`} sx={{ background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)', color: 'white', fontWeight: 700, fontSize: '1rem' }} />
+                      <Chip label={`LKR ${s.price.toFixed(2)}`} sx={{ background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)', color: 'white', fontWeight: 700, fontSize: '1rem' }} />
                     </CardContent>
                   </Card>
                 </Zoom>

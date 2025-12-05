@@ -7,6 +7,8 @@ import { theme, backgroundKeyframes, gradientText, mockData } from '../utils/the
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import handleBookServiceClick from '../pages/VehiclePage';
+import { validatePhoneNumber, handlePhoneInput } from '../utils/validationUtils';
+
 import axios from "axios";
 import API_URL from "../config/api";
 
@@ -15,6 +17,7 @@ const Register = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: ""
   });
@@ -23,11 +26,47 @@ const Register = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let processedValue = value;
+
+    // Handle phone input filtering
+    if (name === 'phone') {
+      processedValue = handlePhoneInput(value);
+    }
+
+    setForm({ ...form, [name]: processedValue });
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+// 🛑 All fields required
+    if (!form.name || !form.email || !form.phone || !form.password || !form.confirmPassword) {
+      setError("❌ All fields are required");
+      return;
+    }
+
+    // 📧 Email Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setError("❌ Invalid email address");
+      return;
+    }
+
+    // 📞 Phone Validation
+    const phoneValidation = validatePhoneNumber(form.phone);
+    if (!phoneValidation.isValid) {
+      setError(`❌ ${phoneValidation.error}`);
+      return;
+    }
+
+    // 🔑 Password Validation (improved - more user-friendly)
+    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
+    if (!passwordRegex.test(form.password)) {
+      setError("❌ Password must be at least 6 characters long and contain at least one letter and one number");
+      return;
+    }
+
 
     // 🛑 Password match validation
     if (form.password !== form.confirmPassword) {
@@ -39,6 +78,7 @@ const Register = () => {
       await axios.post(`${API_URL}/api/users/register`, {
         name: form.name,
         email: form.email,
+        phone: form.phone,
         password: form.password,
         userType: "customer" // 👈 Always force as customer
       });
@@ -115,12 +155,29 @@ const Register = () => {
                 <TextField
                   fullWidth
                   margin="normal"
+                  type="tel"
+                  label="Phone Number"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  required
+                  inputProps={{
+                    maxLength: 10,
+                    inputMode: 'numeric',
+                    pattern: "0[0-9]{9}"
+                  }}
+                  helperText="Must be 10 digits and start with 0 (e.g., 071xxxxxxx)"
+                />
+                <TextField
+                  fullWidth
+                  margin="normal"
                   type="password"
                   label="Password"
                   name="password"
                   value={form.password}
                   onChange={handleChange}
                   required
+                  helperText="Must be at least 6 characters with at least one letter and one number"
                 />
                 <TextField
                   fullWidth

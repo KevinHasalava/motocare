@@ -26,55 +26,67 @@ const createBooking = async (req, res) => {
 
     // business hours
     const openHour = new Date(`${date}T08:00:00`);
-    const closeHour = new Date(`${date}T17:00:00`);
+    const closeHour = new Date(`${date}T21:00:00`);
     if (startTime < openHour || endTime > closeHour) {
       return res.status(400).json({ message: "Booking allowed between 08:00 - 17:00" });
     }
 
-    // ✅ Mechanic assign
-    let assignedMechanic = null;
+let assignedMechanic = null;
 
-    if (mechanic) {
-      // case: user passed mechanic manually
-      const mech = await User.findById(mechanic);
-      if (!mech || mech.userType !== "mechanic") {
+if (mechanic) {
+    const mech = await User.findById(mechanic);
+    if (!mech || mech.userType !== "mechanic") {
         return res.status(400).json({ message: "Invalid mechanic" });
-      }
-      assignedMechanic = mech._id;
-    } else {
-      // case: auto assign → find all mechanics
-      const allMechs = await User.find({ userType: "mechanic" });
+    }
+    assignedMechanic = mech._id;
+} else {
+    const allMechs = await User.find({ userType: "mechanic" });
 
-      // count each mechanic jobs that day
-      let mechWorkload = [];
-      for (const m of allMechs) {
-        const jobsCount = await Job.countDocuments({
-          mechanic: m._id,
-          startTime: { $gte: new Date(`${date}T00:00:00`), $lt: new Date(`${date}T23:59:59`) },
-          status: { $in: ["Booked", "Ongoing"] }
+    const availabilityChecks = allMechs.map(async (mech) => {
+        const overlap = await Job.findOne({
+            mechanic: mech._id,
+            startTime: { $lt: endTime },
+            endTime: { $gt: startTime },
+            status: { $in: ["Booked", "Ongoing"] }
         });
-        mechWorkload.push({ mech: m._id, count: jobsCount });
-      }
+        return overlap ? null : mech;
+    });
 
-      // pick mechanic with lowest jobs
-      mechWorkload.sort((a, b) => a.count - b.count);
-      if (mechWorkload.length > 0) {
-        assignedMechanic = mechWorkload[0].mech;
-      }
+    const results = await Promise.all(availabilityChecks);
+    const availableMechs = results.filter(mech => mech !== null);
+
+    if (availableMechs.length === 0) {
+        return res.status(400).json({ message: "No mechanics are available at the selected time." });
     }
 
-    // Availability check for chosen mechanic
-    if (assignedMechanic) {
-      const overlap = await Job.findOne({
+    let mechWorkload = [];
+    for (const m of availableMechs) {
+        const jobsCount = await Job.countDocuments({
+            mechanic: m._id,
+            startTime: { $gte: new Date(`${date}T00:00:00`), $lt: new Date(`${date}T23:59:59`) },
+            status: { $in: ["Booked", "Ongoing"] }
+        });
+        mechWorkload.push({ mech: m._id, count: jobsCount });
+    }
+
+    mechWorkload.sort((a, b) => a.count - b.count);
+
+    assignedMechanic = mechWorkload[0].mech;
+}
+
+if (assignedMechanic) {
+    const overlap = await Job.findOne({
         mechanic: assignedMechanic,
         startTime: { $lt: endTime },
         endTime: { $gt: startTime },
         status: { $in: ["Booked", "Ongoing"] }
-      });
-      if (overlap) {
-        return res.status(400).json({ message: "Chosen mechanic not free at this time" });
-      }
+    });
+    if (overlap) {
+        return res.status(400).json({ message: "The assigned mechanic is not free. Please try another slot." });
     }
+} else {
+     return res.status(400).json({ message: "Could not assign a mechanic for this booking." });
+}
 
     // Save booking
     const booking = new Booking({
@@ -95,20 +107,20 @@ const createBooking = async (req, res) => {
     await job.save();
 
     try {
-    // Email එකට අවශ්‍ය සම්පූර්ණ user සහ vehicle විස්තර ලබාගැනීම
+    // get user and vehicle details related to email
     const bookingUser = await User.findById(user).select('name email');
     const bookingVehicle = await Vehicle.findById(vehicle).select('brand model vehicleNumber');
 
-    // serviceObj එක අප සතුව දැනටමත් තිබේ.
+    // serviceObj 
     
-    // Email යැවීමේ function එකට අවශ්‍ය සියලු දත්ත ලබා දීම
-    // මෙහිදී 'job' object එක ලබා දෙන නිසා, Job ID එක email එකට ඇතුළත් වේ.
+    // Email sending func data getting
+    // jobID added to email form job
     await sendBookingConfirmationEmail({
         user: bookingUser,
         vehicle: bookingVehicle,
-        service: serviceObj, // We already have the full service object from the top of the function
-        bookingDetails: booking, // Pass the original booking document for date/time
-        jobDetails: job // Pass the job document which contains the new jobId
+        service: serviceObj, 
+        bookingDetails: booking, 
+        jobDetails: job 
     });
 
 } catch (emailError) {
@@ -156,7 +168,7 @@ const getBookingById = async (req, res) => {
 const getBookingsByUser = async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.params.userId })
-      .populate("vehicle", "vehicleNumber brand model type") // 👈 'type' මෙතනට එකතු කරන්න
+      .populate("vehicle", "vehicleNumber brand model type") 
       .populate("service", "name price duration vehicleType")
       .populate("mechanic", "name email");
     res.status(200).json(bookings);

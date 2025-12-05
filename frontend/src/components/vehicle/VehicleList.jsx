@@ -27,9 +27,8 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
   const getVehicleIcon = (type) => {
     const icons = {
       'car': '🚗',
+      'three wheel': '🛺',
       'motorcycle': '🏍️',
-      'truck': '🚛',
-      'bus': '🚌',
       'van': '🚐',
       'suv': '🚙'
     };

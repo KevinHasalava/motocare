@@ -1,12 +1,11 @@
 const express = require('express');
 const dotenv = require('dotenv');
-require('dotenv').config();
-
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./config/db');
 
 // Environment variables configuration
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 // Connect to MongoDB database
 connectDB();
@@ -23,6 +22,9 @@ app.use(cors({
 })); // Enable CORS for cross-origin requests (e.g., from frontend)
 app.use(express.json()); // Enable body parser for JSON requests
 
+// Serve static files (uploaded payment slips)
+app.use('/uploads', express.static('uploads'));
+
 // --- Basic Route ---
 app.get("/", (req,res) => {
   res.status(200).send('Api is working..5');
@@ -36,8 +38,8 @@ const serviceRoutes = require('./routes/serviceRoutes');
 const userRoutes = require('./routes/userRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const availabilityRoutes = require('./routes/availabilityRoutes');
-// 🛠️ NEW IMPORT: For fetching services, mechanics, and user vehicle data
 const dataRoutes = require('./routes/dataRoutes'); 
+const purchaseRequestRoutes = require('./routes/purchaseRequestRoutes');
 
 
 // --- API Endpoints ---
@@ -49,8 +51,18 @@ app.use("/api/services", serviceRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/availability", availabilityRoutes); 
+app.use('/api/admin', require('./routes/adminRoutes'));
 
-// 🎯 NEW ENDPOINT: Route for general data fetching required by the frontend forms
+
+app.use('/api/inventory', require('./routes/inventoryRoutes'));
+app.use('/api/suppliers', require('./routes/supplierRoutes'));
+app.use('/api/stock', require('./routes/stockRoutes'));
+app.use('/api/payments', require('./routes/paymentRoutes'));
+
+// NEW ENDPOINT: Route for Purchase Requests
+app.use('/api/purchase-requests', purchaseRequestRoutes);
+
+// Route for general data fetching required by the frontend forms
 app.use('/api/data', dataRoutes); 
 
 

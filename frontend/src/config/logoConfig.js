@@ -1,47 +1,41 @@
 // frontend/src/config/logoConfig.js
-// This file contains all logo-related configurations
-// Change these values to update the logo across the entire application
+// Fixed version – 'tagline' → 'subtitle' to match Logo.jsx usage
 
 export const logoConfig = {
   // Company/Brand Information
   brand: {
     name: "Moto-Care",
- 
-    tagline: "Professional Vehicle Care"
+    subtitle: "Professional Vehicle Care" // ✅ renamed from tagline → subtitle
   },
 
   // Image/Icon Settings
   image: {
-    // Set to true if you want to use an image instead of icon
     useImage: false,
-    // Path to your logo image (when useImage is true)
     imagePath: "/assets/images/logo.png",
-    // Alt text for the image
     imageAlt: "Moto-Care Logo",
-    // Fallback icon component name (when useImage is false)
-    iconName: "DirectionsCar" // You can change this to any Material-UI icon name
+    iconName: "DirectionsCar"
   },
 
   // Default Settings
   defaults: {
-    size: 'medium',
+    size: "medium",
     showSubtitle: true,
-    variant: 'default'
+    variant: "default"
   },
 
   // Colors and Styling
   styling: {
-    // You can add custom color schemes here
+    // Provide custom variants using titleStyle directly
     customVariants: {
       accent: {
-        iconColor: 'secondary.main',
-        titleColor: 'secondary.main',
-        subtitleColor: 'secondary.light'
+        iconColor: "secondary.main",
+        titleStyle: { color: "secondary.main" },  // ✅ now uses titleStyle instead of titleColor
+        subtitleColor: "secondary.light"
       },
       success: {
-        iconColor: 'success.main',
-        titleColor: 'success.main',
-        subtitleColor: 'success.light'
+        iconColor: "success.main",
+        titleStyle: { color: "success.main" },    // ✅ fixed
+        subtitleColor: "success.light"
       }
     }
   }
@@ -49,12 +43,12 @@ export const logoConfig = {
 
 // Icon mapping - add more icons as needed
 export const iconMapping = {
-  DirectionsCar: 'DirectionsCar',
-  Build: 'Build',
-  Settings: 'Settings',
-  Speed: 'Speed',
-  LocalCarWash: 'LocalCarWash',
-  Garage: 'Garage'
+  DirectionsCar: "DirectionsCar",
+  Build: "Build",
+  Settings: "Settings",
+  Speed: "Speed",
+  LocalCarWash: "LocalCarWash",
+  Garage: "Garage"
 };
 
 // Helper function to get logo configuration

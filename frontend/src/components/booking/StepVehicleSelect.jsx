@@ -14,6 +14,7 @@ const StepVehicleSelect = ({ vehicles, vehicle, setVehicle, onNext }) => {
     const icons = {
       'car': '🚗',
       'motorcycle': '🏍️',
+      'three wheel': '🛺',
       'truck': '🚛',
       'bus': '🚌',
       'van': '🚐',
