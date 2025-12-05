@@ -7,10 +7,10 @@ const connectDB = require('./config/db');
 // Environment variables configuration
 dotenv.config({ path: path.join(__dirname, '.env') });
 
-// Connect to MongoDB database
-connectDB();
-
 const app = express();
+
+// Connect to MongoDB database (for serverless, this will be called on each request)
+connectDB().catch(err => console.error('Database connection error:', err));
 
 // --- Middleware ---
 app.use(cors({
@@ -68,4 +68,11 @@ app.use('/api/data', dataRoutes);
 
 // --- Server Listener ---
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+}
+
+// Export for Vercel serverless
+module.exports = app;
