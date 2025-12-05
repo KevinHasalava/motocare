@@ -9,9 +9,6 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 
-// Connect to MongoDB database (for serverless, this will be called on each request)
-connectDB().catch(err => console.error('Database connection error:', err));
-
 // --- Middleware ---
 app.use(cors({
   origin: [
@@ -22,14 +19,29 @@ app.use(cors({
 })); // Enable CORS for cross-origin requests (e.g., from frontend)
 app.use(express.json()); // Enable body parser for JSON requests
 
-// Serve static files (uploaded payment slips)
-app.use('/uploads', express.static('uploads'));
+// Serve static files (uploaded payment slips) - only for local development
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/uploads', express.static('uploads'));
+}
 
 // --- Basic Route ---
 app.get("/", (req,res) => {
   res.status(200).send('Api is working..5');
 });
 
+// Database connection middleware for API routes
+app.use('/api', async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    res.status(503).json({ 
+      success: false, 
+      message: 'Database connection failed. Please try again later.' 
+    });
+  }
+});
 
 // --- Route Imports (Ensure these files exist in your routes folder) ---
 const vehicleRoutes = require('./routes/vehicleRoutes');
@@ -65,6 +77,15 @@ app.use('/api/purchase-requests', purchaseRequestRoutes);
 // Route for general data fetching required by the frontend forms
 app.use('/api/data', dataRoutes); 
 
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Error:', err.stack);
+  res.status(500).json({ 
+    success: false, 
+    message: 'Something went wrong!',
+    error: process.env.NODE_ENV !== 'production' ? err.message : undefined
+  });
+});
 
 // --- Server Listener ---
 const PORT = process.env.PORT || 5000;
