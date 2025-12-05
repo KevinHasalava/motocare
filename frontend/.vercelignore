@@ -1,0 +1,9 @@
+# Vercel Ignore - Don't upload these to Vercel
+.env.local
+.env.development
+.env.test
+node_modules
+npm-debug.log
+yarn-error.log
+.DS_Store
+*.log

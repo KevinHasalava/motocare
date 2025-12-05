@@ -172,6 +172,15 @@ PORT=5000
 
 ## 🆘 Troubleshooting
 
+### Build Fails on Vercel
+**Error:** "Treating warnings as errors because process.env.CI = true"
+
+**Solution:** The build script has been updated to ignore warnings:
+```json
+"build": "CI=false react-scripts build"
+```
+This is already in your `package.json`. Commit and push, then redeploy.
+
 ### CORS Errors
 - Make sure your backend CORS settings include your frontend URL
 - Redeploy backend after updating CORS
