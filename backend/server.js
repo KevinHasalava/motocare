@@ -14,7 +14,13 @@ connectDB();
 const app = express();
 
 // --- Middleware ---
-app.use(cors()); // Enable CORS for cross-origin requests (e.g., from frontend)
+app.use(cors({
+  origin: [
+    'http://localhost:3000', // Local development
+    'https://mtcr.vercel.app/' // Production frontend
+  ],
+  credentials: true
+})); // Enable CORS for cross-origin requests (e.g., from frontend)
 app.use(express.json()); // Enable body parser for JSON requests
 
 // --- Basic Route ---
