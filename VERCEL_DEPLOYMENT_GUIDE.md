@@ -21,12 +21,19 @@ This guide explains how to deploy your MotoCare project (frontend + backend) to 
 #### C. Set Environment Variables in Vercel
 In your Vercel project settings, add these environment variables:
 
-```
-MONGO_URI=mongodb+srv://motocare:motocarep@motocare.ltnksjw.mongodb.net/?retryWrites=true&w=majority&appName=motocare
-JWT_SECRET=mySuperSecretKey123
-SENDGRID_API_KEY=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
-PORT=5000
-```
+**Key-Value pairs to add:**
+
+| Key | Value |
+|-----|-------|
+| `MONGO_URI` | `mongodb+srv://motocare:motocarep@motocare.ltnksjw.mongodb.net/?retryWrites=true&w=majority&appName=motocare` |
+| `JWT_SECRET` | `mySuperSecretKey123` |
+| `SENDGRID_API_KEY` | `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` |
+| `PORT` | `5000` |
+
+**Important Notes:**
+- ⚠️ Do NOT use the `@secret-name` syntax - just paste the actual values directly
+- ⚠️ Make sure there are no extra spaces before or after the values
+- ✅ The environment variables are set in Vercel Dashboard, NOT in `vercel.json`
 
 ⚠️ **IMPORTANT**: Never commit your `.env` file to GitHub. Use Vercel's environment variables feature.
 
