@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../../config/api";
 
 const AdminJobView = () => {
   const [jobs, setJobs] = useState([]);
@@ -10,7 +11,7 @@ const AdminJobView = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/jobs", {
+        const res = await axios.get(`${API_URL}/api/jobs`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setJobs(res.data);
@@ -26,7 +27,7 @@ const AdminJobView = () => {
   const updateStatus = async (id, newStatus) => {
     try {
       await axios.put(
-        `http://localhost:5000/api/jobs/${id}/status`,
+        `${API_URL}/api/jobs/${id}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

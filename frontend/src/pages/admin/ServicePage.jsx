@@ -8,6 +8,7 @@ import {
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import API_URL from "../../config/api";
 
 const vehicleTypes = ['Car', 'Van', 'SUV', 'Motorcycle', 'Three Wheel'];
 
@@ -31,7 +32,7 @@ const ServicesPage = () => {
     const fetchServices = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await axios.get('http://localhost:5000/api/services');
+            const res = await axios.get(`${API_URL}/api/services`);
             setServices(res.data);
         } catch (err) {
             setError('Failed to fetch services.');
@@ -87,9 +88,9 @@ const ServicesPage = () => {
         };
         try {
             if (isEditing) {
-                await axios.put(`http://localhost:5000/api/services/${currentServiceId}`, serviceData);
+                await axios.put(`${API_URL}/api/services/${currentServiceId}`, serviceData);
             } else {
-                await axios.post('http://localhost:5000/api/services', serviceData);
+                await axios.post(`${API_URL}/api/services`, serviceData);
             }
             fetchServices();
             handleClose();
@@ -101,7 +102,7 @@ const ServicesPage = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this service?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/services/${id}`);
+                await axios.delete(`${API_URL}/api/services/${id}`);
                 fetchServices();
             } catch (err) {
                 setError('Failed to delete service.');

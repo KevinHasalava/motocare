@@ -9,6 +9,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../config/api";
 
 // ඔබගේ project එකේ components වලට අදාළ නිවැරදි path යොදන්න
 import { theme } from "../utils/theme";
@@ -62,11 +63,11 @@ const MyBookingsPage = () => {
         try {
             // Fetch all data concurrently
             const [bookingsRes, jobsRes, mechanicsRes, servicesRes, vehiclesRes] = await Promise.all([
-                axios.get(`http://localhost:5000/api/bookings/user/${user._id}`),
-                axios.get("http://localhost:5000/api/jobs"),
-                axios.get("http://localhost:5000/api/users"),
-                axios.get("http://localhost:5000/api/services"),
-                axios.get(`http://localhost:5000/api/bookings/vehicles/${user._id}`)
+                axios.get(`${API_URL}/api/bookings/user/${user._id}`),
+                axios.get(`${API_URL}/api/jobs`),
+                axios.get(`${API_URL}/api/users`),
+                axios.get(`${API_URL}/api/services`),
+                axios.get(`${API_URL}/api/bookings/vehicles/${user._id}`)
             ]);
 
             setMyBookings(bookingsRes.data);
@@ -111,8 +112,8 @@ const MyBookingsPage = () => {
             alert("Something is missing. Please go back and check your selections.");
             return;
         }
-        try {
-            await axios.put(`http://localhost:5000/api/bookings/update-with-job/${selectedBooking._id}`, {
+        try{
+            await axios.put(`${API_URL}/api/bookings/update-with-job/${selectedBooking._id}`, {
                 // We send the new data from the edit state
                 vehicle: editVehicle._id,
                 service: editService._id,
@@ -130,7 +131,7 @@ const MyBookingsPage = () => {
     const handleCancelBooking = async (bookingId) => {
         if (window.confirm("Are you sure you want to cancel this booking?")) {
             try {
-                await axios.delete(`http://localhost:5000/api/bookings/delete-with-job/${bookingId}`);
+                await axios.delete(`${API_URL}/api/bookings/delete-with-job/${bookingId}`);
                 fetchData();
             } catch (err) {
                 alert("Failed to cancel booking: " + (err.response?.data?.message || err.message));

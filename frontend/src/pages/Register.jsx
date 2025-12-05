@@ -7,11 +7,8 @@ import { theme, backgroundKeyframes, gradientText, mockData } from '../utils/the
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import handleBookServiceClick from '../pages/VehiclePage';
-    
-
-
-
 import axios from "axios";
+import API_URL from "../config/api";
 
 
 const Register = () => {
@@ -39,7 +36,7 @@ const Register = () => {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/users/register", {
+      await axios.post(`${API_URL}/api/users/register`, {
         name: form.name,
         email: form.email,
         password: form.password,

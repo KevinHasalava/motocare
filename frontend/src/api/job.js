@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Set the base URL for the Job API routes
-const API_URL = 'http://localhost:5000/api/jobs'; 
+const API_URL = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/jobs`; 
 
 /**
  * 1. Create a Walk-In Job (Manual Job)

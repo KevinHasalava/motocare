@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/data'; // Base URL for the new data routes
+const API_URL = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/data`; // Base URL for the new data routes
 
 /**
  * Fetches all available services.

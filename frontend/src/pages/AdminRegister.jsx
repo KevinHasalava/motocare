@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { TextField, Button, Box, Typography, Container, MenuItem, Alert } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../config/api";
 
 const AdminRegister = () => {
   const [form, setForm] = useState({
@@ -28,7 +29,7 @@ const AdminRegister = () => {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/users/register", {
+      await axios.post(`${API_URL}/api/users/register`, {
         name: form.name,
         email: form.email,
         password: form.password,
