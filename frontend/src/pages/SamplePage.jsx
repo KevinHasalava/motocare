@@ -14,7 +14,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { theme, backgroundKeyframes, mockData } from "../utils/theme";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import handleBookServiceClick from "../pages/VehiclePage"; // if needed, can modify
 
 const SamplePage = () => {
   return (
@@ -35,7 +34,7 @@ const SamplePage = () => {
           {/* 🟢 Header (always at top) */}
           <Header
             navItems={mockData.navItems}
-            onBookNowClick={handleBookServiceClick}
+            onBookNowClick={() => window.location.href = '/booking'}
             theme={theme}
           />
 

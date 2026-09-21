@@ -1,12 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Container, Typography, GlobalStyles, CssBaseline, ThemeProvider, Alert , Button, TextField} from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { theme, backgroundKeyframes, gradientText, mockData } from '../utils/theme';
+import { theme, backgroundKeyframes, mockData } from '../utils/theme';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import handleBookServiceClick from '../pages/VehiclePage';
 import { validatePhoneNumber, handlePhoneInput } from '../utils/validationUtils';
 
 import axios from "axios";
@@ -111,7 +110,7 @@ const Register = () => {
         }}>
           <Header
             navItems={mockData.navItems}
-            onBookNowClick={handleBookServiceClick}
+            onBookNowClick={() => navigate('/booking')}
             theme={theme}
           />
 

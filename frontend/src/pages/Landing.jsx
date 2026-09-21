@@ -86,7 +86,7 @@ const Landing = () => {
   });
 
   const handleBookServiceClick = () => {
-    console.log("Advanced booking system would be implemented here!");
+    window.location.href = '/booking';
   };
 
   return (

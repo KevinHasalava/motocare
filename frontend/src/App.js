@@ -80,9 +80,12 @@ export default function App() {
         {/* --- Public/Customer Routes --- */}
         <Route path="/home" element={<DefaultRoute />} />
         <Route path="/VehiclePage" element={<VehiclePage />} />
+        <Route path="/vehiclepage" element={<VehiclePage />} />
         <Route path="/services" element={<CustomerServicesPage />} />
         <Route path="/Login" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/Header" element={<Header />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/my-bookings" element={<MyBookings />} />

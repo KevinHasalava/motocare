@@ -21,10 +21,10 @@ import {
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-import StepVehicleSelect from "../components/booking/StepVehicleSelect";
-import StepServiceSelect from "../components/booking/StepServiceSelect";
-import StepDateTime from "../components/booking/StepDateTime";
-import StepConfirm from "../components/booking/StepConfirm";
+import StepVehicleSelect from "../components/Booking/StepVehicleSelect";
+import StepServiceSelect from "../components/Booking/StepServiceSelect";
+import StepDateTime from "../components/Booking/StepDateTime";
+import StepConfirm from "../components/Booking/StepConfirm";
 
 import { theme, backgroundKeyframes } from "../utils/theme";
 import Header from "../components/Header";
