@@ -252,54 +252,21 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
   return (
     <Fade in timeout={600}>
       <Box sx={{ maxWidth: 900, mx: 'auto', mb: 4, position: 'relative' }}>
-        {/* Floating Background Elements */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: -20,
-            left: -20,
-            width: 100,
-            height: 100,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            opacity: 0.1,
-            filter: 'blur(40px)',
-            animation: 'float 6s ease-in-out infinite',
-          }}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: -20,
-            right: -20,
-            width: 150,
-            height: 150,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-            opacity: 0.1,
-            filter: 'blur(40px)',
-            animation: 'float 6s ease-in-out infinite 2s',
-          }}
-        />
-
         <Card 
           sx={{ 
             borderRadius: '24px',
-            background: '#0a0e1a',
-            border: '1px solid',
-            borderColor: 'rgba(255, 255, 255, 0.05)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+            background: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            boxShadow: '0 8px 30px rgba(0, 0, 0, 0.06)',
             overflow: 'hidden',
             position: 'relative',
           }}
         >
-          {/* Animated Header Bar */}
+          {/* Brand Header Bar */}
           <Box
             sx={{
               height: 4,
-              background: 'linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c, #667eea)',
-              backgroundSize: '200% 100%',
-              animation: 'gradient 4s linear infinite',
+              background: '#D32F2F',
             }}
           />
 
@@ -307,70 +274,47 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
             {/* Header Section */}
             <Box
               sx={{
-                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                background: '#F8F9FB',
+                borderBottom: '1px solid #E5E7EB',
                 p: 4,
               }}
             >
               <Stack direction="row" alignItems="center" spacing={3}>
                 <Box
                   sx={{
-                    position: 'relative',
-                    width: 80,
-                    height: 80,
+                    width: 60,
+                    height: 60,
+                    borderRadius: '16px',
+                    background: '#D32F2F',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    boxShadow: '0 6px 18px rgba(211, 47, 47, 0.3)',
+                    flexShrink: 0,
                   }}
                 >
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      inset: 0,
-                      borderRadius: '20px',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      opacity: 0.2,
-                      animation: 'pulse 3s ease-in-out infinite',
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: '16px',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      position: 'relative',
-                      zIndex: 1,
-                    }}
-                  >
-                    {editingVehicle ? 
-                      <EditIcon sx={{ color: 'white', fontSize: 32 }} /> : 
-                      <AddIcon sx={{ color: 'white', fontSize: 32 }} />
-                    }
-                  </Box>
+                  {editingVehicle ? 
+                    <EditIcon sx={{ color: 'white', fontSize: 32 }} /> : 
+                    <AddIcon sx={{ color: 'white', fontSize: 32 }} />
+                  }
                 </Box>
 
                 <Box sx={{ flex: 1 }}>
-                  <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+                  <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
                     <Typography 
-                      variant="h3" 
+                      variant="h4" 
                       sx={{
+                        fontFamily: '"Outfit", sans-serif',
                         fontWeight: 800,
-                        fontSize: '2rem',
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
+                        fontSize: '1.75rem',
+                        color: '#111827',
                       }}
                     >
                       {editingVehicle ? 'Edit Vehicle' : 'Add Vehicle'}
                     </Typography>
-                    <SparkleIcon sx={{ color: '#fbbf24', fontSize: 24 }} />
+                    <SparkleIcon sx={{ color: '#D32F2F', fontSize: 22 }} />
                   </Stack>
-                  <Typography sx={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.95rem' }}>
+                  <Typography sx={{ color: '#6B7280', fontSize: '0.95rem' }}>
                     {editingVehicle ? 
                       'Modify your vehicle details below' : 
                       'Fill in the details to register your vehicle'
@@ -382,7 +326,7 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                   <Chip
                     label="EDIT MODE"
                     sx={{
-                      background: 'linear-gradient(135deg, #10b981 0%, #3b82f6 100%)',
+                      background: '#D32F2F',
                       color: 'white',
                       fontWeight: 700,
                       letterSpacing: 1,
@@ -399,7 +343,7 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                 {/* Vehicle Type Selection - Visual Cards */}
                 {!editingVehicle && (
                   <Box sx={{ mb: 4 }}>
-                    <Typography sx={{ color: 'rgba(255, 255, 255, 0.9)', mb: 2, fontWeight: 600 }}>
+                    <Typography sx={{ color: '#111827', mb: 2, fontWeight: 700 }}>
                       Select Vehicle Type *
                     </Typography>
                     <Grid container spacing={2}>
@@ -421,23 +365,23 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                                 ? '#f44336' 
                                 : formData.type === type.value 
                                   ? type.color 
-                                  : 'rgba(255, 255, 255, 0.1)',
+                                  : '#E5E7EB',
                               background: formData.type === type.value 
-                                ? alpha(type.color, 0.1) 
-                                : 'rgba(255, 255, 255, 0.02)',
+                                ? alpha(type.color, 0.08) 
+                                : '#F8F9FB',
                               cursor: 'pointer',
-                              transition: 'all 0.3s ease',
+                              transition: 'all 0.25s ease',
                               textAlign: 'center',
                               '&:hover': {
                                 borderColor: type.color,
                                 background: alpha(type.color, 0.05),
-                                transform: 'translateY(-4px)',
+                                transform: 'translateY(-2px)',
                               }
                             }}
                           >
                             <Typography sx={{ fontSize: 32, mb: 1 }}>{type.icon}</Typography>
                             <Typography sx={{ 
-                              color: formData.type === type.value ? type.color : 'rgba(255, 255, 255, 0.7)',
+                              color: formData.type === type.value ? type.color : '#374151',
                               fontSize: '0.875rem',
                               fontWeight: 600
                             }}>
@@ -500,30 +444,20 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                         InputProps={{ 
                           startAdornment: (
                             <InputAdornment position="start">
-                              <VehicleNumberIcon sx={{ color: '#667eea' }} />
+                              <VehicleNumberIcon sx={{ color: '#D32F2F' }} />
                             </InputAdornment>
                           )
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             borderRadius: '12px',
-                            background: 'rgba(255, 255, 255, 0.02)',
-                            '& fieldset': {
-                              borderColor: 'rgba(255, 255, 255, 0.1)',
-                            },
-                            '&:hover fieldset': {
-                              borderColor: 'rgba(255, 255, 255, 0.2)',
-                            },
-                            '&.Mui-focused fieldset': {
-                              borderColor: '#667eea',
-                            }
+                            background: '#FFFFFF',
+                            '& fieldset': { borderColor: '#E5E7EB' },
+                            '&:hover fieldset': { borderColor: '#D1D5DB' },
+                            '&.Mui-focused fieldset': { borderColor: '#D32F2F' }
                           },
-                          '& .MuiInputLabel-root': {
-                            color: 'rgba(255, 255, 255, 0.5)',
-                          },
-                          '& .MuiOutlinedInput-input': {
-                            color: 'rgba(255, 255, 255, 0.9)',
-                          }
+                          '& .MuiInputLabel-root': { color: '#6B7280' },
+                          '& .MuiOutlinedInput-input': { color: '#111827' }
                         }}
                       />
                     </Box>
@@ -545,30 +479,20 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                         InputProps={{ 
                           startAdornment: (
                             <InputAdornment position="start">
-                              <TypeIcon sx={{ color: '#764ba2' }} />
+                              <TypeIcon sx={{ color: '#D32F2F' }} />
                             </InputAdornment>
                           )
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             borderRadius: '12px',
-                            background: 'rgba(255, 255, 255, 0.02)',
-                            '& fieldset': {
-                              borderColor: 'rgba(255, 255, 255, 0.1)',
-                            },
-                            '&:hover fieldset': {
-                              borderColor: 'rgba(255, 255, 255, 0.2)',
-                            },
-                            '&.Mui-focused fieldset': {
-                              borderColor: '#764ba2',
-                            }
+                            background: '#FFFFFF',
+                            '& fieldset': { borderColor: '#E5E7EB' },
+                            '&:hover fieldset': { borderColor: '#D1D5DB' },
+                            '&.Mui-focused fieldset': { borderColor: '#D32F2F' }
                           },
-                          '& .MuiInputLabel-root': {
-                            color: 'rgba(255, 255, 255, 0.5)',
-                          },
-                          '& .MuiOutlinedInput-input': {
-                            color: 'rgba(255, 255, 255, 0.9)',
-                          }
+                          '& .MuiInputLabel-root': { color: '#6B7280' },
+                          '& .MuiOutlinedInput-input': { color: '#111827' }
                         }}
                       >
                         {vehicleTypes.map(type => (
@@ -584,23 +508,7 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                     <Box
                       onMouseEnter={() => setHoveredField('brand')}
                       onMouseLeave={() => setHoveredField(null)}
-                      sx={{
-                        position: 'relative',
-                        '&::before': {
-                          content: '""',
-                          position: 'absolute',
-                          inset: -2,
-                          borderRadius: '12px',
-                          padding: '2px',
-                          background: hoveredField === 'brand' 
-                            ? 'linear-gradient(135deg, #f093fb, #f5576c)'
-                            : 'transparent',
-                          mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                          maskComposite: 'exclude',
-                          opacity: 0.5,
-                          transition: 'all 0.3s ease',
-                        }
-                      }}
+                      sx={{ position: 'relative' }}
                     >
                       <TextField
                         name="brand"
@@ -615,30 +523,20 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                         InputProps={{ 
                           startAdornment: (
                             <InputAdornment position="start">
-                              <BrandIcon sx={{ color: '#f093fb' }} />
+                              <BrandIcon sx={{ color: '#D32F2F' }} />
                             </InputAdornment>
                           )
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             borderRadius: '12px',
-                            background: 'rgba(255, 255, 255, 0.02)',
-                            '& fieldset': {
-                              borderColor: 'rgba(255, 255, 255, 0.1)',
-                            },
-                            '&:hover fieldset': {
-                              borderColor: 'rgba(255, 255, 255, 0.2)',
-                            },
-                            '&.Mui-focused fieldset': {
-                              borderColor: '#f093fb',
-                            }
+                            background: '#FFFFFF',
+                            '& fieldset': { borderColor: '#E5E7EB' },
+                            '&:hover fieldset': { borderColor: '#D1D5DB' },
+                            '&.Mui-focused fieldset': { borderColor: '#D32F2F' }
                           },
-                          '& .MuiInputLabel-root': {
-                            color: 'rgba(255, 255, 255, 0.5)',
-                          },
-                          '& .MuiOutlinedInput-input': {
-                            color: 'rgba(255, 255, 255, 0.9)',
-                          }
+                          '& .MuiInputLabel-root': { color: '#6B7280' },
+                          '& .MuiOutlinedInput-input': { color: '#111827' }
                         }}
                       />
                     </Box>
@@ -658,30 +556,20 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                       InputProps={{ 
                         startAdornment: (
                           <InputAdornment position="start">
-                            <ModelIcon sx={{ color: '#f5576c' }} />
+                            <ModelIcon sx={{ color: '#D32F2F' }} />
                           </InputAdornment>
                         )
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
                           borderRadius: '12px',
-                          background: 'rgba(255, 255, 255, 0.02)',
-                          '& fieldset': {
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
-                          },
-                          '&:hover fieldset': {
-                            borderColor: 'rgba(255, 255, 255, 0.2)',
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: '#f5576c',
-                          }
+                          background: '#FFFFFF',
+                          '& fieldset': { borderColor: '#E5E7EB' },
+                          '&:hover fieldset': { borderColor: '#D1D5DB' },
+                          '&.Mui-focused fieldset': { borderColor: '#D32F2F' }
                         },
-                        '& .MuiInputLabel-root': {
-                          color: 'rgba(255, 255, 255, 0.5)',
-                        },
-                        '& .MuiOutlinedInput-input': {
-                          color: 'rgba(255, 255, 255, 0.9)',
-                        }
+                        '& .MuiInputLabel-root': { color: '#6B7280' },
+                        '& .MuiOutlinedInput-input': { color: '#111827' }
                       }}
                     />
                   </Grid>
@@ -705,30 +593,20 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                             ...params.InputProps,
                             startAdornment: (
                               <InputAdornment position="start">
-                                <YearIcon sx={{ color: '#fbbf24' }} />
+                                <YearIcon sx={{ color: '#D32F2F' }} />
                               </InputAdornment>
                             ),
                           }}
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               borderRadius: '12px',
-                              background: 'rgba(255, 255, 255, 0.02)',
-                              '& fieldset': {
-                                borderColor: 'rgba(255, 255, 255, 0.1)',
-                              },
-                              '&:hover fieldset': {
-                                borderColor: 'rgba(255, 255, 255, 0.2)',
-                              },
-                              '&.Mui-focused fieldset': {
-                                borderColor: '#fbbf24',
-                              }
+                              background: '#FFFFFF',
+                              '& fieldset': { borderColor: '#E5E7EB' },
+                              '&:hover fieldset': { borderColor: '#D1D5DB' },
+                              '&.Mui-focused fieldset': { borderColor: '#D32F2F' }
                             },
-                            '& .MuiInputLabel-root': {
-                              color: 'rgba(255, 255, 255, 0.5)',
-                            },
-                            '& .MuiOutlinedInput-input': {
-                              color: 'rgba(255, 255, 255, 0.9)',
-                            }
+                            '& .MuiInputLabel-root': { color: '#6B7280' },
+                            '& .MuiOutlinedInput-input': { color: '#111827' }
                           }}
                         />
                       )}
@@ -746,23 +624,24 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                     disabled={loading}
                     startIcon={editingVehicle ? <SaveIcon /> : <AddIcon />}
                     sx={{ 
-                      py: 2,
+                      py: 1.8,
                       px: 4,
                       borderRadius: '12px',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      background: '#D32F2F',
                       fontSize: '1rem',
                       fontWeight: 700,
                       textTransform: 'none',
                       letterSpacing: 0.5,
-                      boxShadow: '0 10px 30px rgba(102, 126, 234, 0.3)',
+                      boxShadow: '0 4px 14px rgba(211, 47, 47, 0.35)',
                       transition: 'all 0.3s ease',
                       '&:hover': {
+                        background: '#B71C1C',
                         transform: 'translateY(-2px)',
-                        boxShadow: '0 15px 40px rgba(102, 126, 234, 0.4)',
+                        boxShadow: '0 8px 20px rgba(211, 47, 47, 0.45)',
                       },
                       '&:disabled': {
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        color: 'rgba(255, 255, 255, 0.5)',
+                        background: '#F3F4F6',
+                        color: '#9CA3AF',
                       }
                     }}
                   >
@@ -778,18 +657,18 @@ const VehicleForm = ({ onVehicleAdded, editingVehicle, onUpdateComplete, theme }
                       size="large"
                       startIcon={<CancelIcon />}
                       sx={{ 
-                        py: 2,
+                        py: 1.8,
                         px: 4,
                         borderRadius: '12px',
-                        borderColor: 'rgba(239, 68, 68, 0.5)',
-                        color: '#ef4444',
+                        borderColor: '#E5E7EB',
+                        color: '#374151',
                         fontSize: '1rem',
                         fontWeight: 700,
                         textTransform: 'none',
                         letterSpacing: 0.5,
                         '&:hover': {
-                          borderColor: '#ef4444',
-                          background: 'rgba(239, 68, 68, 0.1)',
+                          borderColor: '#D1D5DB',
+                          background: '#F9FAFB',
                           transform: 'translateY(-2px)',
                         }
                       }}

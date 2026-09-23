@@ -1,166 +1,229 @@
-// frontend/src/components/FeaturesSection.jsx
-import React from 'react';
+// frontend/src/components/Landing_Page/FeaturesSection.jsx — Light Premium Theme
+import React, { useState, useEffect, useRef } from 'react';
 import {
-  Box, Container, Typography, Grid, Paper, Fade
+  Box, Container, Grid, Typography, Stack
 } from '@mui/material';
-import { gradientText } from '../../utils/theme';
+import {
+  Event as CalendarIcon,
+  AccessTime as ClockIcon,
+  History as HistoryIcon,
+  Build as WrenchIcon,
+  Engineering as EngineeringIcon,
+} from '@mui/icons-material';
 
-const FeaturesSection = ({ isVisible, features, theme }) => (
-  <Box component="section" id="features" sx={{ py: 12 }}>
-    <Container maxWidth="lg">
-      <Box sx={{ textAlign: 'center', mb: 10 }}>
-        <Typography 
-          variant="h2" 
-          component="h2" 
-          sx={{ mb: 2, fontSize: { xs: '2.5rem', md: '3.75rem' } }}
+function useScrollReveal(options = {}) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0.12, ...options }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return [ref, visible];
+}
+
+const FEATURES = [
+  {
+    icon: <CalendarIcon sx={{ fontSize: 28, color: '#D32F2F' }} />,
+    iconBg: '#FFEBEE',
+    title: 'Smart Scheduling',
+    description: 'AI-powered booking system that finds the perfect slot for your vehicle service needs.',
+  },
+  {
+    icon: <ClockIcon sx={{ fontSize: 28, color: '#2563EB' }} />,
+    iconBg: '#EFF6FF',
+    title: 'Real-time Updates',
+    description: 'Live notifications and progress tracking throughout your entire service journey.',
+  },
+  {
+    icon: <HistoryIcon sx={{ fontSize: 28, color: '#059669' }} />,
+    iconBg: '#ECFDF5',
+    title: 'Digital Records',
+    description: 'Complete service history digitally accessible anytime, anywhere on any device.',
+  },
+  {
+    icon: <WrenchIcon sx={{ fontSize: 28, color: '#7C3AED' }} />,
+    iconBg: '#F5F3FF',
+    title: 'Smart Diagnostics',
+    description: 'Advanced diagnostic tools ensure accurate issue detection and efficient repairs.',
+  },
+  {
+    icon: <EngineeringIcon sx={{ fontSize: 28, color: '#D97706' }} />,
+    iconBg: '#FFFBEB',
+    title: 'Live Queue Update',
+    description: 'Real-time queue tracking so you always know exactly where your vehicle stands.',
+  },
+];
+
+const FeaturesSection = ({ features, theme }) => {
+  const [sectionRef, sectionVisible] = useScrollReveal({ threshold: 0.1 });
+
+  return (
+    <Box
+      id="features"
+      component="section"
+      sx={{
+        py: { xs: 10, md: 14 },
+        background: '#F8F9FB',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Subtle background pattern */}
+      <Box sx={{
+        position: 'absolute', inset: 0,
+        backgroundImage: `radial-gradient(circle at 1px 1px, #E5E7EB 1px, transparent 0)`,
+        backgroundSize: '32px 32px',
+        opacity: 0.5,
+      }} />
+
+      <Container maxWidth="lg" sx={{ position: 'relative' }}>
+        {/* Section Header */}
+        <Box
+          ref={sectionRef}
+          sx={{
+            textAlign: 'center',
+            mb: { xs: 6, md: 8 },
+            opacity: sectionVisible ? 1 : 0,
+            transform: sectionVisible ? 'translateY(0)' : 'translateY(28px)',
+            transition: 'opacity 0.6s ease, transform 0.6s ease',
+          }}
         >
-          Powerful <Box component="span" sx={gradientText}>Features</Box>
-        </Typography>
-        <Typography 
-          variant="h6" 
-          color="text.secondary" 
-          sx={{ maxWidth: '600px', mx: 'auto' }}
-        >
-          Advanced technology meets exceptional service quality
-        </Typography>
-      </Box>
-      
-      {/* Option 1: 2x2 Grid Layout (Recommended for 4 items) */}
-      {/* <Grid 
-        container 
-        spacing={4} 
-        sx={{ 
-          maxWidth: '900px', 
-          mx: 'auto',
-          justifyContent: 'center'
-        }}
-      >
-        {features.map((feature, index) => (
-          <Grid 
-            item 
-            xs={12} 
-            sm={6} 
-            md={6}
-            key={feature.title}
+          <Typography
             sx={{
-              display: 'flex',
-              justifyContent: 'center'
+              display: 'inline-block',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: '#D32F2F',
+              fontFamily: '"Inter", sans-serif',
+              mb: 2,
+              background: '#FFEBEE',
+              px: 2, py: 0.75,
+              borderRadius: '100px',
+              border: '1px solid rgba(211,47,47,0.2)',
             }}
           >
-            <Fade in={isVisible} timeout={1000} style={{ transitionDelay: `${index * 150}ms` }}>
-              <Paper
-                elevation={4}
-                sx={{
-                  p: 4, 
-                  height: '100%',
-                  width: '100%',
-                  maxWidth: '400px', // Constrain maximum width
-                  border: '1px solid', 
-                  borderColor: 'rgba(51, 65, 85, 0.5)',
-                  backdropFilter: 'blur(10px)', 
-                  transition: 'all 0.3s ease',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  '&:hover': {
-                    transform: 'translateY(-8px)', 
-                    borderColor: 'primary.main',
-                    boxShadow: `0 10px 20px ${theme.palette.primary.dark}33`,
-                  }
-                }}
-              >
-                <Box sx={{
-                  p: 1.5, 
-                  borderRadius: 3, 
-                  mb: 3, 
-                  display: 'inline-block',
-                  background: feature.gradient, 
-                  transition: 'transform 0.3s ease',
-                  '&:hover': { transform: 'scale(1.1)' }
-                }}>
-                  {feature.icon}
-                </Box>
-                <Typography variant="h5" component="h3" sx={{ mb: 2 }}>
-                  {feature.title}
-                </Typography>
-                <Typography color="text.secondary" sx={{ flexGrow: 1 }}>
-                  {feature.description}
-                </Typography>
-              </Paper>
-            </Fade>
-          </Grid>
-        ))}
-      </Grid> */}
+            Why Choose Us
+          </Typography>
+          <Typography
+            variant="h2"
+            component="h2"
+            sx={{
+              fontSize: { xs: '2rem', md: '2.8rem' },
+              color: '#111827',
+              mb: 2,
+            }}
+          >
+            Everything You Need,{' '}
+            <Box component="span" sx={{ color: '#D32F2F' }}>One Platform</Box>
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              maxWidth: 560,
+              mx: 'auto',
+              color: '#6B7280',
+              fontSize: '1.05rem',
+              lineHeight: 1.8,
+            }}
+          >
+            Our integrated platform combines cutting-edge technology with premium automotive expertise.
+          </Typography>
+        </Box>
 
-      {/* Alternative Option 2: Single Row with Better Spacing  */}
-      <Box sx={{ maxWidth: '1200px', mx: 'auto' }}>
-        <Grid 
-          container 
-          spacing={3}
-          sx={{ justifyContent: 'center' }}
-        >
-          {features.map((feature, index) => (
-            <Grid 
-              item 
-              xs={12} 
-              sm={6} 
-              md={3}
+        {/* Feature Cards */}
+        <Grid container spacing={{ xs: 2.5, md: 3 }}>
+          {FEATURES.map((feature, i) => (
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={i < 3 ? 4 : 6}
               key={feature.title}
               sx={{
-                display: 'flex',
-                justifyContent: 'center'
+                opacity: sectionVisible ? 1 : 0,
+                transform: sectionVisible ? 'translateY(0)' : 'translateY(32px)',
+                transition: `opacity 0.55s ease ${0.1 + i * 0.08}s, transform 0.55s ease ${0.1 + i * 0.08}s`,
+                ...(i === 3 && { ml: { md: 'calc(16.666%)' } }),
               }}
             >
-              <Fade in={isVisible} timeout={1000} style={{ transitionDelay: `${index * 150}ms` }}>
-                <Paper
-                  elevation={4}
+              <Box
+                sx={{
+                  height: '100%',
+                  p: { xs: 3, md: 3.5 },
+                  borderRadius: '18px',
+                  background: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+                  transition: 'all 0.25s ease',
+                  '&:hover': {
+                    transform: 'translateY(-6px)',
+                    boxShadow: '0 16px 40px rgba(0,0,0,0.1)',
+                    borderColor: 'rgba(211,47,47,0.3)',
+                  },
+                }}
+              >
+                {/* Icon box */}
+                <Box
                   sx={{
-                    p: 3, 
-                    height: '100%',
-                    width: '100%',
-                    maxWidth: '280px',
-                    border: '1px solid', 
-                    borderColor: 'rgba(51, 65, 85, 0.5)',
-                    backdropFilter: 'blur(10px)', 
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    textAlign: 'center',
-                    '&:hover': {
-                      transform: 'translateY(-8px)', 
-                      borderColor: 'primary.main',
-                      boxShadow: `0 10px 20px ${theme.palette.primary.dark}33`,
-                    }
+                    width: 56, height: 56,
+                    borderRadius: '14px',
+                    background: feature.iconBg,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    mb: 2.5,
                   }}
                 >
-                  <Box sx={{
-                    p: 1.5, 
-                    borderRadius: 3, 
-                    mb: 2, 
-                    display: 'inline-block',
-                    background: feature.gradient, 
-                    transition: 'transform 0.3s ease',
-                    '&:hover': { transform: 'scale(1.1)' }
-                  }}>
-                    {feature.icon}
-                  </Box>
-                  <Typography variant="h6" component="h3" sx={{ mb: 2, fontSize: '1.1rem' }}>
-                    {feature.title}
-                  </Typography>
-                  <Typography color="text.secondary" sx={{ fontSize: '0.9rem', flexGrow: 1 }}>
-                    {feature.description}
-                  </Typography>
-                </Paper>
-              </Fade>
+                  {feature.icon}
+                </Box>
+
+                {/* Title */}
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontFamily: '"Outfit", sans-serif',
+                    fontWeight: 700,
+                    color: '#111827',
+                    mb: 1.5,
+                    fontSize: '1.1rem',
+                  }}
+                >
+                  {feature.title}
+                </Typography>
+
+                {/* Description — use feature data if passed, else fallback */}
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#6B7280',
+                    lineHeight: 1.75,
+                    fontSize: '0.92rem',
+                  }}
+                >
+                  {(features && features[i]?.description) || feature.description}
+                </Typography>
+
+                {/* Bottom accent line */}
+                <Box sx={{
+                  mt: 3, height: 2, width: 40,
+                  background: feature.iconBg === '#FFEBEE' ? '#D32F2F' : feature.iconBg.replace('FF', 'D3').slice(0, 7),
+                  borderRadius: 1,
+                  transition: 'width 0.25s ease',
+                  '.MuiBox-root:hover &': { width: '60%' },
+                }} />
+              </Box>
             </Grid>
           ))}
         </Grid>
-      </Box>
-     
-    </Container>
-  </Box>
-);
+      </Container>
+    </Box>
+  );
+};
 
 export default FeaturesSection;

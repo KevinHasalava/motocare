@@ -1,13 +1,199 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ============================================================
+   Moto-Care — Light Premium Design System
+   Global CSS tokens, typography, and animations
+   ============================================================ */
+
+/* ── Google Fonts ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── CSS Design Tokens ────────────────────────────────────── */
+:root {
+  /* Backgrounds */
+  --mc-white:        #FFFFFF;
+  --mc-bg-light:     #F8F9FB;
+  --mc-bg-card:      #FFFFFF;
+  --mc-bg-alt:       #F3F4F6;
+
+  /* Brand Colors */
+  --mc-red:          #D32F2F;
+  --mc-red-bright:   #EF4444;
+  --mc-red-dark:     #B71C1C;
+  --mc-red-light:    #FFEBEE;
+  --mc-red-tint:     #FFF5F5;
+
+  /* Text */
+  --mc-charcoal:     #111827;
+  --mc-text-dark:    #1F2937;
+  --mc-text-body:    #374151;
+  --mc-text-muted:   #6B7280;
+  --mc-text-light:   #9CA3AF;
+
+  /* Borders & Shadows */
+  --mc-border:       #E5E7EB;
+  --mc-border-light: #F3F4F6;
+  --mc-shadow-sm:    0 1px 4px rgba(0,0,0,0.06);
+  --mc-shadow:       0 4px 20px rgba(0,0,0,0.08);
+  --mc-shadow-lg:    0 12px 40px rgba(0,0,0,0.12);
+  --mc-shadow-red:   0 8px 24px rgba(211,47,47,0.25);
+
+  /* Spacing scale */
+  --mc-radius-sm:    8px;
+  --mc-radius:       14px;
+  --mc-radius-lg:    22px;
+  --mc-radius-xl:    32px;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* ── Base Reset ───────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--mc-white);
+  color: var(--mc-text-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── Premium Scrollbar ────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--mc-bg-light);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--mc-red), var(--mc-red-dark));
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mc-red-dark);
+}
+
+/* ── Loading Screen ───────────────────────────────────────── */
+#mc-loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--mc-white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  opacity: 1;
+}
+
+#mc-loading-screen.mc-loaded {
+  opacity: 0;
+  transform: scale(1.02);
+  pointer-events: none;
+}
+
+/* ── Keyframe Animations ──────────────────────────────────── */
+@keyframes mc-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes mc-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.97); }
+  50%       { opacity: 1;   transform: scale(1.03); }
+}
+
+@keyframes mc-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@keyframes mc-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes mc-reveal {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes mc-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes mc-loader-progress {
+  0%   { width: 0%; }
+  60%  { width: 75%; }
+  100% { width: 100%; }
+}
+
+@keyframes mc-slide-right {
+  from { transform: translateX(-20px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+@keyframes mc-scale-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+/* ── Scroll-Reveal Utility ────────────────────────────────── */
+.mc-reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mc-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Premium Button Utility ───────────────────────────────── */
+.mc-btn-red {
+  background: var(--mc-red);
+  color: #fff;
+  border: none;
+  border-radius: var(--mc-radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--mc-shadow-red);
+}
+.mc-btn-red:hover {
+  background: var(--mc-red-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(211,47,47,0.35);
+}
+
+/* ── Card Utility ─────────────────────────────────────────── */
+.mc-card {
+  background: var(--mc-bg-card);
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius);
+  box-shadow: var(--mc-shadow);
+  transition: box-shadow 0.22s ease, transform 0.22s ease;
+}
+.mc-card:hover {
+  box-shadow: var(--mc-shadow-lg);
+  transform: translateY(-4px);
+}
+
+/* ── Section Spacing Utilities ────────────────────────────── */
+.mc-section {
+  padding: 96px 0;
+}
+
+.mc-section-alt {
+  padding: 96px 0;
+  background: var(--mc-bg-light);
 }

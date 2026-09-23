@@ -61,7 +61,7 @@ const PageContainer = styled(Box)(({ theme }) => ({
 }));
 
 const HeaderSection = styled(Paper)(({ theme }) => ({
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: 'linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%)',
     color: 'white',
     padding: theme.spacing(4),
     marginBottom: theme.spacing(3),

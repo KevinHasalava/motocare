@@ -1,428 +1,331 @@
-// frontend/src/components/CtaSection.jsx
-import React from 'react';
+// frontend/src/components/Landing_Page/CtaSection.jsx — Light Premium Theme
+import React, { useState, useEffect, useRef } from 'react';
 import {
-  Box, Container, Paper, Typography, Button, Stack, Grid, alpha, Chip
+  Box, Container, Grid, Typography, Button, Stack
 } from '@mui/material';
-import { 
-  CalendarMonth as CalendarIcon, 
-  AutoAwesome as SparkleIcon,
-  Speed as SpeedIcon,
-  Engineering as EngineeringIcon,
-  DirectionsCar as CarIcon,
-  CheckCircle as CheckIcon,
+import {
+  CalendarMonth as CalendarIcon,
   ArrowForward as ArrowIcon,
-  LocalOffer as OfferIcon
+  CheckCircle as CheckIcon,
+  Phone as PhoneIcon,
 } from '@mui/icons-material';
 
-const CtaSection = ({ onBookNowClick, theme }) => {
+function useScrollReveal(options = {}) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0.12, ...options }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return [ref, visible];
+}
+
+const CtaSection = ({ theme }) => {
+  const [ctaRef, ctaVisible] = useScrollReveal({ threshold: 0.1 });
+
   const benefits = [
-    { icon: <SpeedIcon />, text: "24/7 Service" },
-    { icon: <EngineeringIcon />, text: "Expert Mechanics" },
-    { icon: <CheckIcon />, text: "Quality Guarantee" },
+    'Online booking in under 2 minutes',
+    'Real-time service progress tracking',
+    'Digital records always available',
+    'Expert certified mechanics',
   ];
 
   return (
-    <Box 
-      component="section" 
-      sx={{ 
-        py: { xs: 8, md: 12 },
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Animated Background Elements */}
+    <>
+      {/* ── About Section ────────────────────────────────────────── */}
       <Box
+        id="about"
+        component="section"
         sx={{
-          position: 'absolute',
-          top: -100,
-          left: -100,
-          width: 300,
-          height: 300,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(255, 107, 107, 0.1) 0%, transparent 70%)',
-          filter: 'blur(60px)',
-          animation: 'float 8s ease-in-out infinite',
+          py: { xs: 10, md: 14 },
+          background: '#F8F9FB',
+          position: 'relative',
+          overflow: 'hidden',
         }}
-      />
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: -100,
-          right: -100,
-          width: 400,
-          height: 400,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(78, 205, 196, 0.1) 0%, transparent 70%)',
-          filter: 'blur(60px)',
-          animation: 'float 8s ease-in-out infinite 2s',
-        }}
-      />
-
-      {/* Tire Track Pattern */}
-      <Box
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          opacity: 0.02,
-          background: `repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 20px,
-            rgba(255, 255, 255, 0.05) 20px,
-            rgba(255, 255, 255, 0.05) 21px
-          )`,
-        }}
-      />
-
-      <Container maxWidth="lg">
-        <Paper 
-          elevation={0}
-          sx={{
-            p: { xs: 4, md: 8 },
-            position: 'relative',
-            borderRadius: 4,
-            background: 'linear-gradient(135deg, #0B0E14 0%, #1A1F2B 100%)',
-            border: '1px solid',
-            borderColor: alpha('#FF6B6B', 0.2),
-            overflow: 'hidden',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '3px',
-              background: 'linear-gradient(90deg, #FF6B6B, #4ECDC4, #FFD43B, #748FFC)',
-              animation: 'shimmer 3s linear infinite',
-            },
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '200px',
-              height: '200px',
-              background: 'radial-gradient(circle, rgba(255, 107, 107, 0.1) 0%, transparent 70%)',
-              filter: 'blur(80px)',
-            }
-          }}
-        >
-          {/* Special Offer Badge */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
-            <Chip
-              icon={<OfferIcon />}
-              label="LIMITED TIME OFFER"
-              sx={{
-                background: 'linear-gradient(135deg, #FFD43B 0%, #FD7E14 100%)',
-                color: '#0B0E14',
-                fontWeight: 700,
-                fontSize: '0.85rem',
-                letterSpacing: 1,
-                px: 2,
-                py: 2.5,
-                '& .MuiChip-icon': {
-                  color: '#0B0E14',
-                },
-                animation: 'pulse 2s ease-in-out infinite',
-              }}
-            />
-          </Box>
-
-          {/* Main Content */}
-          <Stack spacing={4} alignItems="center">
-            {/* Icon */}
-            <Box
-              sx={{
-                width: 120,
-                height: 120,
-                borderRadius: '30%',
-                background: 'linear-gradient(135deg, #FF6B6B 0%, #C92A2A 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                boxShadow: '0 20px 40px rgba(255, 107, 107, 0.3)',
-                animation: 'engineRev 3s ease-in-out infinite',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  inset: -2,
-                  borderRadius: '30%',
-                  background: 'linear-gradient(135deg, #FF6B6B, #4ECDC4)',
-                  opacity: 0.5,
-                  animation: 'rotate 3s linear infinite',
-                  zIndex: -1,
-                  filter: 'blur(10px)',
-                }
-              }}
-            >
-              <CarIcon sx={{ fontSize: 60, color: 'white' }} />
-            </Box>
-
-            {/* Heading */}
-            <Typography 
-              variant="h2" 
-              component="h2" 
-              align="center"
-              sx={{ 
-                fontSize: { xs: '2.5rem', md: '3.5rem' },
-                fontWeight: 900,
-                letterSpacing: '-0.02em',
-                lineHeight: 1.2,
-                maxWidth: '800px',
-                background: 'linear-gradient(135deg, #FFFFFF 0%, #94A3B8 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                position: 'relative',
-              }}
-            >
-              Your Vehicle Deserves
-              <Box 
-                component="span" 
-                sx={{
-                  display: 'block',
-                  background: 'linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  position: 'relative',
-                }}
-              >
-                Premium Service
-                <SparkleIcon 
-                  sx={{ 
-                    position: 'absolute',
-                    top: -10,
-                    right: -30,
-                    color: '#FFD43B',
-                    fontSize: 30,
-                    animation: 'sparkle 2s ease-in-out infinite',
-                  }} 
+      >
+        <Container maxWidth="lg">
+          <Grid container spacing={{ xs: 4, md: 8 }} alignItems="center">
+            {/* Left: Image */}
+            <Grid item xs={12} md={6}>
+              <Box sx={{ position: 'relative' }}>
+                <Box
+                  component="img"
+                  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=80&auto=format&fit=crop"
+                  alt="Professional car service bay"
+                  sx={{
+                    width: '100%',
+                    height: { xs: 260, md: 400 },
+                    objectFit: 'cover',
+                    borderRadius: '20px',
+                    boxShadow: '0 16px 48px rgba(0,0,0,0.12)',
+                    display: 'block',
+                  }}
                 />
+                {/* Accent image */}
+                <Box
+                  component="img"
+                  src="https://images.unsplash.com/photo-1486006920555-c77dcf18193c?w=400&q=80&auto=format&fit=crop"
+                  alt="Modern garage interior"
+                  sx={{
+                    position: 'absolute',
+                    bottom: -24, right: -20,
+                    width: { xs: 120, md: 180 },
+                    height: { xs: 100, md: 140 },
+                    objectFit: 'cover',
+                    borderRadius: '14px',
+                    boxShadow: '0 12px 32px rgba(0,0,0,0.18)',
+                    border: '4px solid white',
+                    display: { xs: 'none', sm: 'block' },
+                  }}
+                />
+                {/* Red badge */}
+                <Box sx={{
+                  position: 'absolute', top: 20, left: -16,
+                  background: '#D32F2F',
+                  borderRadius: '14px',
+                  p: 2,
+                  boxShadow: '0 8px 24px rgba(211,47,47,0.35)',
+                  animation: 'mc-float 4s ease-in-out infinite',
+                }}>
+                  <Typography sx={{ fontWeight: 900, fontSize: '1.4rem', color: 'white', lineHeight: 1 }}>4.9★</Typography>
+                  <Typography sx={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.85)', fontWeight: 600 }}>Average Rating</Typography>
+                </Box>
               </Box>
-            </Typography>
-
-            {/* Description */}
-            <Typography 
-              variant="h6"
-              align="center"
-              sx={{ 
-                color: alpha('#fff', 0.6),
-                maxWidth: '600px',
-                fontSize: { xs: '1rem', md: '1.25rem' },
-                lineHeight: 1.6,
-              }}
-            >
-              Experience next-generation automotive care with cutting-edge diagnostics, 
-              expert technicians, and transparent pricing.
-            </Typography>
-
-            {/* Benefits */}
-            <Grid container spacing={3} sx={{ maxWidth: 600, mt: 2 }}>
-              {benefits.map((benefit, index) => (
-                <Grid item xs={12} sm={4} key={index}>
-                  <Stack 
-                    direction="row" 
-                    spacing={1.5} 
-                    alignItems="center"
-                    justifyContent="center"
-                    sx={{
-                      p: 2,
-                      borderRadius: 2,
-                      background: alpha('#fff', 0.03),
-                      border: '1px solid',
-                      borderColor: alpha('#4ECDC4', 0.2),
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        background: alpha('#4ECDC4', 0.1),
-                        borderColor: alpha('#4ECDC4', 0.4),
-                        transform: 'translateY(-2px)',
-                      }
-                    }}
-                  >
-                    <Box sx={{ color: '#4ECDC4' }}>
-                      {benefit.icon}
-                    </Box>
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        color: alpha('#fff', 0.9),
-                        fontWeight: 600,
-                      }}
-                    >
-                      {benefit.text}
-                    </Typography>
-                  </Stack>
-                </Grid>
-              ))}
             </Grid>
 
-            {/* CTA Buttons */}
-            <Stack 
-              direction={{ xs: 'column', sm: 'row' }} 
-              spacing={3} 
-              sx={{ mt: 4 }}
+            {/* Right: Content */}
+            <Grid item xs={12} md={6}>
+              <Typography
+                sx={{
+                  display: 'inline-block',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: '#D32F2F',
+                  fontFamily: '"Inter", sans-serif',
+                  mb: 2,
+                  background: '#FFEBEE',
+                  px: 2, py: 0.75,
+                  borderRadius: '100px',
+                  border: '1px solid rgba(211,47,47,0.2)',
+                }}
+              >
+                About Moto-Care
+              </Typography>
+              <Typography
+                variant="h2"
+                component="h2"
+                sx={{
+                  fontSize: { xs: '1.9rem', md: '2.5rem' },
+                  color: '#111827',
+                  mb: 2,
+                  mt: 1,
+                }}
+              >
+                Imaduwa's Most{' '}
+                <Box component="span" sx={{ color: '#D32F2F' }}>Trusted</Box>
+                {' '}Auto Service
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: '#6B7280',
+                  mb: 3,
+                  lineHeight: 1.85,
+                  fontSize: '1rem',
+                }}
+              >
+                With over 15 years of experience in the Galle District, Moto-Care has built a reputation
+                for precision, transparency, and world-class customer service. Our certified team uses
+                the latest diagnostic technology to keep your vehicle performing at its best.
+              </Typography>
+
+              {/* Benefits */}
+              <Stack spacing={1.5} sx={{ mb: 4 }}>
+                {benefits.map((item) => (
+                  <Stack key={item} direction="row" alignItems="center" spacing={1.5}>
+                    <Box sx={{
+                      width: 22, height: 22,
+                      borderRadius: '50%',
+                      background: '#FFEBEE',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      <CheckIcon sx={{ color: '#D32F2F', fontSize: 14 }} />
+                    </Box>
+                    <Typography sx={{ color: '#374151', fontWeight: 500, fontSize: '0.95rem' }}>
+                      {item}
+                    </Typography>
+                  </Stack>
+                ))}
+              </Stack>
+
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <Button
+                  variant="contained"
+                  href="/booking"
+                  startIcon={<CalendarIcon />}
+                  sx={{
+                    px: 3.5, py: 1.4,
+                    background: '#D32F2F',
+                    fontWeight: 700,
+                    borderRadius: '10px',
+                    boxShadow: '0 4px 16px rgba(211,47,47,0.28)',
+                    '&:hover': { background: '#B71C1C', transform: 'translateY(-2px)' },
+                  }}
+                >
+                  Book a Service
+                </Button>
+                <Button
+                  variant="outlined"
+                  href="tel:+94XXXXXXXXX"
+                  startIcon={<PhoneIcon />}
+                  sx={{
+                    px: 3.5, py: 1.4,
+                    borderColor: '#E5E7EB',
+                    color: '#374151',
+                    fontWeight: 600,
+                    borderRadius: '10px',
+                    '&:hover': { borderColor: '#D32F2F', color: '#D32F2F', background: '#FFF5F5' },
+                  }}
+                >
+                  Call Us Now
+                </Button>
+              </Stack>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* ── CTA Banner ───────────────────────────────────────────── */}
+      <Box
+        id="cta"
+        component="section"
+        ref={ctaRef}
+        sx={{
+          py: { xs: 8, md: 10 },
+          background: '#D32F2F',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Subtle pattern */}
+        <Box sx={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0)`,
+          backgroundSize: '28px 28px',
+        }} />
+        <Box sx={{
+          position: 'absolute', top: '-30%', right: '-10%',
+          width: 500, height: 500, borderRadius: '50%',
+          background: 'rgba(0,0,0,0.1)',
+          filter: 'blur(80px)',
+        }} />
+
+        <Container maxWidth="md" sx={{ position: 'relative', textAlign: 'center' }}>
+          <Box
+            sx={{
+              opacity: ctaVisible ? 1 : 0,
+              transform: ctaVisible ? 'translateY(0)' : 'translateY(28px)',
+              transition: 'opacity 0.6s ease, transform 0.6s ease',
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.8)',
+                fontFamily: '"Inter", sans-serif',
+                mb: 2,
+              }}
             >
+              Ready to Get Started?
+            </Typography>
+            <Typography
+              variant="h2"
+              component="h2"
+              sx={{
+                fontSize: { xs: '2rem', md: '3rem' },
+                color: 'white',
+                mb: 2,
+                fontWeight: 900,
+              }}
+            >
+              Your Vehicle Deserves the Best
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'rgba(255,255,255,0.85)',
+                mb: 5,
+                lineHeight: 1.8,
+                fontSize: '1.05rem',
+                maxWidth: 520,
+                mx: 'auto',
+              }}
+            >
+              Join 5,000+ satisfied customers who trust Moto-Care for all their vehicle service needs.
+              Book today and experience the difference.
+            </Typography>
+
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
               <Button
-                onClick={onBookNowClick}
                 variant="contained"
+                href="/booking"
                 size="large"
                 startIcon={<CalendarIcon />}
                 endIcon={<ArrowIcon />}
                 sx={{
-                  px: 5,
-                  py: 2,
-                  fontSize: '1.1rem',
+                  px: 4, py: 1.7,
+                  background: 'white',
+                  color: '#D32F2F',
                   fontWeight: 700,
-                  textTransform: 'none',
-                  borderRadius: 3,
-                  background: 'linear-gradient(135deg, #FF6B6B 0%, #C92A2A 100%)',
-                  color: 'white',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  boxShadow: '0 10px 30px rgba(255, 107, 107, 0.3)',
-                  transition: 'all 0.3s ease',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: '-100%',
-                    width: '100%',
-                    height: '100%',
-                    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)',
-                    transition: 'left 0.5s ease',
-                  },
+                  fontSize: '1rem',
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
                   '&:hover': {
-                    transform: 'translateY(-3px) scale(1.02)',
-                    boxShadow: '0 15px 40px rgba(255, 107, 107, 0.4)',
-                    '&::before': {
-                      left: '100%',
-                    },
-                    '& .MuiButton-endIcon': {
-                      transform: 'translateX(5px)',
-                    }
-                  }
+                    background: '#F8F9FB',
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 12px 36px rgba(0,0,0,0.25)',
+                  },
                 }}
               >
-                Book Service Now
+                Book Your Service
               </Button>
-
               <Button
                 variant="outlined"
+                href="/services"
                 size="large"
-                startIcon={<SpeedIcon />}
                 sx={{
-                  px: 5,
-                  py: 2,
-                  fontSize: '1.1rem',
-                  fontWeight: 700,
-                  textTransform: 'none',
-                  borderRadius: 3,
-                  borderColor: '#4ECDC4',
-                  color: '#4ECDC4',
-                  background: alpha('#4ECDC4', 0.05),
-                  transition: 'all 0.3s ease',
+                  px: 4, py: 1.7,
+                  borderColor: 'rgba(255,255,255,0.5)',
+                  color: 'white',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  borderRadius: '12px',
                   '&:hover': {
-                    borderColor: '#4ECDC4',
-                    background: alpha('#4ECDC4', 0.15),
-                    transform: 'translateY(-3px)',
-                    boxShadow: '0 10px 30px rgba(78, 205, 196, 0.2)',
-                  }
+                    borderColor: 'white',
+                    background: 'rgba(255,255,255,0.1)',
+                    transform: 'translateY(-2px)',
+                  },
                 }}
               >
-                Get Free Quote
+                View Services
               </Button>
             </Stack>
-
-            {/* Trust Indicators */}
-            <Stack 
-              direction="row" 
-              spacing={4} 
-              sx={{ 
-                mt: 6,
-                pt: 4,
-                borderTop: '1px solid',
-                borderColor: alpha('#fff', 0.1),
-              }}
-            >
-              {[
-                { number: '10K+', label: 'Happy Customers' },
-                { number: '15+', label: 'Years Experience' },
-                { number: '4.9★', label: 'Average Rating' },
-              ].map((stat, index) => (
-                <Box key={index} sx={{ textAlign: 'center' }}>
-                  <Typography 
-                    variant="h4" 
-                    sx={{ 
-                      fontWeight: 900,
-                      background: 'linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%)',
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                    }}
-                  >
-                    {stat.number}
-                  </Typography>
-                  <Typography 
-                    variant="body2" 
-                    sx={{ 
-                      color: alpha('#fff', 0.5),
-                      fontSize: '0.85rem',
-                      mt: 0.5,
-                    }}
-                  >
-                    {stat.label}
-                  </Typography>
-                </Box>
-              ))}
-            </Stack>
-          </Stack>
-        </Paper>
-      </Container>
-
-      {/* Add animations */}
-      <style jsx global>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-20px); }
-        }
-        
-        @keyframes shimmer {
-          0% { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
-        
-        @keyframes engineRev {
-          0%, 100% { transform: scale(1) rotate(0deg); }
-          25% { transform: scale(1.05) rotate(-2deg); }
-          75% { transform: scale(1.05) rotate(2deg); }
-        }
-        
-        @keyframes rotate {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes sparkle {
-          0%, 100% { 
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-          }
-          50% { 
-            opacity: 0.5;
-            transform: scale(1.2) rotate(180deg);
-          }
-        }
-        
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.05); }
-        }
-      `}</style>
-    </Box>
+          </Box>
+        </Container>
+      </Box>
+    </>
   );
 };
 

@@ -90,16 +90,12 @@ const Register = () => {
   };
 
   return (
-
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <CssBaseline />
         <GlobalStyles styles={backgroundKeyframes} />
 
-        <Box sx={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: -1 }}>
-          <Box sx={{ position: 'absolute', top: '10%', left: '10%', width: 384, height: 384, bgcolor: 'primary.main', borderRadius: '50%', filter: 'blur(100px)', animation: 'pulse 8s infinite ease-in-out' }} />
-          <Box sx={{ position: 'absolute', bottom: '10%', right: '10%', width: 384, height: 384, bgcolor: 'secondary.main', borderRadius: '50%', filter: 'blur(100px)', animation: 'pulse 8s infinite 2s ease-in-out' }} />
-        </Box>
+
 
         <Box sx={{
           display: 'flex',
@@ -116,95 +112,139 @@ const Register = () => {
 
           <Box
             component="main"
-            sx={{ flexGrow: 1, pt: '80px', pb: 8 }}
+            sx={{ flexGrow: 1, pt: '80px', pb: 8, display: 'flex', alignItems: 'center' }}
           >
+            <Container maxWidth="sm" sx={{ py: 6 }}>
+              {/* Card */}
+              <Box
+                sx={{
+                  p: { xs: 4, md: 5 },
+                  borderRadius: '20px',
+                  background: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  boxShadow: '0 8px 40px rgba(0,0,0,0.08)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute', top: 0, left: 0, right: 0,
+                    height: '3px',
+                    background: '#D32F2F',
+                  }
+                }}
+              >
+                {/* Header */}
+                <Box sx={{ textAlign: 'center', mb: 4 }}>
+                  {/* Icon */}
+                  <Box sx={{
+                    width: 68, height: 68, borderRadius: '18px',
+                    background: '#D32F2F',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    mx: 'auto', mb: 3,
+                    boxShadow: '0 8px 24px rgba(211,47,47,0.3)',
+                  }}>
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="white"/>
+                    </svg>
+                  </Box>
 
+                  <Typography variant="h3" sx={{
+                    fontFamily: '"Outfit", sans-serif',
+                    fontWeight: 900,
+                    fontSize: { xs: '1.8rem', md: '2.2rem' },
+                    color: '#111827',
+                    mb: 1,
+                  }}>
+                    Create Account
+                  </Typography>
+                  <Typography sx={{
+                    fontFamily: '"Inter", sans-serif',
+                    color: '#6B7280', fontSize: '0.95rem',
+                  }}>
+                    Join Moto-Care and manage your vehicle services
+                  </Typography>
+                </Box>
 
-            <Container maxWidth="sm" sx={{ mt: 10 }}>
-              <Typography variant="h4" gutterBottom align="center">
-                Register
-              </Typography>
+                {error && (
+                  <Alert severity="error" sx={{ mb: 3, borderRadius: '10px' }}>
+                    {error}
+                  </Alert>
+                )}
 
-              {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {error}
-                </Alert>
-              )}
+                <Box component="form" onSubmit={handleRegister}>
+                  <TextField
+                    fullWidth margin="normal"
+                    label="Full Name" name="name"
+                    value={form.name} onChange={handleChange} required
+                  />
+                  <TextField
+                    fullWidth margin="normal"
+                    type="email" label="Email Address" name="email"
+                    value={form.email} onChange={handleChange} required
+                  />
+                  <TextField
+                    fullWidth margin="normal"
+                    type="tel" label="Phone Number" name="phone"
+                    value={form.phone} onChange={handleChange} required
+                    inputProps={{ maxLength: 10, inputMode: 'numeric', pattern: "0[0-9]{9}" }}
+                    helperText="Must be 10 digits and start with 0 (e.g., 071xxxxxxx)"
+                  />
+                  <TextField
+                    fullWidth margin="normal"
+                    type="password" label="Password" name="password"
+                    value={form.password} onChange={handleChange} required
+                    helperText="Must be at least 6 characters with at least one letter and one number"
+                  />
+                  <TextField
+                    fullWidth margin="normal"
+                    type="password" label="Confirm Password" name="confirmPassword"
+                    value={form.confirmPassword} onChange={handleChange} required
+                  />
 
-              <Box component="form" onSubmit={handleRegister}>
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  label="Name"
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  required
-                />
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  type="email"
-                  label="Email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  required
-                />
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  type="tel"
-                  label="Phone Number"
-                  name="phone"
-                  value={form.phone}
-                  onChange={handleChange}
-                  required
-                  inputProps={{
-                    maxLength: 10,
-                    inputMode: 'numeric',
-                    pattern: "0[0-9]{9}"
-                  }}
-                  helperText="Must be 10 digits and start with 0 (e.g., 071xxxxxxx)"
-                />
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  type="password"
-                  label="Password"
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                  helperText="Must be at least 6 characters with at least one letter and one number"
-                />
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  type="password"
-                  label="Confirm Password"
-                  name="confirmPassword"
-                  value={form.confirmPassword}
-                  onChange={handleChange}
-                  required
-                />
+                  {/* 🔒 No "User Type" input shown to user */}
 
-                {/* 🔒 No "User Type" input shown to user */}
+                  <Button
+                    type="submit" fullWidth variant="contained"
+                    size="large"
+                    sx={{
+                      mt: 3, py: 1.8,
+                      borderRadius: '12px',
+                      fontSize: '1rem', fontWeight: 700,
+                      fontFamily: '"Inter", sans-serif',
+                      background: '#D32F2F',
+                      textTransform: 'none',
+                      boxShadow: '0 6px 20px rgba(211,47,47,0.3)',
+                      '&:hover': {
+                        background: '#B71C1C',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 10px 28px rgba(211,47,47,0.4)',
+                      },
+                    }}
+                  >
+                    Create Account
+                  </Button>
 
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 2 }}
-                >
-                  Register
-                </Button>
+                  {/* Link to login */}
+                  <Box sx={{ textAlign: 'center', mt: 3 }}>
+                    <Typography sx={{
+                      fontFamily: '"Inter", sans-serif',
+                      color: '#6B7280', fontSize: '0.9rem',
+                    }}>
+                      Already have an account?{' '}
+                      <Box
+                        component="a" href="/login"
+                        sx={{
+                          color: '#D32F2F', textDecoration: 'none', fontWeight: 600,
+                          '&:hover': { textDecoration: 'underline', color: '#B71C1C' },
+                        }}
+                      >
+                        Sign In
+                      </Box>
+                    </Typography>
+                  </Box>
+                </Box>
               </Box>
             </Container>
-
-
-
-
           </Box>
 
           <Footer />

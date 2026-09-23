@@ -57,18 +57,13 @@ const VehiclePage = () => {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <CssBaseline />
         <GlobalStyles styles={backgroundKeyframes} />
-
-        <Box sx={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: -1 }}>
-          <Box sx={{ position: 'absolute', top: '10%', left: '10%', width: 384, height: 384, bgcolor: 'primary.main', borderRadius: '50%', filter: 'blur(100px)', animation: 'pulse 8s infinite ease-in-out' }} />
-          <Box sx={{ position: 'absolute', bottom: '10%', right: '10%', width: 384, height: 384, bgcolor: 'secondary.main', borderRadius: '50%', filter: 'blur(100px)', animation: 'pulse 8s infinite 2s ease-in-out' }} />
-        </Box>
-
         <Box sx={{
           display: 'flex',
           flexDirection: 'column',
           minHeight: '100vh',
           position: 'relative',
           overflowX: 'hidden',
+          background: '#F8F9FB',
         }}>
           <Header
             navItems={mockData.navItems}
@@ -81,16 +76,38 @@ const VehiclePage = () => {
             sx={{ flexGrow: 1, pt: '80px', pb: 8 }}
           >
             <Container maxWidth="lg">
-              <Typography
-                variant="h2"
-                component="h1"
-                align="center"
-                sx={{ mt: 4, mb: 6, fontSize: { xs: '2.5rem', md: '3.75rem' } }}
-              >
-                <Box component="span" sx={gradientText}>
-                  Vehicle
-                </Box> Management
-              </Typography>
+              <Box sx={{
+                mt: 4, mb: 6,
+                p: { xs: 3, md: 4 },
+                borderRadius: '20px',
+                background: '#FFFFFF',
+                border: '1px solid #E5E7EB',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                position: 'relative', overflow: 'hidden',
+                textAlign: 'center',
+                '&::before': {
+                  content: '""', position: 'absolute',
+                  top: 0, left: 0, right: 0, height: '3px',
+                  background: '#D32F2F',
+                }
+              }}>
+                <Typography
+                  variant="h3"
+                  component="h1"
+                  sx={{
+                    fontFamily: '"Outfit", sans-serif',
+                    fontWeight: 900,
+                    color: '#111827',
+                    fontSize: { xs: '2rem', md: '2.5rem' },
+                    mb: 1
+                  }}
+                >
+                  Vehicle <Box component="span" sx={{ color: '#D32F2F' }}>Management</Box>
+                </Typography>
+                <Typography sx={{ fontFamily: '"Inter", sans-serif', color: '#6B7280', fontSize: '0.95rem' }}>
+                  Register, update, and manage your vehicle profiles for seamless service bookings
+                </Typography>
+              </Box>
 
               <VehicleForm
                 onVehicleAdded={loadVehicles}

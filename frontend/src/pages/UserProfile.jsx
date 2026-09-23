@@ -243,18 +243,6 @@ const UserProfilePage = () => {
             overflow: 'hidden',
           }}
         >
-          {/* Background Elements */}
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 50%)',
-              animation: 'backgroundShift 20s ease-in-out infinite',
-            }}
-          />
 
           <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
             <Box sx={{ textAlign: 'center' }}>
@@ -262,9 +250,7 @@ const UserProfilePage = () => {
                 variant="h3"
                 component="h1"
                 sx={{
-                  background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
+                  color: '#111827',
                   fontWeight: 800,
                   mb: 4,
                   fontSize: { xs: '2.5rem', md: '3.5rem' }
@@ -272,7 +258,7 @@ const UserProfilePage = () => {
               >
                 Loading Profile...
               </Typography>
-              <CircularProgress size={60} sx={{ color: '#6366f1' }} />
+              <CircularProgress size={60} sx={{ color: '#D32F2F' }} />
             </Box>
           </Container>
         </Box>
@@ -356,19 +342,6 @@ const UserProfilePage = () => {
           overflow: 'hidden',
         }}
       >
-        {/* Background Elements */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 50%)',
-            animation: 'backgroundShift 20s ease-in-out infinite',
-          }}
-        />
-
         <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
           <Fade in timeout={600}>
             <Box>
@@ -378,12 +351,11 @@ const UserProfilePage = () => {
                   variant="h3"
                   component="h1"
                   sx={{
-                    background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    fontWeight: 800,
-                    mb: 2,
-                    fontSize: { xs: '2.5rem', md: '3.5rem' }
+                    fontFamily: '"Outfit", sans-serif',
+                    color: '#111827',
+                    fontWeight: 900,
+                    mb: 1.5,
+                    fontSize: { xs: '2.2rem', md: '3rem' }
                   }}
                 >
                   My Profile
@@ -391,9 +363,11 @@ const UserProfilePage = () => {
                 <Typography
                   variant="h6"
                   sx={{
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    fontFamily: '"Inter", sans-serif',
+                    color: '#6B7280',
                     maxWidth: 600,
-                    mx: 'auto'
+                    mx: 'auto',
+                    fontSize: '1rem',
                   }}
                 >
                   Manage your account information and settings
@@ -403,29 +377,38 @@ const UserProfilePage = () => {
               {/* Profile Card */}
               <Card
                 sx={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: 4,
+                  background: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  boxShadow: '0 8px 30px rgba(0, 0, 0, 0.06)',
+                  borderRadius: '20px',
                   overflow: 'hidden',
+                  position: 'relative',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0,
+                    height: '3px',
+                    background: '#D32F2F',
+                  }
                 }}
               >
-                <CardContent sx={{ p: 4 }}>
+                <CardContent sx={{ p: { xs: 3, md: 5 } }}>
                   {/* Profile Header */}
                   <Stack direction="row" spacing={3} alignItems="center" sx={{ mb: 4 }}>
                     <Avatar
                       sx={{
                         width: 80,
                         height: 80,
-                        background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                        background: '#D32F2F',
                         fontSize: '2rem',
-                        fontWeight: 700
+                        fontWeight: 700,
+                        boxShadow: '0 6px 18px rgba(211, 47, 47, 0.3)',
                       }}
                     >
                       {user.name?.charAt(0).toUpperCase()}
                     </Avatar>
                     <Box sx={{ flex: 1 }}>
-                      <Typography variant="h4" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
+                      <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', color: '#111827', fontWeight: 800, mb: 1, fontSize: '1.6rem' }}>
                         {user.name}
                       </Typography>
                       <Chip
@@ -442,9 +425,9 @@ const UserProfilePage = () => {
                         label={`Member since ${new Date(user.createdAt).getFullYear()}`}
                         size="small"
                         sx={{
-                          background: 'rgba(255, 255, 255, 0.1)',
-                          color: 'rgba(255, 255, 255, 0.7)',
-                          border: '1px solid rgba(255, 255, 255, 0.2)'
+                          background: '#F3F4F6',
+                          color: '#4B5563',
+                          border: '1px solid #E5E7EB'
                         }}
                       />
                     </Box>
@@ -452,11 +435,12 @@ const UserProfilePage = () => {
                       <IconButton
                         onClick={handleEdit}
                         sx={{
-                          background: 'rgba(99, 102, 241, 0.1)',
-                          border: '1px solid rgba(99, 102, 241, 0.3)',
-                          color: '#6366f1',
+                          background: '#FEE2E2',
+                          border: '1px solid #FECACA',
+                          color: '#D32F2F',
                           '&:hover': {
-                            background: 'rgba(99, 102, 241, 0.2)',
+                            background: '#FEE2E2',
+                            transform: 'scale(1.05)',
                           }
                         }}
                       >
@@ -465,14 +449,14 @@ const UserProfilePage = () => {
                     )}
                   </Stack>
 
-                  <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)', mb: 4 }} />
+                  <Divider sx={{ borderColor: '#F3F4F6', mb: 4 }} />
 
                   {/* Profile Information */}
                   <Stack spacing={3}>
                     <Box>
-                      <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
-                        <PersonIcon sx={{ color: '#6366f1' }} />
-                        <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+                      <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
+                        <PersonIcon sx={{ color: '#D32F2F' }} />
+                        <Typography variant="h6" sx={{ fontFamily: '"Outfit", sans-serif', color: '#111827', fontWeight: 700 }}>
                           Personal Information
                         </Typography>
                       </Stack>
@@ -488,24 +472,14 @@ const UserProfilePage = () => {
                           variant="outlined"
                           sx={{
                             '& .MuiOutlinedInput-root': {
-                              background: editing ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.05)',
-                              color: 'white',
-                              '& fieldset': {
-                                borderColor: 'rgba(255, 255, 255, 0.2)',
-                              },
-                              '&:hover fieldset': {
-                                borderColor: 'rgba(255, 255, 255, 0.3)',
-                              },
-                              '&.Mui-focused fieldset': {
-                                borderColor: '#6366f1',
-                              },
+                              borderRadius: '12px',
+                              background: '#FFFFFF',
+                              '& fieldset': { borderColor: '#E5E7EB' },
+                              '&:hover fieldset': { borderColor: '#D1D5DB' },
+                              '&.Mui-focused fieldset': { borderColor: '#D32F2F' },
                             },
-                            '& .MuiInputLabel-root': {
-                              color: 'rgba(255, 255, 255, 0.7)',
-                              '&.Mui-focused': {
-                                color: '#6366f1',
-                              },
-                            },
+                            '& .MuiInputLabel-root': { color: '#6B7280' },
+                            '& .MuiOutlinedInput-input': { color: '#111827' },
                           }}
                         />
 
@@ -520,24 +494,14 @@ const UserProfilePage = () => {
                           variant="outlined"
                           sx={{
                             '& .MuiOutlinedInput-root': {
-                              background: editing ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.05)',
-                              color: 'white',
-                              '& fieldset': {
-                                borderColor: 'rgba(255, 255, 255, 0.2)',
-                              },
-                              '&:hover fieldset': {
-                                borderColor: 'rgba(255, 255, 255, 0.3)',
-                              },
-                              '&.Mui-focused fieldset': {
-                                borderColor: '#6366f1',
-                              },
+                              borderRadius: '12px',
+                              background: '#FFFFFF',
+                              '& fieldset': { borderColor: '#E5E7EB' },
+                              '&:hover fieldset': { borderColor: '#D1D5DB' },
+                              '&.Mui-focused fieldset': { borderColor: '#D32F2F' },
                             },
-                            '& .MuiInputLabel-root': {
-                              color: 'rgba(255, 255, 255, 0.7)',
-                              '&.Mui-focused': {
-                                color: '#6366f1',
-                              },
-                            },
+                            '& .MuiInputLabel-root': { color: '#6B7280' },
+                            '& .MuiOutlinedInput-input': { color: '#111827' },
                           }}
                         />
 
@@ -558,24 +522,14 @@ const UserProfilePage = () => {
                           helperText={editing ? "Must be 10 digits and start with 0 (optional)" : ""}
                           sx={{
                             '& .MuiOutlinedInput-root': {
-                              background: editing ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.05)',
-                              color: 'white',
-                              '& fieldset': {
-                                borderColor: 'rgba(255, 255, 255, 0.2)',
-                              },
-                              '&:hover fieldset': {
-                                borderColor: 'rgba(255, 255, 255, 0.3)',
-                              },
-                              '&.Mui-focused fieldset': {
-                                borderColor: '#6366f1',
-                              },
+                              borderRadius: '12px',
+                              background: '#FFFFFF',
+                              '& fieldset': { borderColor: '#E5E7EB' },
+                              '&:hover fieldset': { borderColor: '#D1D5DB' },
+                              '&.Mui-focused fieldset': { borderColor: '#D32F2F' },
                             },
-                            '& .MuiInputLabel-root': {
-                              color: 'rgba(255, 255, 255, 0.7)',
-                              '&.Mui-focused': {
-                                color: '#6366f1',
-                              },
-                            },
+                            '& .MuiInputLabel-root': { color: '#6B7280' },
+                            '& .MuiOutlinedInput-input': { color: '#111827' },
                           }}
                         />
                       </Stack>
@@ -583,9 +537,9 @@ const UserProfilePage = () => {
 
                     {/* Account Information */}
                     <Box>
-                      <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
-                        <SecurityIcon sx={{ color: '#6366f1' }} />
-                        <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+                      <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
+                        <SecurityIcon sx={{ color: '#D32F2F' }} />
+                        <Typography variant="h6" sx={{ fontFamily: '"Outfit", sans-serif', color: '#111827', fontWeight: 700 }}>
                           Account Information
                         </Typography>
                       </Stack>
@@ -593,18 +547,18 @@ const UserProfilePage = () => {
                       <Stack spacing={2}>
                         <Box
                           sx={{
-                            p: 3,
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            borderRadius: 2,
-                            border: '1px solid rgba(255, 255, 255, 0.1)'
+                            p: 2.5,
+                            background: '#F8F9FB',
+                            borderRadius: '12px',
+                            border: '1px solid #E5E7EB'
                           }}
                         >
                           <Stack direction="row" justifyContent="space-between" alignItems="center">
                             <Box>
-                              <Typography variant="body1" sx={{ color: 'white', fontWeight: 600 }}>
+                              <Typography variant="body1" sx={{ color: '#111827', fontWeight: 600 }}>
                                 Account Type
                               </Typography>
-                              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                              <Typography variant="body2" sx={{ color: '#6B7280' }}>
                                 {user.userType.charAt(0).toUpperCase() + user.userType.slice(1)}
                               </Typography>
                             </Box>
@@ -622,18 +576,18 @@ const UserProfilePage = () => {
 
                         <Box
                           sx={{
-                            p: 3,
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            borderRadius: 2,
-                            border: '1px solid rgba(255, 255, 255, 0.1)'
+                            p: 2.5,
+                            background: '#F8F9FB',
+                            borderRadius: '12px',
+                            border: '1px solid #E5E7EB'
                           }}
                         >
                           <Stack direction="row" justifyContent="space-between" alignItems="center">
                             <Box>
-                              <Typography variant="body1" sx={{ color: 'white', fontWeight: 600 }}>
+                              <Typography variant="body1" sx={{ color: '#111827', fontWeight: 600 }}>
                                 Member Since
                               </Typography>
-                              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                              <Typography variant="body2" sx={{ color: '#6B7280' }}>
                                 {new Date(user.createdAt).toLocaleDateString('en-US', {
                                   year: 'numeric',
                                   month: 'long',
@@ -655,16 +609,19 @@ const UserProfilePage = () => {
                           onClick={handleSave}
                           disabled={updating}
                           sx={{
-                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                            background: '#D32F2F',
                             color: 'white',
-                            fontWeight: 600,
+                            fontWeight: 700,
+                            borderRadius: '12px',
                             py: 1.5,
-                            px: 3,
+                            px: 4,
+                            boxShadow: '0 4px 14px rgba(211, 47, 47, 0.35)',
                             '&:hover': {
-                              background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                              background: '#B71C1C',
                             },
                             '&:disabled': {
-                              background: 'rgba(255, 255, 255, 0.1)',
+                              background: '#F3F4F6',
+                              color: '#9CA3AF',
                             }
                           }}
                         >
@@ -676,14 +633,15 @@ const UserProfilePage = () => {
                           onClick={handleCancel}
                           disabled={updating}
                           sx={{
-                            borderColor: 'rgba(239, 68, 68, 0.5)',
-                            color: '#ef4444',
-                            fontWeight: 600,
+                            borderColor: '#E5E7EB',
+                            color: '#4B5563',
+                            fontWeight: 700,
+                            borderRadius: '12px',
                             py: 1.5,
-                            px: 3,
+                            px: 4,
                             '&:hover': {
-                              borderColor: '#ef4444',
-                              background: 'rgba(239, 68, 68, 0.1)',
+                              borderColor: '#D1D5DB',
+                              background: '#F9FAFB',
                             }
                           }}
                         >

@@ -35,27 +35,28 @@ const StepVehicleSelect = ({ vehicles, vehicle, setVehicle, onNext }) => {
                     cursor: "pointer",
                     height: '100%',
                     background: vehicle?._id === v._id 
-                      ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%)'
-                      : 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)',
-                    backdropFilter: 'blur(10px)',
+                      ? '#FEF2F2'
+                      : '#FFFFFF',
                     borderRadius: 3,
                     border: '2px solid',
-                    borderColor: vehicle?._id === v._id ? 'primary.main' : alpha('#fff', 0.1),
+                    borderColor: vehicle?._id === v._id ? '#D32F2F' : '#E2E8F0',
+                    boxShadow: vehicle?._id === v._id ? '0 10px 25px -5px rgba(211, 47, 47, 0.15)' : '0 4px 12px rgba(0, 0, 0, 0.04)',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 12px 24px rgba(0, 0, 0, 0.08)',
+                      borderColor: vehicle?._id === v._id ? '#D32F2F' : '#CBD5E1',
                     }
                   }}
                   onClick={() => setVehicle(v)}
                 >
                   <CardContent sx={{ p: 3 }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                      <Box sx={{ fontSize: 48 }}>
+                      <Box sx={{ fontSize: 44 }}>
                         {getVehicleIcon(v.type)}
                       </Box>
                       {vehicle?._id === v._id && (
-                        <CheckCircleIcon sx={{ color: 'primary.main' }} />
+                        <CheckCircleIcon sx={{ color: '#D32F2F', fontSize: 28 }} />
                       )}
                     </Stack>
                     <Typography
@@ -63,21 +64,21 @@ const StepVehicleSelect = ({ vehicles, vehicle, setVehicle, onNext }) => {
                       sx={{
                         fontWeight: 700,
                         mb: 1,
-                        color: 'white',
+                        color: '#0F172A',
                       }}
                     >
                       {v.brand} {v.model}
                     </Typography>
                     <Stack spacing={1}>
                       <Stack direction="row" spacing={1} alignItems="center">
-                        <NumbersIcon sx={{ fontSize: 16, color: 'primary.light' }} />
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        <NumbersIcon sx={{ fontSize: 16, color: '#D32F2F' }} />
+                        <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 500 }}>
                           {v.vehicleNumber}
                         </Typography>
                       </Stack>
                       <Stack direction="row" spacing={1} alignItems="center">
-                        <CategoryIcon sx={{ fontSize: 16, color: 'secondary.light' }} />
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        <CategoryIcon sx={{ fontSize: 16, color: '#94A3B8' }} />
+                        <Typography variant="body2" sx={{ color: '#64748B' }}>
                           Type: {v.type}
                         </Typography>
                       </Stack>
@@ -94,34 +95,32 @@ const StepVehicleSelect = ({ vehicles, vehicle, setVehicle, onNext }) => {
                 sx={{ 
                   height: '100%',
                   minHeight: 200,
-                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)',
-                  backdropFilter: 'blur(10px)',
+                  background: '#FFFFFF',
                   borderRadius: 3,
-                  border: '2px dashed',
-                  borderColor: alpha('#10b981', 0.3),
+                  border: '2px dashed #CBD5E1',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   transition: 'all 0.3s ease',
                   cursor: 'pointer',
                   '&:hover': {
-                    transform: 'translateY(-8px)',
-                    borderColor: alpha('#10b981', 0.6),
-                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%)',
+                    transform: 'translateY(-4px)',
+                    borderColor: '#D32F2F',
+                    background: '#FEF2F2',
                   }
                 }}
               >
                 <CardContent sx={{ textAlign: 'center' }}>
                   <IconButton 
                     sx={{ 
-                      background: alpha('#10b981', 0.1),
+                      background: 'rgba(211, 47, 47, 0.08)',
                       mb: 2,
-                      '&:hover': { background: alpha('#10b981', 0.2) }
+                      '&:hover': { background: 'rgba(211, 47, 47, 0.15)' }
                     }}
                   >
-                    <AddCircleIcon sx={{ fontSize: 48, color: '#10b981' }} />
+                    <AddCircleIcon sx={{ fontSize: 44, color: '#D32F2F' }} />
                   </IconButton>
-                  <Typography sx={{ color: '#10b981', fontWeight: 600 }}>
+                  <Typography sx={{ color: '#D32F2F', fontWeight: 700, fontSize: '0.95rem' }}>
                     Add New Vehicle
                   </Typography>
                 </CardContent>
@@ -136,13 +135,20 @@ const StepVehicleSelect = ({ vehicles, vehicle, setVehicle, onNext }) => {
             disabled={!vehicle} 
             onClick={onNext}
             sx={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: '#D32F2F',
+              color: '#FFFFFF',
               px: 4,
               py: 1.5,
               fontSize: '1rem',
-              fontWeight: 600,
+              fontWeight: 700,
+              boxShadow: '0 4px 14px rgba(211, 47, 47, 0.3)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                background: '#B71C1C',
+                boxShadow: '0 6px 20px rgba(211, 47, 47, 0.4)',
+              },
+              '&.Mui-disabled': {
+                background: '#E2E8F0',
+                color: '#94A3B8',
               }
             }}
           >

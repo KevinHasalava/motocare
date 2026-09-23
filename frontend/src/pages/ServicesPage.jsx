@@ -1,19 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container, Typography, Box, Paper, Grid, Card, CardContent, CardActions,
-  Button, Chip, FormControl, InputLabel, Select, MenuItem, TextField,
-  InputAdornment, Stack, CircularProgress, Alert, IconButton, Tooltip,
-  Avatar, Divider, ThemeProvider, CssBaseline, GlobalStyles
+  Container, Typography, Box, Grid, Button, Chip, FormControl,
+  InputLabel, Select, MenuItem, TextField, InputAdornment, Stack,
+  Alert, ThemeProvider, CssBaseline, GlobalStyles
 } from '@mui/material';
 import {
   Search as SearchIcon, Build as ServiceIcon, Schedule as ScheduleIcon,
   AttachMoney as PriceIcon, DirectionsCar as CarIcon, Clear as ClearIcon,
-  BookOnline as BookIcon, FilterList as FilterIcon, ArrowBack as ArrowBackIcon
+  BookOnline as BookIcon, FilterList as FilterIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
+import TopBar from '../components/TopBar';
+import PageHeaderBanner from '../components/PageHeaderBanner';
 import { theme, backgroundKeyframes } from '../utils/theme';
+
+// Map vehicleType → a curated Unsplash automotive image
+const SERVICE_IMAGES = {
+  'Car':         'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=75&auto=format&fit=crop',
+  'Van':         'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=600&q=75&auto=format&fit=crop',
+  'SUV':         'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&q=75&auto=format&fit=crop',
+  'Motorcycle':  'https://images.unsplash.com/photo-1558981285-6f0c68243fc8?w=600&q=75&auto=format&fit=crop',
+  'Three Wheel': 'https://images.unsplash.com/photo-1572535641234-64f09a81a72e?w=600&q=75&auto=format&fit=crop',
+  'default':     'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=600&q=75&auto=format&fit=crop',
+};
+
+const getServiceImage = (vehicleType) => SERVICE_IMAGES[vehicleType] || SERVICE_IMAGES['default'];
+
 
 const vehicleTypes = ['All', 'Car', 'Van', 'SUV', 'Motorcycle', 'Three Wheel'];
 
@@ -101,14 +115,33 @@ const ServicesPage = () => {
 
   if (loading) {
     return (
-      <>
-        <Header navItems={['Home', 'Services', 'Vehicles']} />
-        <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
-          <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
-            <CircularProgress size={60} />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box sx={{ minHeight: '100vh', background: '#FFFFFF' }}>
+          <TopBar />
+          <Header navItems={['Home', 'Services', 'About', 'Contact']} />
+          <Box sx={{ pt: { xs: '64px', md: '76px' } }}>
+            <PageHeaderBanner
+              title="Our Services"
+              breadcrumb="Services"
+              imageUrl="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=80&auto=format&fit=crop"
+            />
           </Box>
-        </Container>
-      </>
+          <Box sx={{ minHeight: '40vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Box sx={{ textAlign: 'center' }}>
+              <Box sx={{
+                width: 64, height: 64, borderRadius: '50%',
+                border: '3px solid transparent',
+                borderTopColor: '#D32F2F',
+                borderRightColor: '#E5E7EB',
+                animation: 'mc-spin 0.8s linear infinite',
+                mx: 'auto', mb: 3,
+              }} />
+              <Typography sx={{ fontFamily: '"Inter", sans-serif', color: '#6B7280', fontSize: '0.95rem' }}>Loading services...</Typography>
+            </Box>
+          </Box>
+        </Box>
+      </ThemeProvider>
     );
   }
 
@@ -116,327 +149,471 @@ const ServicesPage = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <GlobalStyles styles={backgroundKeyframes} />
-      <Header navItems={['Home', 'Services', 'Vehicles']} />
-      <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
-        {/* Back Button */}
-        <Box sx={{ mb: 2 }}>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate(-1)}
-            sx={{ 
-              color: 'text.secondary',
-              '&:hover': { 
-                bgcolor: 'action.hover',
-                color: 'primary.main'
-              }
-            }}
-          >
-            Back
-          </Button>
+      <Box sx={{ minHeight: '100vh', background: '#FFFFFF', position: 'relative' }}>
+        <TopBar />
+        <Header navItems={['Home', 'Services', 'About', 'Contact']} />
+
+        {/* Page Header Banner */}
+        <Box sx={{ pt: { xs: '64px', md: '76px' } }}>
+          <PageHeaderBanner
+            title="Our Services"
+            breadcrumb="Services"
+            imageUrl="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=80&auto=format&fit=crop"
+          />
         </Box>
 
-        {/* Page Header */}
-        <Paper 
-          sx={{ 
-            p: 4, 
-            mb: 4, 
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white',
-            textAlign: 'center'
-          }}
-        >
-          <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} mb={2}>
-            <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 56, height: 56 }}>
-              <ServiceIcon fontSize="large" />
-            </Avatar>
-            <Box>
-              <Typography variant="h3" component="h1" fontWeight="bold">
-                Our Services
-              </Typography>
-              <Typography variant="h6" sx={{ opacity: 0.9 }}>
-                Professional vehicle maintenance and repair services
-              </Typography>
-            </Box>
-          </Stack>
-          <Typography variant="body1" sx={{ maxWidth: 600, mx: 'auto', opacity: 0.8 }}>
-            Discover our comprehensive range of automotive services designed to keep your vehicle 
-            running smoothly and safely on the road.
-          </Typography>
-        </Paper>
+        <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 }, position: 'relative', zIndex: 1 }}>
 
-        {/* Filters Section */}
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Stack direction="row" alignItems="center" spacing={2} mb={2}>
-            <FilterIcon color="primary" />
-            <Typography variant="h6" fontWeight="600">
-              Filter Services
+          {/* Intro */}
+          <Box sx={{ textAlign: 'center', mb: 5 }}>
+            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#D32F2F', fontFamily: '"Inter", sans-serif', mb: 1.5 }}>
+              What We Offer
             </Typography>
-            {(searchTerm || selectedVehicleType !== 'All' || priceSort) && (
-              <Button 
-                startIcon={<ClearIcon />} 
-                onClick={clearFilters}
-                size="small"
-                sx={{ ml: 'auto' }}
-              >
-                Clear Filters
-              </Button>
-            )}
-          </Stack>
-          
-          <Grid container spacing={3}>
-            {/* Search */}
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                placeholder="Search services..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
+            <Typography variant="h2" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 900, fontSize: { xs: '2rem', md: '2.6rem' }, color: '#111827', mb: 2 }}>
+              Our Services
+            </Typography>
+            <Typography sx={{ fontFamily: '"Inter", sans-serif', color: '#6B7280', fontSize: { xs: '0.95rem', md: '1.05rem' }, maxWidth: 560, mx: 'auto', lineHeight: 1.75 }}>
+              Discover our comprehensive range of automotive services designed to keep your vehicle
+              running smoothly and safely on the road.
+            </Typography>
+          </Box>
 
-            {/* Vehicle Type Filter */}
-            <Grid item xs={12} md={4}>
-              <FormControl fullWidth>
-                <InputLabel>Vehicle Type</InputLabel>
-                <Select
-                  value={selectedVehicleType}
-                  label="Vehicle Type"
-                  onChange={(e) => setSelectedVehicleType(e.target.value)}
+
+          {/* Filters Section */}
+          <Box
+            sx={{
+              p: 3, mb: 4, borderRadius: '16px',
+              background: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+            }}
+          >
+            <Stack direction="row" alignItems="center" spacing={2} mb={2.5}>
+              <Box sx={{
+                width: 36, height: 36, borderRadius: '10px',
+                background: '#FEE2E2',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <FilterIcon sx={{ color: '#D32F2F', fontSize: '1.1rem' }} />
+              </Box>
+              <Typography sx={{
+                fontFamily: '"Outfit", sans-serif',
+                fontWeight: 700, fontSize: '1rem', color: '#111827',
+              }}>
+                Filter Services
+              </Typography>
+              {(searchTerm || selectedVehicleType !== 'All' || priceSort) && (
+                <Button
+                  startIcon={<ClearIcon />}
+                  onClick={clearFilters}
+                  size="small"
+                  sx={{
+                    ml: 'auto', color: '#6B7280',
+                    fontFamily: '"Inter", sans-serif',
+                    fontSize: '0.82rem', textTransform: 'none',
+                    borderRadius: '8px',
+                    '&:hover': { color: '#D32F2F', background: '#FEE2E2' }
+                  }}
                 >
-                  {vehicleTypes.map((type) => (
-                    <MenuItem key={type} value={type}>
-                      {type}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                  Clear Filters
+                </Button>
+              )}
+            </Stack>
+
+            <Grid container spacing={2}>
+              {/* Search */}
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  placeholder="Search services..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon sx={{ color: '#8B95A8' }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              {/* Vehicle Type Filter */}
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Vehicle Type</InputLabel>
+                  <Select
+                    value={selectedVehicleType}
+                    label="Vehicle Type"
+                    onChange={(e) => setSelectedVehicleType(e.target.value)}
+                  >
+                    {vehicleTypes.map((type) => (
+                      <MenuItem key={type} value={type}>{type}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Price Sort */}
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Sort by Price</InputLabel>
+                  <Select
+                    value={priceSort}
+                    label="Sort by Price"
+                    onChange={(e) => setPriceSort(e.target.value)}
+                  >
+                    <MenuItem value="">Default</MenuItem>
+                    <MenuItem value="low-to-high">Price: Low to High</MenuItem>
+                    <MenuItem value="high-to-low">Price: High to Low</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
             </Grid>
+          </Box>
 
-            {/* Price Sort */}
-            <Grid item xs={12} md={4}>
-              <FormControl fullWidth>
-                <InputLabel>Sort by Price</InputLabel>
-                <Select
-                  value={priceSort}
-                  label="Sort by Price"
-                  onChange={(e) => setPriceSort(e.target.value)}
-                >
-                  <MenuItem value="">Default</MenuItem>
-                  <MenuItem value="low-to-high">Price: Low to High</MenuItem>
-                  <MenuItem value="high-to-low">Price: High to Low</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </Paper>
+          {/* Error Display */}
+          {error && (
+            <Alert
+              severity="error"
+              sx={{
+                mb: 3, borderRadius: '12px',
+                background: 'rgba(229, 62, 62, 0.1)',
+                border: '1px solid rgba(229, 62, 62, 0.3)',
+              }}
+            >
+              {error}
+            </Alert>
+          )}
 
-        {/* Error Display */}
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
-
-        {/* Results Count and Stats */}
-        <Paper sx={{ p: 3, mb: 3, bgcolor: 'grey.50' }}>
-          <Grid container spacing={3} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <Typography variant="h6" color="primary" gutterBottom>
+          {/* Results Count */}
+          <Box
+            sx={{
+              p: 2.5, mb: 3, borderRadius: '12px',
+              background: '#F8F9FB',
+              border: '1px solid #E5E7EB',
+              display: 'flex', alignItems: 'center',
+              justifyContent: 'space-between', flexWrap: 'wrap', gap: 2,
+            }}
+          >
+            <Box>
+              <Typography sx={{
+                fontFamily: '"Inter", sans-serif',
+                color: '#D32F2F', fontWeight: 700, fontSize: '0.95rem',
+              }}>
                 {filteredServices.length} service{filteredServices.length !== 1 ? 's' : ''} found
                 {selectedVehicleType !== 'All' && ` for ${selectedVehicleType}`}
               </Typography>
               {searchTerm && (
-                <Typography variant="body2" color="text.secondary">
+                <Typography sx={{
+                  fontFamily: '"Inter", sans-serif',
+                  color: '#6B7280', fontSize: '0.82rem', mt: 0.3,
+                }}>
                   Showing results for "{searchTerm}"
                 </Typography>
               )}
-            </Grid>
-            <Grid item xs={12} md={6}>
-              {filteredServices.length > 0 && (
-                <Box textAlign={{ xs: 'left', md: 'right' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Price Range: LKR {Math.min(...filteredServices.map(s => s.price))} - LKR {Math.max(...filteredServices.map(s => s.price))}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Avg. Duration: {Math.round(filteredServices.reduce((acc, s) => acc + s.duration, 0) / filteredServices.length)} minutes
-                  </Typography>
-                </Box>
-              )}
-            </Grid>
-          </Grid>
-        </Paper>
+            </Box>
+            {filteredServices.length > 0 && (
+              <Box sx={{ textAlign: 'right' }}>
+                <Typography sx={{
+                  fontFamily: '"Inter", sans-serif',
+                  color: '#6B7280', fontSize: '0.82rem',
+                }}>
+                  Price Range: LKR {Math.min(...filteredServices.map(s => s.price))} –{' '}
+                  LKR {Math.max(...filteredServices.map(s => s.price))}
+                </Typography>
+                <Typography sx={{
+                  fontFamily: '"Inter", sans-serif',
+                  color: '#6B7280', fontSize: '0.82rem',
+                }}>
+                  Avg. Duration: {Math.round(filteredServices.reduce((acc, s) => acc + s.duration, 0) / filteredServices.length)} min
+                </Typography>
+              </Box>
+            )}
+          </Box>
 
-        {/* Services Grid */}
-        {filteredServices.length === 0 && !loading ? (
-          <Paper sx={{ p: 6, textAlign: 'center' }}>
-            <ServiceIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-            <Typography variant="h6" color="text.secondary" gutterBottom>
-              No services found
-            </Typography>
-            <Typography variant="body2" color="text.secondary" mb={3}>
-              Try adjusting your filters or search terms
-            </Typography>
-            <Button 
-              variant="outlined" 
-              onClick={clearFilters}
-              startIcon={<ClearIcon />}
-            >
-              Clear All Filters
-            </Button>
-          </Paper>
-        ) : (
-          <Grid container spacing={3}>
-            {filteredServices.map((service) => (
-              <Grid item xs={12} sm={6} md={4} key={service._id}>
-                <Card 
-                  sx={{ 
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'all 0.3s ease',
-                    position: 'relative',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: 4,
-                    },
-                  }}
-                >
-                  {/* Popular badge for lower-priced services */}
-                  {service.price <= 3000 && (
-                    <Chip
-                      label="Popular"
-                      size="small"
-                      sx={{
-                        position: 'absolute',
-                        top: 8,
-                        right: 8,
-                        bgcolor: '#ff9800',
-                        color: 'white',
-                        fontWeight: 600,
-                        zIndex: 2,
-                      }}
-                    />
-                  )}
-                  
-                  <CardContent sx={{ flexGrow: 1, pt: service.price <= 3000 ? 4 : 2 }}>
-                    {/* Service Header */}
-                    <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={2} sx={{ minHeight: 32 }}>
-                      <Typography variant="h6" component="h2" fontWeight="600" sx={{ pr: 2, lineHeight: 1.2 }}>
-                        {service.name}
-                      </Typography>
-                      <Chip
-                        label={service.vehicleType}
-                        size="small"
-                        sx={{
-                          bgcolor: getVehicleTypeColor(service.vehicleType),
-                          color: 'white',
-                          fontWeight: 600,
-                          flexShrink: 0,
-                          mt: service.price <= 3000 ? 2 : 0, // Add margin top if popular tag exists
-                        }}
-                      />
-                    </Stack>
-
-                    {/* Service Description */}
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary" 
-                      sx={{ mb: 3, minHeight: 40 }}
-                    >
-                      {service.description || 'Professional service for your vehicle'}
-                    </Typography>
-
-                    <Divider sx={{ mb: 2 }} />
-
-                    {/* Service Details */}
-                    <Stack spacing={1.5}>
-                      <Stack direction="row" alignItems="center" spacing={1}>
-                        <ScheduleIcon fontSize="small" color="primary" />
-                        <Typography variant="body2">
-                          <strong>Duration:</strong> {service.duration} minutes
-                        </Typography>
-                      </Stack>
-                      
-                      <Stack direction="row" alignItems="center" spacing={1}>
-                        <PriceIcon fontSize="small" color="success" />
-                        <Typography variant="body2">
-                          <strong>Price:</strong> LKR {service.price}
-                        </Typography>
-                      </Stack>
-                      
-                      <Stack direction="row" alignItems="center" spacing={1}>
-                        <CarIcon fontSize="small" sx={{ color: getVehicleTypeColor(service.vehicleType) }} />
-                        <Typography variant="body2">
-                          <strong>Vehicle:</strong> {service.vehicleType}
-                        </Typography>
-                      </Stack>
-                    </Stack>
-                  </CardContent>
-
-                  <CardActions sx={{ p: 2, pt: 0 }}>
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      startIcon={<BookIcon />}
-                      onClick={() => handleBookService(service)}
-                      sx={{
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        '&:hover': {
-                          background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
-                        },
-                      }}
-                    >
-                      Book This Service
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        )}
-
-        {/* Call to Action */}
-        {filteredServices.length > 0 && (
-          <Paper 
-            sx={{ 
-              p: 4, 
-              mt: 6, 
-              textAlign: 'center',
-              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-              color: 'white'
-            }}
-          >
-            <Typography variant="h5" fontWeight="bold" gutterBottom>
-              Ready to Book a Service?
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
-              Choose from our wide range of professional automotive services
-            </Typography>
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<BookIcon />}
-              onClick={() => navigate('/booking')}
+          {/* Services Grid */}
+          {filteredServices.length === 0 && !loading ? (
+            <Box
               sx={{
-                bgcolor: 'rgba(255,255,255,0.2)',
-                color: 'white',
-                '&:hover': {
-                  bgcolor: 'rgba(255,255,255,0.3)',
-                },
+                p: 8, textAlign: 'center',
+                borderRadius: '20px',
+                background: '#FFFFFF',
+                border: '1px solid #E5E7EB',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
               }}
             >
-              Start Booking Process
-            </Button>
-          </Paper>
-        )}
-      </Container>
+              <Box sx={{
+                width: 72, height: 72, borderRadius: '20px',
+                background: '#FEE2E2',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                mx: 'auto', mb: 3,
+              }}>
+                <ServiceIcon sx={{ fontSize: 36, color: '#D32F2F' }} />
+              </Box>
+              <Typography sx={{
+                fontFamily: '"Outfit", sans-serif',
+                fontWeight: 700, color: '#111827', fontSize: '1.2rem', mb: 1,
+              }}>
+                No services found
+              </Typography>
+              <Typography sx={{
+                fontFamily: '"Inter", sans-serif',
+                color: '#6B7280', fontSize: '0.9rem', mb: 3,
+              }}>
+                Try adjusting your filters or search terms
+              </Typography>
+              <Button
+                variant="outlined"
+                onClick={clearFilters}
+                startIcon={<ClearIcon />}
+                sx={{
+                  borderRadius: '10px',
+                  borderColor: '#E5E7EB',
+                  color: '#D32F2F',
+                  fontFamily: '"Inter", sans-serif',
+                  fontWeight: 600, textTransform: 'none',
+                  '&:hover': {
+                    borderColor: '#D32F2F',
+                    background: '#FEE2E2',
+                  }
+                }}
+              >
+                Clear All Filters
+              </Button>
+            </Box>
+          ) : (
+            <Grid container spacing={3}>
+              {filteredServices.map((service) => (
+                <Grid item xs={12} sm={6} md={4} key={service._id}>
+                  <Box
+                    sx={{
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      borderRadius: '18px',
+                      background: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
+                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
+                      overflow: 'hidden',
+                      position: 'relative',
+                      transition: 'all 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
+                      '&:hover': {
+                        transform: 'translateY(-6px)',
+                        borderColor: '#FCA5A5',
+                        boxShadow: '0 16px 36px rgba(0,0,0,0.1)',
+                      },
+                    }}
+                  >
+                    {/* Popular badge */}
+                    {service.price <= 3000 && (
+                      <Box sx={{
+                        position: 'absolute', top: 14, right: 14,
+                        px: 1.5, py: 0.4,
+                        borderRadius: '100px',
+                        background: '#D32F2F',
+                        zIndex: 2,
+                      }}>
+                        <Typography sx={{
+                          fontFamily: '"Inter", sans-serif',
+                          fontSize: '0.7rem', fontWeight: 700,
+                          color: 'white', letterSpacing: '0.06em',
+                          textTransform: 'uppercase',
+                        }}>
+                          Popular
+                        </Typography>
+                      </Box>
+                    )}
+
+                    <Box sx={{ p: 3, flexGrow: 1 }}>
+                      {/* Service Header */}
+                      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={2} sx={{ minHeight: 32 }}>
+                        <Typography
+                          variant="h6" component="h2"
+                          sx={{
+                            fontFamily: '"Outfit", sans-serif',
+                            fontWeight: 700, fontSize: '1.05rem',
+                            color: '#111827', pr: 2, lineHeight: 1.3,
+                            mt: service.price <= 3000 ? 2.5 : 0,
+                          }}
+                        >
+                          {service.name}
+                        </Typography>
+                        <Chip
+                          label={service.vehicleType}
+                          size="small"
+                          sx={{
+                            bgcolor: `${getVehicleTypeColor(service.vehicleType)}18`,
+                            color: getVehicleTypeColor(service.vehicleType),
+                            border: `1px solid ${getVehicleTypeColor(service.vehicleType)}33`,
+                            fontWeight: 700, flexShrink: 0, fontSize: '0.72rem',
+                            mt: service.price <= 3000 ? 2.5 : 0,
+                          }}
+                        />
+                      </Stack>
+
+                      {/* Description */}
+                      <Typography
+                        sx={{
+                          fontFamily: '"Inter", sans-serif',
+                          color: '#4B5563', fontSize: '0.88rem',
+                          lineHeight: 1.7, mb: 3, minHeight: 52,
+                        }}
+                      >
+                        {service.description || 'Professional service for your vehicle'}
+                      </Typography>
+
+                      <Divider sx={{ mb: 2.5, borderColor: '#F3F4F6' }} />
+
+                      {/* Service Details */}
+                      <Stack spacing={1.5}>
+                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                          <Box sx={{
+                            width: 28, height: 28, borderRadius: '8px',
+                            background: '#FEE2E2',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}>
+                            <ScheduleIcon sx={{ fontSize: '0.9rem', color: '#D32F2F' }} />
+                          </Box>
+                          <Typography sx={{
+                            fontFamily: '"Inter", sans-serif',
+                            color: '#4B5563', fontSize: '0.87rem',
+                          }}>
+                            <Box component="strong" sx={{ color: '#111827', mr: 0.5 }}>Duration:</Box>
+                            {service.duration} minutes
+                          </Typography>
+                        </Stack>
+
+                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                          <Box sx={{
+                            width: 28, height: 28, borderRadius: '8px',
+                            background: '#ECFDF5',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}>
+                            <PriceIcon sx={{ fontSize: '0.9rem', color: '#059669' }} />
+                          </Box>
+                          <Typography sx={{
+                            fontFamily: '"Inter", sans-serif',
+                            color: '#4B5563', fontSize: '0.87rem',
+                          }}>
+                            <Box component="strong" sx={{ color: '#111827', mr: 0.5 }}>Price:</Box>
+                            LKR {service.price}
+                          </Typography>
+                        </Stack>
+
+                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                          <Box sx={{
+                            width: 28, height: 28, borderRadius: '8px',
+                            background: '#F3F4F6',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}>
+                            <CarIcon sx={{ fontSize: '0.9rem', color: '#374151' }} />
+                          </Box>
+                          <Typography sx={{
+                            fontFamily: '"Inter", sans-serif',
+                            color: '#4B5563', fontSize: '0.87rem',
+                          }}>
+                            <Box component="strong" sx={{ color: '#111827', mr: 0.5 }}>Vehicle:</Box>
+                            {service.vehicleType}
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                    </Box>
+
+                    {/* Book Button */}
+                    <Box sx={{ p: 2.5, pt: 0 }}>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        startIcon={<BookIcon />}
+                        onClick={() => handleBookService(service)}
+                        sx={{
+                          py: 1.3,
+                          borderRadius: '12px',
+                          background: '#D32F2F',
+                          fontFamily: '"Inter", sans-serif',
+                          fontWeight: 700, textTransform: 'none',
+                          fontSize: '0.9rem',
+                          boxShadow: '0 4px 14px rgba(211, 47, 47, 0.35)',
+                          '&:hover': {
+                            background: '#B71C1C',
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 8px 20px rgba(211, 47, 47, 0.45)',
+                          },
+                        }}
+                      >
+                        Book This Service
+                      </Button>
+                    </Box>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+
+          {/* CTA Section */}
+          {filteredServices.length > 0 && (
+            <Box
+              sx={{
+                p: { xs: 4, md: 6 }, mt: 8,
+                borderRadius: '22px',
+                textAlign: 'center',
+                background: '#FFFFFF',
+                border: '1px solid #E5E7EB',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                position: 'relative', overflow: 'hidden',
+                '&::before': {
+                  content: '""', position: 'absolute',
+                  top: 0, left: 0, right: 0, height: '3px',
+                  background: '#D32F2F',
+                }
+              }}
+            >
+              <Typography
+                variant="h5"
+                sx={{
+                  fontFamily: '"Outfit", sans-serif',
+                  fontWeight: 800, color: '#111827',
+                  mb: 1.5, fontSize: { xs: '1.4rem', md: '1.8rem' },
+                }}
+              >
+                Ready to Book a Service?
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: '"Inter", sans-serif',
+                  color: '#6B7280', mb: 4,
+                  fontSize: { xs: '0.95rem', md: '1.05rem' },
+                }}
+              >
+                Choose from our wide range of professional automotive services
+              </Typography>
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<BookIcon />}
+                onClick={() => navigate('/booking')}
+                sx={{
+                  px: 5, py: 1.6,
+                  borderRadius: '14px',
+                  background: '#D32F2F',
+                  fontFamily: '"Inter", sans-serif',
+                  fontWeight: 700, textTransform: 'none',
+                  fontSize: '1rem',
+                  boxShadow: '0 4px 14px rgba(211, 47, 47, 0.35)',
+                  '&:hover': {
+                    background: '#B71C1C',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 20px rgba(211, 47, 47, 0.45)',
+                  },
+                }}
+              >
+                Start Booking Process
+              </Button>
+            </Box>
+          )}
+        </Container>
+      </Box>
     </ThemeProvider>
   );
 };

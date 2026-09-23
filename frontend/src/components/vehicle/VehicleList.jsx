@@ -54,13 +54,12 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
         <Paper
           elevation={0}
           sx={{
-            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: 4,
+            background: '#FFFFFF',
+            borderRadius: '16px',
             p: 3,
             mb: 4,
-            border: '1px solid',
-            borderColor: alpha('#fff', 0.1),
+            border: '1px solid #E5E7EB',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
             position: 'relative',
             overflow: 'hidden',
             '&::before': {
@@ -69,9 +68,8 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
               top: 0,
               left: 0,
               right: 0,
-              height: '2px',
-              background: 'linear-gradient(90deg, #6366f1, #a855f7, #ec4899)',
-              animation: 'shimmer 3s ease-in-out infinite',
+              height: '3px',
+              background: '#D32F2F',
             }
           }}
         >
@@ -80,12 +78,12 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
               sx={{
                 width: 56,
                 height: 56,
-                borderRadius: 2,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: '14px',
+                background: '#D32F2F',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 8px 16px rgba(102, 126, 234, 0.4)',
+                boxShadow: '0 6px 18px rgba(211, 47, 47, 0.3)',
               }}
             >
               <CarIcon sx={{ color: 'white', fontSize: 28 }} />
@@ -94,14 +92,15 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
               <Typography
                 variant="h4"
                 sx={{
-                  ...gradientText,
+                  fontFamily: '"Outfit", sans-serif',
                   fontWeight: 800,
                   letterSpacing: '-0.02em',
+                  color: '#111827',
                 }}
               >
                 My Vehicles
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+              <Typography variant="body2" sx={{ color: '#6B7280', mt: 0.5 }}>
                 Manage your registered vehicles
               </Typography>
             </Box>
@@ -109,9 +108,10 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
               <Chip
                 label={`${myVehicles.length} vehicle${myVehicles.length !== 1 ? 's' : ''}`}
                 sx={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  fontWeight: 600,
+                  background: '#FEE2E2',
+                  color: '#B91C1C',
+                  fontWeight: 700,
+                  borderRadius: '8px',
                 }}
               />
             </Box>
@@ -127,41 +127,26 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
                   <Card
                     sx={{
                       height: '100%',
-                      background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)',
-                      backdropFilter: 'blur(10px)',
-                      borderRadius: 3,
-                      border: '1px solid',
-                      borderColor: alpha('#fff', 0.1),
+                      background: '#FFFFFF',
+                      borderRadius: '16px',
+                      border: '1px solid #E5E7EB',
+                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                       position: 'relative',
                       overflow: 'hidden',
                       '&:hover': {
-                        transform: 'translateY(-8px)',
-                        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+                        transform: 'translateY(-6px)',
+                        boxShadow: '0 16px 36px rgba(0, 0, 0, 0.1)',
                         '& .vehicle-actions': {
                           opacity: 1,
                           transform: 'translateY(0)',
                         },
                         '& .vehicle-icon': {
-                          transform: 'scale(1.1) rotate(5deg)',
+                          transform: 'scale(1.08) rotate(3deg)',
                         }
                       },
                     }}
                   >
-                    {/* Decorative Background */}
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        top: -50,
-                        right: -50,
-                        width: 150,
-                        height: 150,
-                        borderRadius: '50%',
-                        background: `linear-gradient(135deg, ${alpha('#6366f1', 0.1)} 0%, ${alpha('#a855f7', 0.1)} 100%)`,
-                        filter: 'blur(40px)',
-                      }}
-                    />
-
                     <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
                       {/* Vehicle Icon and Number */}
                       <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={2}>
@@ -187,12 +172,10 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
                         <Typography
                           variant="h5"
                           sx={{
+                            fontFamily: '"Outfit", sans-serif',
                             fontWeight: 700,
                             mb: 1,
-                            background: 'linear-gradient(135deg, #fff 0%, #e2e8f0 100%)',
-                            backgroundClip: 'text',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
+                            color: '#111827',
                           }}
                         >
                           {vehicle.brand} {vehicle.model}
@@ -200,14 +183,14 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
 
                         <Stack spacing={1.5}>
                           <Stack direction="row" spacing={1} alignItems="center">
-                            <NumberIcon sx={{ fontSize: 18, color: 'primary.light' }} />
-                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            <NumberIcon sx={{ fontSize: 18, color: '#D32F2F' }} />
+                            <Typography variant="body2" sx={{ color: '#4B5563', fontWeight: 500 }}>
                               {vehicle.vehicleNumber}
                             </Typography>
                           </Stack>
                           <Stack direction="row" spacing={1} alignItems="center">
-                            <YearIcon sx={{ fontSize: 18, color: 'secondary.light' }} />
-                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            <YearIcon sx={{ fontSize: 18, color: '#6B7280' }} />
+                            <Typography variant="body2" sx={{ color: '#4B5563' }}>
                               Year: {vehicle.year}
                             </Typography>
                           </Stack>
@@ -222,10 +205,9 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
                         sx={{
                           mt: 3,
                           pt: 2,
-                          borderTop: '1px solid',
-                          borderColor: alpha('#fff', 0.1),
-                          opacity: 0.7,
-                          transform: 'translateY(10px)',
+                          borderTop: '1px solid #E5E7EB',
+                          opacity: 0.9,
+                          transform: 'translateY(0)',
                           transition: 'all 0.3s ease',
                         }}
                       >
@@ -235,12 +217,11 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
                             sx={{
                               flex: 1,
                               borderRadius: 2,
-                              background: alpha('#10b981', 0.1),
-                              border: '1px solid',
-                              borderColor: alpha('#10b981', 0.3),
-                              color: '#10b981',
+                              background: '#F0FDF4',
+                              border: '1px solid #BBF7D0',
+                              color: '#16A34A',
                               '&:hover': {
-                                background: alpha('#10b981', 0.2),
+                                background: '#DCFCE7',
                                 transform: 'scale(1.05)',
                               }
                             }}
@@ -254,12 +235,11 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
                             sx={{
                               flex: 1,
                               borderRadius: 2,
-                              background: alpha('#ef4444', 0.1),
-                              border: '1px solid',
-                              borderColor: alpha('#ef4444', 0.3),
-                              color: '#ef4444',
+                              background: '#FEF2F2',
+                              border: '1px solid #FECACA',
+                              color: '#DC2626',
                               '&:hover': {
-                                background: alpha('#ef4444', 0.2),
+                                background: '#FEE2E2',
                                 transform: 'scale(1.05)',
                               }
                             }}
@@ -281,19 +261,18 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
               sx={{
                 p: 8,
                 textAlign: 'center',
-                background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: 4,
-                border: '1px solid',
-                borderColor: alpha('#fff', 0.1),
+                background: '#FFFFFF',
+                borderRadius: '16px',
+                border: '1px solid #E5E7EB',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
               }}
             >
               <Box
                 sx={{
-                  width: 120,
-                  height: 120,
+                  width: 100,
+                  height: 100,
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)',
+                  background: '#FEE2E2',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -301,22 +280,23 @@ const VehicleList = ({ vehicles, onVehicleDeleted, onEdit }) => {
                   mb: 3,
                 }}
               >
-                <NoResultsIcon sx={{ fontSize: 60, color: 'primary.light' }} />
+                <NoResultsIcon sx={{ fontSize: 50, color: '#D32F2F' }} />
               </Box>
               <Typography
                 variant="h5"
                 sx={{
-                  fontWeight: 700,
+                  fontFamily: '"Outfit", sans-serif',
+                  fontWeight: 800,
                   mb: 1,
-                  ...gradientText
+                  color: '#111827',
                 }}
               >
                 No Vehicles Yet
               </Typography>
-              <Typography color="text.secondary" sx={{ mb: 3 }}>
+              <Typography sx={{ color: '#6B7280', mb: 3 }}>
                 Start by adding your first vehicle to manage your fleet
               </Typography>
-              <Typography variant="h3" sx={{ opacity: 0.3 }}>
+              <Typography variant="h3" sx={{ opacity: 0.5 }}>
                 🚗 🏍️ 🚛
               </Typography>
             </Paper>

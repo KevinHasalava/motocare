@@ -295,24 +295,42 @@ const MyBookingsPage = () => {
     const jobsForAvailabilityCheck = allJobs.filter(job =>
         job.booking?._id !== selectedBooking?._id
     );
-
     return (
         <ThemeProvider theme={theme}>
             <style dangerouslySetInnerHTML={{ __html: loadingStyles }} />
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#0f172a' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#F8F9FB' }}>
                     <Header />
 
-
-                         <Container component="main" maxWidth="xl" sx={{ mt: 12, mb: 4, flexGrow: 1, px: { xs: 2, sm: 3 } }}>
-                        <Typography variant="h4" gutterBottom sx={{ 
-                            fontWeight: 700, 
-                            color: 'white', 
-                            mb: 3,
-                            fontSize: { xs: '1.75rem', sm: '2.125rem' }
+                    <Container component="main" maxWidth="xl" sx={{ mt: 12, mb: 4, flexGrow: 1, px: { xs: 2, sm: 3 } }}>
+                        {/* Page heading */}
+                        <Box sx={{
+                            mb: 4,
+                            p: { xs: 3, md: 4 },
+                            borderRadius: '20px',
+                            background: '#FFFFFF',
+                            border: '1px solid #E5E7EB',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                            position: 'relative', overflow: 'hidden',
+                            '&::before': {
+                                content: '""', position: 'absolute',
+                                top: 0, left: 0, right: 0, height: '3px',
+                                background: '#D32F2F',
+                            }
                         }}>
-                            My Bookings
-                        </Typography>
+                            <Typography variant="h4" sx={{ 
+                                fontFamily: '"Outfit", sans-serif',
+                                fontWeight: 800, 
+                                color: '#111827', 
+                                fontSize: { xs: '1.6rem', md: '2rem' },
+                                mb: 0.5
+                            }}>
+                                My Bookings
+                            </Typography>
+                            <Typography sx={{ fontFamily: '"Inter", sans-serif', color: '#6B7280', fontSize: '0.95rem' }}>
+                                Track, manage and review your vehicle service bookings
+                            </Typography>
+                        </Box>
                         
                         {loading && (
                             <Grid container spacing={3}>
@@ -321,31 +339,33 @@ const MyBookingsPage = () => {
                                         <Paper sx={{ 
                                             p: 3, 
                                             height: 300,
-                                            background: 'linear-gradient(135deg, #1e293b, #0f172a)',
-                                            border: '2px solid #374151'
+                                            background: '#FFFFFF',
+                                            border: '1px solid #E5E7EB',
+                                            borderRadius: '16px',
+                                            boxShadow: '0 2px 12px rgba(0,0,0,0.04)'
                                         }}>
                                             <Stack spacing={2}>
                                                 <Box sx={{ 
                                                     height: 24, 
-                                                    bgcolor: '#374151', 
+                                                    bgcolor: '#F3F4F6', 
                                                     borderRadius: 1,
                                                     animation: 'pulse 2s infinite'
                                                 }} />
                                                 <Box sx={{ 
                                                     height: 40, 
-                                                    bgcolor: '#4b5563', 
+                                                    bgcolor: '#E5E7EB', 
                                                     borderRadius: 1,
                                                     animation: 'pulse 2s infinite'
                                                 }} />
                                                 <Box sx={{ 
                                                     height: 16, 
-                                                    bgcolor: '#374151', 
+                                                    bgcolor: '#F3F4F6', 
                                                     borderRadius: 1,
                                                     animation: 'pulse 2s infinite'
                                                 }} />
                                                 <Box sx={{ 
                                                     height: 32, 
-                                                    bgcolor: '#4b5563', 
+                                                    bgcolor: '#E5E7EB', 
                                                     borderRadius: 1,
                                                     animation: 'pulse 2s infinite'
                                                 }} />
@@ -353,14 +373,14 @@ const MyBookingsPage = () => {
                                                     <Box sx={{ 
                                                         height: 32, 
                                                         flex: 1,
-                                                        bgcolor: '#374151', 
+                                                        bgcolor: '#F3F4F6', 
                                                         borderRadius: 1,
                                                         animation: 'pulse 2s infinite'
                                                     }} />
                                                     <Box sx={{ 
                                                         height: 32, 
                                                         flex: 1,
-                                                        bgcolor: '#374151', 
+                                                        bgcolor: '#F3F4F6', 
                                                         borderRadius: 1,
                                                         animation: 'pulse 2s infinite'
                                                     }} />
@@ -403,11 +423,15 @@ const MyBookingsPage = () => {
                                             variant={filter === 'all' ? 'contained' : 'outlined'}
                                             onClick={() => setFilter('all')}
                                             sx={{
-                                                borderColor: '#6366f1',
-                                                color: filter === 'all' ? 'white' : '#6366f1',
-                                                bgcolor: filter === 'all' ? '#6366f1' : 'transparent',
+                                                borderColor: '#D32F2F',
+                                                color: filter === 'all' ? 'white' : '#D32F2F',
+                                                bgcolor: filter === 'all' ? '#D32F2F' : 'transparent',
+                                                borderRadius: '10px',
+                                                textTransform: 'none',
+                                                fontWeight: 600,
                                                 '&:hover': {
-                                                    bgcolor: filter === 'all' ? '#5338f7' : 'rgba(99, 102, 241, 0.1)'
+                                                    bgcolor: filter === 'all' ? '#B71C1C' : '#FFF5F5',
+                                                    borderColor: '#D32F2F',
                                                 }
                                             }}
                                         >
@@ -417,11 +441,15 @@ const MyBookingsPage = () => {
                                             variant={filter === 'active' ? 'contained' : 'outlined'}
                                             onClick={() => setFilter('active')}
                                             sx={{
-                                                borderColor: '#22c55e',
-                                                color: filter === 'active' ? 'white' : '#22c55e',
-                                                bgcolor: filter === 'active' ? '#22c55e' : 'transparent',
+                                                borderColor: '#10B981',
+                                                color: filter === 'active' ? 'white' : '#059669',
+                                                bgcolor: filter === 'active' ? '#10B981' : 'transparent',
+                                                borderRadius: '10px',
+                                                textTransform: 'none',
+                                                fontWeight: 600,
                                                 '&:hover': {
-                                                    bgcolor: filter === 'active' ? '#16a34a' : 'rgba(34, 197, 94, 0.1)'
+                                                    bgcolor: filter === 'active' ? '#059669' : '#ECFDF5',
+                                                    borderColor: '#10B981',
                                                 }
                                             }}
                                         >
@@ -431,11 +459,15 @@ const MyBookingsPage = () => {
                                             variant={filter === 'completed' ? 'contained' : 'outlined'}
                                             onClick={() => setFilter('completed')}
                                             sx={{
-                                                borderColor: '#6b7280',
-                                                color: filter === 'completed' ? 'white' : '#6b7280',
-                                                bgcolor: filter === 'completed' ? '#6b7280' : 'transparent',
+                                                borderColor: '#9CA3AF',
+                                                color: filter === 'completed' ? 'white' : '#4B5563',
+                                                bgcolor: filter === 'completed' ? '#6B7280' : 'transparent',
+                                                borderRadius: '10px',
+                                                textTransform: 'none',
+                                                fontWeight: 600,
                                                 '&:hover': {
-                                                    bgcolor: filter === 'completed' ? '#5b6570' : 'rgba(107, 114, 128, 0.1)'
+                                                    bgcolor: filter === 'completed' ? '#4B5563' : '#F9FAFB',
+                                                    borderColor: '#6B7280',
                                                 }
                                             }}
                                         >
@@ -448,22 +480,23 @@ const MyBookingsPage = () => {
 
                         {!loading && !error && (
                             myBookings.length === 0 ? (
-                                <Paper sx={{ p: 4, textAlign: 'center', background: alpha("#000", 0.2) }}>
-                                    <EventBusyIcon sx={{ fontSize: 60, color: 'text.secondary' }} />
-                                    <Typography variant="h6" sx={{ color: 'white' }}>No Bookings Found</Typography>
-                                    <Button variant="contained" sx={{ mt: 2 }} onClick={() => navigate('/booking')}>Book a Service</Button>
+                                <Paper sx={{ p: 5, textAlign: 'center', background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+                                    <EventBusyIcon sx={{ fontSize: 60, color: '#9CA3AF', mb: 2 }} />
+                                    <Typography variant="h6" sx={{ color: '#111827', fontWeight: 700, mb: 1 }}>No Bookings Found</Typography>
+                                    <Typography sx={{ color: '#6B7280', mb: 3 }}>You have not made any service bookings yet.</Typography>
+                                    <Button variant="contained" sx={{ bgcolor: '#D32F2F', '&:hover': { bgcolor: '#B71C1C' }, borderRadius: '10px', textTransform: 'none', px: 3 }} onClick={() => navigate('/booking')}>Book a Service</Button>
                                 </Paper>
                             ) : (() => {
                                 const filteredBookings = getFilteredBookings();
                                 
                                 if (filteredBookings.length === 0) {
                                     return (
-                                        <Paper sx={{ p: 4, textAlign: 'center', background: alpha("#000", 0.2) }}>
-                                            <EventBusyIcon sx={{ fontSize: 60, color: 'text.secondary' }} />
-                                            <Typography variant="h6" sx={{ color: 'white' }}>
+                                        <Paper sx={{ p: 5, textAlign: 'center', background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+                                            <EventBusyIcon sx={{ fontSize: 60, color: '#9CA3AF', mb: 2 }} />
+                                            <Typography variant="h6" sx={{ color: '#111827', fontWeight: 700, mb: 1 }}>
                                                 No {filter} bookings found
                                             </Typography>
-                                            <Typography variant="body2" sx={{ color: '#9ca3af', mt: 1 }}>
+                                            <Typography variant="body2" sx={{ color: '#6B7280' }}>
                                                 Try selecting a different filter
                                             </Typography>
                                         </Paper>
@@ -488,21 +521,18 @@ const MyBookingsPage = () => {
                                                         minHeight: isCompleted ? '350px' : '400px',
                                                         display: 'flex',
                                                         flexDirection: 'column',
-                                                        background: isCompleted ? 
-                                                            'linear-gradient(135deg, #374151, #1f2937)' : 
-                                                            'linear-gradient(135deg, #1e293b, #0f172a)', 
-                                                        color: isCompleted ? '#d1d5db' : 'white',
+                                                        background: '#FFFFFF', 
+                                                        color: '#111827',
                                                         border: isCompleted ? 
-                                                            '2px solid #6b7280' : 
-                                                            '2px solid #22c55e',
-                                                        borderRadius: 2,
-                                                        opacity: isCompleted ? 0.8 : 1,
+                                                            '1px solid #E5E7EB' : 
+                                                            '1px solid #FCA5A5', 
+                                                        borderRadius: '16px',
+                                                        boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                                                        opacity: isCompleted ? 0.85 : 1,
                                                         transition: 'all 0.3s ease',
                                                         '&:hover': {
-                                                            transform: isCompleted ? 'translateY(-2px)' : 'translateY(-4px)',
-                                                            boxShadow: isCompleted ? 
-                                                                '0 5px 15px rgba(107, 114, 128, 0.3)' : 
-                                                                '0 10px 30px rgba(34, 197, 94, 0.3)'
+                                                            transform: 'translateY(-4px)',
+                                                            boxShadow: '0 12px 30px rgba(0, 0, 0, 0.1)'
                                                         }
                                                     }}>
                                                         {/* Main Card Content */}
@@ -510,7 +540,9 @@ const MyBookingsPage = () => {
                                                             {/* Header Section */}
                                                             <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2} sx={{ mb: 2 }}>
                                                                 <Typography variant="h6" sx={{ 
-                                                                    fontWeight: 600, 
+                                                                    fontFamily: '"Outfit", sans-serif',
+                                                                    fontWeight: 700, 
+                                                                    color: '#111827',
                                                                     flex: 1, 
                                                                     lineHeight: 1.2,
                                                                     fontSize: '1.1rem',
@@ -549,14 +581,14 @@ const MyBookingsPage = () => {
                                                             {/* Job ID Section */}
                                                             <Box sx={{ 
                                                                 p: 1.5, 
-                                                                bgcolor: isCompleted ? 'rgba(107, 114, 128, 0.2)' : 'rgba(99, 102, 241, 0.1)', 
-                                                                borderRadius: 1,
-                                                                border: isCompleted ? '1px solid rgba(107, 114, 128, 0.3)' : '1px solid rgba(99, 102, 241, 0.3)',
+                                                                bgcolor: '#F8F9FB', 
+                                                                borderRadius: '10px',
+                                                                border: '1px solid #E5E7EB',
                                                                 mb: 2
                                                             }}>
                                                                 <Typography variant="body2" sx={{ 
-                                                                    color: isCompleted ? '#9ca3af' : '#a5b4fc', 
-                                                                    fontWeight: 500 
+                                                                    color: '#374151', 
+                                                                    fontWeight: 600 
                                                                 }}>
                                                                     <strong>Job ID:</strong> {jobId}
                                                                 </Typography>
@@ -567,7 +599,7 @@ const MyBookingsPage = () => {
                                                                 {/* Vehicle Details */}
                                                                 <Box>
                                                                     <Typography variant="body2" sx={{ 
-                                                                        color: isCompleted ? '#9ca3af' : '#94a3b8', 
+                                                                        color: '#4B5563', 
                                                                         fontSize: '0.875rem' 
                                                                     }}>
                                                                         <strong>Vehicle:</strong> {booking.vehicle?.brand} {booking.vehicle?.model}
@@ -579,11 +611,13 @@ const MyBookingsPage = () => {
                                                                     <Chip 
                                                                         label={dayjs(booking.date).format('ddd, D MMM YYYY, h:mm A')} 
                                                                         sx={{ 
-                                                                            bgcolor: isCompleted ? '#6b7280' : '#0ea5e9',
-                                                                            color: 'white',
+                                                                            bgcolor: isCompleted ? '#F3F4F6' : '#EFF6FF',
+                                                                            color: isCompleted ? '#4B5563' : '#1D4ED8',
+                                                                            border: isCompleted ? '1px solid #E5E7EB' : '1px solid #BFDBFE',
                                                                             width: '100%',
                                                                             justifyContent: 'center',
-                                                                            fontSize: '0.8rem'
+                                                                            fontSize: '0.8rem',
+                                                                            fontWeight: 500
                                                                         }}
                                                                     />
                                                                 </Box>
@@ -591,7 +625,7 @@ const MyBookingsPage = () => {
                                                                 {/* Mechanic */}
                                                                 <Box>
                                                                     <Typography variant="body2" sx={{ 
-                                                                        color: isCompleted ? '#9ca3af' : '#94a3b8', 
+                                                                        color: '#4B5563', 
                                                                         fontSize: '0.875rem' 
                                                                     }}>
                                                                         <strong>Mechanic:</strong> {booking.mechanic?.name || 'Any Available'}
@@ -602,8 +636,8 @@ const MyBookingsPage = () => {
                                                                 {booking.service?.price && (
                                                                     <Box>
                                                                         <Typography variant="body2" sx={{ 
-                                                                            color: isCompleted ? '#9ca3af' : '#22c55e', 
-                                                                            fontWeight: 600 
+                                                                            color: isCompleted ? '#6B7280' : '#D32F2F', 
+                                                                            fontWeight: 700 
                                                                         }}>
                                                                             <strong>Price:</strong> LKR {booking.service.price}
                                                                         </Typography>
@@ -695,10 +729,10 @@ const MyBookingsPage = () => {
                     <Footer />
                 </Box>
 
-                <Dialog open={isEditModalOpen} onClose={handleEditModalClose} fullWidth maxWidth="lg">
+                <Dialog open={isEditModalOpen} onClose={handleEditModalClose} fullWidth maxWidth="lg" PaperProps={{ sx: { borderRadius: '20px', overflow: 'hidden' } }}>
                     {/* ... The entire modal content remains unchanged ... */}
-                    <DialogTitle sx={{ background: '#1e293b', color: 'white' }}>Edit Booking</DialogTitle>
-                     <DialogContent sx={{ background: '#0f172a', p: { xs: 1, sm: 2, md: 3 } }}>
+                    <DialogTitle sx={{ background: '#FFFFFF', color: '#111827', borderBottom: '1px solid #E5E7EB', fontFamily: '"Outfit", sans-serif', fontWeight: 800 }}>Edit Booking</DialogTitle>
+                     <DialogContent sx={{ background: '#F8F9FB', p: { xs: 1, sm: 2, md: 3 } }}>
                          <Stepper activeStep={activeEditStep} sx={{ my: 3 }}>
                              {editSteps.map(label => <Step key={label}><StepLabel>{label}</StepLabel></Step>)}
                          </Stepper>

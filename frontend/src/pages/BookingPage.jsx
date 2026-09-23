@@ -174,7 +174,7 @@ const BookingPage = () => {
     <div style="max-width: 800px; margin: 0 auto; background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); overflow: hidden;">
         
         <!-- Header with gradient background -->
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center;">
+        <div style="background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%); color: white; padding: 40px; text-align: center;">
             <div style="display: inline-block; background: rgba(255, 255, 255, 0.2); padding: 8px 16px; border-radius: 100px; margin-bottom: 20px;">
                 <span style="font-size: 14px; font-weight: 500; letter-spacing: 0.5px;">✓ BOOKING CONFIRMED</span>
             </div>
@@ -192,7 +192,7 @@ const BookingPage = () => {
             <!-- Booking Summary -->
             <div style="margin-bottom: 40px;">
                 <h3 style="color: #1e293b; font-size: 20px; font-weight: 600; margin: 0 0 24px 0; display: flex; align-items: center;">
-                    <span style="background: #667eea; width: 4px; height: 24px; border-radius: 2px; margin-right: 12px;"></span>
+                    <span style="background: #D32F2F; width: 4px; height: 24px; border-radius: 2px; margin-right: 12px;"></span>
                     Booking Details
                 </h3>
                 <div style="background: #f8fafc; border-radius: 12px; padding: 24px; border: 1px solid #e2e8f0;">
@@ -209,7 +209,7 @@ const BookingPage = () => {
             <!-- Terms & Conditions -->
             <div>
                 <h3 style="color: #1e293b; font-size: 20px; font-weight: 600; margin: 0 0 24px 0; display: flex; align-items: center;">
-                    <span style="background: #667eea; width: 4px; height: 24px; border-radius: 2px; margin-right: 12px;"></span>
+                    <span style="background: #D32F2F; width: 4px; height: 24px; border-radius: 2px; margin-right: 12px;"></span>
                     Terms & Conditions
                 </h3>
                 <div style="background: #fef3c7; border-radius: 12px; padding: 24px; border: 1px solid #fde68a;">
@@ -270,19 +270,65 @@ const BookingPage = () => {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <CssBaseline />
                 <GlobalStyles styles={backgroundKeyframes} />
-                <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+                <Box sx={{
+                    display: "flex", flexDirection: "column", minHeight: "100vh",
+                    background: '#F8F9FB',
+                    position: 'relative',
+                }}>
                     <Header theme={theme} />
-                    <Box component="main" sx={{ flexGrow: 1, pt: "80px", pb: 8 }}>
-                        <Container maxWidth="lg" sx={{ mt: 8 }}>
-                            <Paper sx={{ p: 3, mb: 4, background: 'linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1))' }}>
-                                <Typography variant="h4" sx={{ background: 'linear-gradient(to right, #6366f1, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Book a Service</Typography>
-                            </Paper>
-                            {error && <Alert severity="error">{error}</Alert>}
-                            <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
-                                {steps.map((label) => (
-                                    <Step key={label}><StepLabel>{label}</StepLabel></Step>
-                                ))}
-                            </Stepper>
+                    <Box component="main" sx={{ flexGrow: 1, pt: "80px", pb: 8, position: 'relative', zIndex: 1 }}>
+                        <Container maxWidth="lg" sx={{ mt: 6, mb: 4 }}>
+                            {/* Page heading */}
+                            <Box sx={{
+                                mb: 5,
+                                p: { xs: 3, md: 4 },
+                                borderRadius: '20px',
+                                background: '#FFFFFF',
+                                border: '1px solid #E5E7EB',
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                                position: 'relative', overflow: 'hidden',
+                                '&::before': {
+                                    content: '""', position: 'absolute',
+                                    top: 0, left: 0, right: 0, height: '3px',
+                                    background: '#D32F2F',
+                                }
+                            }}>
+                                <Typography
+                                    variant="h4"
+                                    sx={{
+                                        fontFamily: '"Outfit", sans-serif',
+                                        fontWeight: 800,
+                                        fontSize: { xs: '1.6rem', md: '2rem' },
+                                        color: '#111827',
+                                        mb: 0.5,
+                                    }}
+                                >
+                                    Book a Service
+                                </Typography>
+                                <Typography sx={{
+                                    fontFamily: '"Inter", sans-serif',
+                                    color: '#6B7280', fontSize: '0.95rem',
+                                }}>
+                                    Complete the steps below to schedule your vehicle service
+                                </Typography>
+                            </Box>
+
+                            {error && <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }}>{error}</Alert>}
+
+                            {/* Stepper */}
+                            <Box sx={{
+                                mb: 5, p: 3, borderRadius: '16px',
+                                background: '#FFFFFF',
+                                border: '1px solid #E5E7EB',
+                                boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                            }}>
+                                <Stepper activeStep={activeStep}>
+                                    {steps.map((label) => (
+                                        <Step key={label}><StepLabel>{label}</StepLabel></Step>
+                                    ))}
+                                </Stepper>
+                            </Box>
+
                             {activeStep === 0 && <StepVehicleSelect vehicles={vehicles} vehicle={vehicle} setVehicle={setVehicle} onNext={handleNext} />}
                             {activeStep === 1 && <StepServiceSelect services={services} service={service} setService={setService} onNext={handleNext} onBack={handleBack} selectedVehicle={vehicle} />}
                             {activeStep === 2 && <StepDateTime date={date} setDate={setDate} time={time} setTime={setTime} mechanic={mechanic} setMechanic={setMechanic} mechanics={mechanics} bookings={bookings} serviceDuration={service?.duration} onNext={handleNext} onBack={handleBack} />}
@@ -292,40 +338,97 @@ const BookingPage = () => {
                     <Footer />
                 </Box>
 
-                <Dialog open={isLoading} PaperProps={{ sx: { background: alpha("#1e293b", 0.9), color: "white", p: 4, borderRadius: 2 } }}>
+                <Dialog open={isLoading} PaperProps={{ sx: {
+                    background: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    color: "#111827", p: 4, borderRadius: '20px',
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+                }}}>
                     {/* ... Loading dialog content ... */}
                 </Dialog>
                 
                 {/* 👈 Success Dialog*/}
-                <Dialog open={successDialogOpen} onClose={handleNavigateToBookings} fullWidth maxWidth="xs">
-                    <DialogTitle sx={{ color: 'black', textAlign: 'center', pb: 0 }}>
-                        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#10b981' }}>
+                <Dialog
+                    open={successDialogOpen}
+                    onClose={handleNavigateToBookings}
+                    fullWidth maxWidth="xs"
+                    PaperProps={{ sx: {
+                        background: '#FFFFFF',
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '20px',
+                        overflow: 'hidden',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+                        '&::before': {
+                            content: '""', position: 'absolute', top: 0, left: 0, right: 0,
+                            height: '3px', background: '#D32F2F',
+                        }
+                    }}}
+                >
+                    <DialogTitle sx={{ textAlign: 'center', pb: 0, pt: 4 }}>
+                        <Box sx={{
+                            width: 64, height: 64, borderRadius: '50%',
+                            background: '#D32F2F',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            mx: 'auto', mb: 2,
+                            boxShadow: '0 8px 24px rgba(211, 47, 47, 0.3)',
+                        }}>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="white"/>
+                            </svg>
+                        </Box>
+                        <Typography variant="h5" sx={{
+                            fontFamily: '"Outfit", sans-serif',
+                            fontWeight: 800, color: '#111827',
+                        }}>
                             BOOKING CONFIRMED!
                         </Typography>
                     </DialogTitle>
                     
-                    <DialogContent sx={{ background: 'white', p: 4, pt: 2, textAlign: 'center' }}>
-                        <Typography variant="h6" sx={{ color: '#3b82f6', fontWeight: 600 }}>
+                    <DialogContent sx={{ p: 4, pt: 2, textAlign: 'center' }}>
+                        <Typography variant="h6" sx={{
+                            fontFamily: '"Inter", sans-serif',
+                            color: '#374151', fontWeight: 600, mb: 2,
+                        }}>
                             Your Booking was successful.
                         </Typography>
-                        <Typography variant="body1" sx={{ color: 'black', mt: 2 }}>
+                        <Typography variant="body1" sx={{
+                            fontFamily: '"Inter", sans-serif',
+                            color: '#6B7280', mt: 2,
+                        }}>
                             Job ID:
                         </Typography>
-                        <Typography variant="h5" sx={{ color: 'black', fontWeight: 'bold' }}>
+                        <Typography variant="h5" sx={{
+                            fontFamily: '"Outfit", sans-serif',
+                            color: '#D32F2F', fontWeight: 800, letterSpacing: '0.05em',
+                        }}>
                             {newJobId || 'N/A'}
                         </Typography>
                     </DialogContent>
 
-                    <DialogActions>
+                    <DialogActions sx={{ p: 3, pt: 1, gap: 1 }}>
                         <Button 
                             onClick={handleDownloadPdf} 
                             variant="outlined" 
                             disabled={isLoading}
-                            sx={{ color: '#10b981', borderColor: '#10b981', '&:hover': { background: alpha('#10b981', 0.1) } }}
+                            sx={{
+                                borderRadius: '10px', color: '#374151', borderColor: '#E5E7EB',
+                                fontFamily: '"Inter", sans-serif', fontWeight: 600, textTransform: 'none',
+                                '&:hover': { background: '#F9FAFB', borderColor: '#D1D5DB' },
+                            }}
                         >
                             Download Confirmation PDF
                         </Button>
-                        <Button onClick={handleNavigateToBookings} variant="contained" sx={{ backgroundColor: "#3b82f6", '&:hover': { backgroundColor: "#2563eb" } }}>
+                        <Button
+                            onClick={handleNavigateToBookings}
+                            variant="contained"
+                            sx={{
+                                borderRadius: '10px',
+                                background: '#D32F2F',
+                                fontFamily: '"Inter", sans-serif', fontWeight: 600, textTransform: 'none',
+                                boxShadow: '0 4px 14px rgba(211, 47, 47, 0.35)',
+                                '&:hover': { background: '#B71C1C' },
+                            }}
+                        >
                             Go to My Bookings
                         </Button>
                     </DialogActions>

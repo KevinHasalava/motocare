@@ -183,31 +183,18 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
       sx={{ 
         width: 320, 
         height: '100%',
-        background: 'linear-gradient(180deg, #0a0e1a 0%, #1a1f2e 100%)',
+        background: '#FFFFFF',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        borderRight: '1px solid #E5E7EB',
       }}
     >
-      {/* Decorative background elements */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: -100,
-          right: -100,
-          width: 250,
-          height: 250,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%)',
-          filter: 'blur(40px)',
-        }}
-      />
-
       {/* Header */}
       <Box 
         sx={{ 
           p: 3, 
-          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+          background: '#F8F9FB',
+          borderBottom: '1px solid #E5E7EB',
           position: 'relative',
         }}
       >
@@ -216,10 +203,10 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
           <IconButton 
             onClick={toggleDrawer(false)}
             sx={{ 
-              color: 'white',
-              background: 'rgba(255, 255, 255, 0.05)',
+              color: '#374151',
+              background: '#F3F4F6',
               '&:hover': {
-                background: 'rgba(255, 255, 255, 0.1)',
+                background: '#E5E7EB',
                 transform: 'rotate(90deg)',
               },
               transition: 'all 0.3s ease',
@@ -242,23 +229,22 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
           borderRadius: 2,
           py: 1.5,
           px: 2,
-          background: 'linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(255, 159, 64, 0.1) 100%)',
-          border: '1px solid rgba(255, 107, 107, 0.3)',
+          background: '#FFF5F5',
+          border: '1px solid rgba(211,47,47,0.2)',
           transition: 'all 0.3s ease',
           '&:hover': {
-            background: 'linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 159, 64, 0.2) 100%)',
-            borderColor: 'rgba(255, 107, 107, 0.5)',
+            background: '#FFEBEE',
             transform: 'translateX(8px)',
           }
         }}
       >
         <Stack direction="row" spacing={2} alignItems="center">
-          <DashboardIcon sx={{ fontSize: 20, color: '#ff6b6b' }} />
+          <DashboardIcon sx={{ fontSize: 20, color: '#D32F2F' }} />
           <ListItemText 
             primary="Admin Dashboard" 
             sx={{ 
               '& .MuiListItemText-primary': { 
-                color: 'white',
+                color: '#111827',
                 fontWeight: 600,
                 fontSize: '1rem'
               } 
@@ -278,12 +264,12 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                   borderRadius: 2,
                   py: 1.5,
                   px: 2,
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  background: '#FAFAFA',
+                  border: '1px solid #E5E7EB',
                   transition: 'all 0.3s ease',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)',
-                    borderColor: 'rgba(99, 102, 241, 0.3)',
+                    background: '#FFF5F5',
+                    borderColor: 'rgba(211,47,47,0.3)',
                     transform: 'translateX(8px)',
                   }
                 }}
@@ -294,7 +280,7 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                     primary={item} 
                     sx={{ 
                       '& .MuiListItemText-primary': { 
-                        color: 'white',
+                        color: '#1F2937',
                         fontWeight: 600,
                         fontSize: '1rem'
                       } 
@@ -317,14 +303,14 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                   p: 2.5, 
                   mb: 3,
                   borderRadius: 3,
-                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)',
-                  border: '1px solid rgba(16, 185, 129, 0.2)',
+                  background: '#F8F9FB',
+                  border: '1px solid #E5E7EB',
                 }}
               >
                 <Stack direction="row" alignItems="center" spacing={2}>
                   <Avatar 
                     sx={{ 
-                      background: 'linear-gradient(135deg, #10b981 0%, #3b82f6 100%)',
+                      background: 'linear-gradient(135deg, #D32F2F 0%, #EF4444 100%)',
                       width: 48,
                       height: 48
                     }}
@@ -332,7 +318,7 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                     {user.name?.charAt(0).toUpperCase()}
                   </Avatar>
                   <Box>
-                    <Typography variant="body1" sx={{ color: 'white', fontWeight: 600 }}>
+                    <Typography variant="body1" sx={{ color: '#111827', fontWeight: 600 }}>
                       {user.name}
                     </Typography>
                     <Chip 
@@ -340,9 +326,9 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                       size="small"
                       sx={{ 
                         mt: 0.5,
-                        background: 'rgba(16, 185, 129, 0.2)',
-                        color: '#10b981',
-                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        background: '#FFEBEE',
+                        color: '#D32F2F',
+                        border: '1px solid rgba(211,47,47,0.2)',
                         fontSize: '0.75rem'
                       }}
                     />
@@ -359,12 +345,13 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                   py: 1.5,
                   mb: 2,
                   borderRadius: 2,
-                  background: 'rgba(99, 102, 241, 0.1)',
-                  color: '#6366f1',
-                  border: '1px solid rgba(99, 102, 241, 0.2)',
+                  background: '#F8F9FB',
+                  color: '#374151',
+                  border: '1px solid #E5E7EB',
                   fontWeight: 600,
                   '&:hover': {
-                    background: 'rgba(99, 102, 241, 0.2)',
+                    background: '#F3F4F6',
+                    borderColor: '#D1D5DB',
                   }
                 }}
               >
@@ -383,12 +370,12 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                       py: 1.5,
                       mb: 1,
                       borderRadius: 2,
-                      background: 'rgba(34, 197, 94, 0.1)',
-                      color: '#22c55e',
-                      border: '1px solid rgba(34, 197, 94, 0.2)',
+                      background: '#F8F9FB',
+                      color: '#374151',
+                      border: '1px solid #E5E7EB',
                       fontWeight: 600,
                       '&:hover': {
-                        background: 'rgba(34, 197, 94, 0.2)',
+                        background: '#F3F4F6',
                       }
                     }}
                   >
@@ -407,14 +394,14 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                             py: 0.5,
                             mb: 0.5,
                             borderRadius: 1,
-                            background: 'rgba(255, 255, 255, 0.02)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            background: '#FAFAFA',
+                            color: '#6B7280',
                             fontSize: '0.75rem',
                             textAlign: 'left',
                             justifyContent: 'flex-start',
                             '&:hover': {
-                              background: 'rgba(34, 197, 94, 0.1)',
-                              color: '#22c55e',
+                              background: '#FFF5F5',
+                              color: '#D32F2F',
                             }
                           }}
                         >
@@ -424,7 +411,7 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                       {vehicles.length > 3 && (
                         <Typography 
                           variant="caption" 
-                          sx={{ color: 'rgba(255, 255, 255, 0.5)', pl: 1 }}
+                          sx={{ color: '#9CA3AF', pl: 1 }}
                         >
                           +{vehicles.length - 3} more vehicles
                         </Typography>
@@ -442,12 +429,14 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                 sx={{
                   py: 1.5,
                   borderRadius: 2,
-                  background: 'rgba(239, 68, 68, 0.1)',
-                  color: '#ef4444',
-                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                  background: '#FFF5F5',
+                  color: '#D32F2F',
+                  border: '1px solid rgba(211,47,47,0.2)',
                   fontWeight: 600,
+                  boxShadow: 'none',
                   '&:hover': {
-                    background: 'rgba(239, 68, 68, 0.2)',
+                    background: '#FFEBEE',
+                    boxShadow: 'none',
                   }
                 }}
               >
@@ -464,13 +453,13 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
             sx={{
               py: 1.5,
               borderRadius: 2,
-              borderColor: 'rgba(99, 102, 241, 0.3)',
-              color: '#6366f1',
-              background: 'rgba(99, 102, 241, 0.05)',
+              borderColor: '#E5E7EB',
+              color: '#374151',
+              background: '#F8F9FB',
               fontWeight: 600,
               '&:hover': {
-                borderColor: '#6366f1',
-                background: 'rgba(99, 102, 241, 0.1)',
+                borderColor: '#D1D5DB',
+                background: '#F3F4F6',
               }
             }}
           >
@@ -482,19 +471,19 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
           variant="contained"
           fullWidth
           startIcon={<CalendarIcon />}
-          endIcon={<SparkleIcon sx={{ fontSize: 16 }} />}
           onClick={() => navigate("/booking")}
           sx={{ 
             mt: 2,
             py: 1.8,
             borderRadius: 2,
-            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+            background: '#D32F2F',
             fontWeight: 700,
             fontSize: '1rem',
-            boxShadow: '0 10px 30px rgba(99, 102, 241, 0.3)',
+            boxShadow: '0 6px 20px rgba(211,47,47,0.3)',
             '&:hover': {
+              background: '#B71C1C',
               transform: 'translateY(-2px)',
-              boxShadow: '0 15px 40px rgba(99, 102, 241, 0.4)',
+              boxShadow: '0 10px 28px rgba(211,47,47,0.4)',
             },
             transition: 'all 0.3s ease',
           }}
@@ -511,30 +500,26 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
         position="fixed"
         elevation={0}
         sx={{
-          background: scrolled 
-            ? 'rgba(10, 14, 26, 0.95)' 
-            : 'rgba(10, 14, 26, 0.8)',
-          backdropFilter: 'blur(20px)',
+          background: '#FFFFFF',
+          backdropFilter: 'none',
           borderBottom: '1px solid',
-          borderColor: scrolled 
-            ? 'rgba(255, 255, 255, 0.08)' 
-            : 'rgba(255, 255, 255, 0.05)',
-          transition: 'all 0.3s ease',
+          borderColor: '#E5E7EB',
+          transition: 'all 0.35s ease',
+          boxShadow: scrolled ? '0 2px 16px rgba(0,0,0,0.08)' : '0 1px 4px rgba(0,0,0,0.04)',
           '&::before': {
             content: '""',
             position: 'absolute',
-            top: 0,
+            bottom: 0,
             left: 0,
             right: 0,
-            height: '1px',
-            background: 'linear-gradient(90deg, transparent, #6366f1, #a855f7, transparent)',
-            opacity: scrolled ? 0.5 : 0,
-            transition: 'opacity 0.3s ease',
+            height: '2px',
+            background: scrolled ? '#D32F2F' : 'transparent',
+            transition: 'background 0.35s ease',
           }
         }}
       >
         <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ justifyContent: 'space-between', height: 80 }}>
+          <Toolbar disableGutters sx={{ justifyContent: 'space-between', height: 76 }}>
             <Zoom in timeout={500}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Logo size="medium" variant="default" clickable={true} onClick={handleLogoClick} />
@@ -544,7 +529,7 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
             {/* Desktop Nav Items */}
             <Stack 
               direction="row" 
-              spacing={1} 
+              spacing={0.5} 
               alignItems="center" 
               sx={{ display: { xs: 'none', md: 'flex' } }}
             >
@@ -559,12 +544,11 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                       px: 2.5,
                       py: 1,
                       borderRadius: 2,
-                      color: 'white',
+                      color: '#D32F2F',
                       fontWeight: 600,
-                      background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-                      border: 'none',
-                      '&:hover': {transform: 'translateY(-2px)',
-                      boxShadow: '0 6px 18px rgba(99, 102, 241, 0.4)', }
+                      background: '#FFF5F5',
+                      border: '1px solid rgba(211,47,47,0.2)',
+                      '&:hover': { background: '#FFEBEE', transform: 'translateY(-2px)' }
                     }}
                   >
                     Admin Dashboard
@@ -575,36 +559,36 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                 <Fade in timeout={300 + index * 100} key={item}>
                   <Button 
                     onClick={() => handleNavClick(item.toLowerCase())}
-                    startIcon={getNavIcon(item)}
                     sx={{
                       mx: 0.5,
-                      px: 2.5,
-                      py: 1,
-                      borderRadius: 2,
-                      color: 'rgba(255, 255, 255, 0.85)',
-                      fontSize: '0.95rem',
+                      px: 2,
+                      py: 0.9,
+                      borderRadius: '10px',
+                      color: '#374151',
+                      fontSize: '0.9rem',
+                      fontFamily: '"Inter", sans-serif',
                       fontWeight: 600,
                       position: 'relative',
                       overflow: 'hidden',
-                      transition: 'all 0.3s ease',
+                      transition: 'all 0.22s ease',
                       '&:hover': {
-                        color: 'white',
-                        background: 'rgba(99, 102, 241, 0.1)',
-                        transform: 'translateY(-2px)',
+                        color: '#D32F2F',
+                        background: '#FFF5F5',
                       },
-                      '&::before': {
+                      '&::after': {
                         content: '""',
                         position: 'absolute',
-                        bottom: 0,
+                        bottom: 4,
                         left: '50%',
                         transform: 'translateX(-50%)',
                         width: 0,
                         height: '2px',
-                        background: 'linear-gradient(90deg, #6366f1, #a855f7)',
-                        transition: 'width 0.3s ease',
+                        borderRadius: '1px',
+                        background: '#D32F2F',
+                        transition: 'width 0.25s ease',
                       },
-                      '&:hover::before': {
-                        width: '80%',
+                      '&:hover::after': {
+                        width: '60%',
                       }
                     }}
                   >
@@ -625,14 +609,16 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                           startIcon={vehiclesLoading ? <CircularProgress size={16} /> : <CarIcon />}
                           endIcon={<ExpandMoreIcon />}
                           sx={{
-                            background: 'rgba(34, 197, 94, 0.1)',
-                            border: '1px solid rgba(34, 197, 94, 0.3)',
-                            color: '#22c55e',
+                            background: '#F8F9FB',
+                            border: '1px solid #E5E7EB',
+                            color: '#374151',
                             fontWeight: 600,
                             borderRadius: 2,
                             px: 2,
                             '&:hover': {
-                              background: 'rgba(34, 197, 94, 0.2)',
+                              background: '#FFF5F5',
+                              color: '#D32F2F',
+                              borderColor: 'rgba(211,47,47,0.3)',
                               transform: 'translateY(-2px)',
                             },
                             transition: 'all 0.3s ease',
@@ -648,11 +634,7 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                       avatar={
                         <Avatar 
                           sx={{ 
-                            background: user.userType === 'customer' 
-                              ? 'linear-gradient(135deg, #10b981 0%, #3b82f6 100%)'
-                              : user.userType === 'mechanic'
-                              ? 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)'
-                              : 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
+                            background: 'linear-gradient(135deg, #D32F2F 0%, #EF4444 100%)',
                             color: 'white !important'
                           }}
                         >
@@ -662,17 +644,9 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                       label={`${user.name} • ${user.userType || 'user'}`}
                       onClick={handleProfileMenuOpen}
                       sx={{
-                        background: user.userType === 'customer'
-                          ? 'rgba(16, 185, 129, 0.1)'
-                          : user.userType === 'mechanic'
-                          ? 'rgba(245, 158, 11, 0.1)'
-                          : 'rgba(139, 92, 246, 0.1)',
-                        border: user.userType === 'customer'
-                          ? '1px solid rgba(16, 185, 129, 0.3)'
-                          : user.userType === 'mechanic'
-                          ? '1px solid rgba(245, 158, 11, 0.3)'
-                          : '1px solid rgba(139, 92, 246, 0.3)',
-                        color: 'white',
+                        background: '#F8F9FB',
+                        border: '1px solid #E5E7EB',
+                        color: '#374151',
                         fontWeight: 600,
                         px: 1,
                         cursor: 'pointer',
@@ -680,11 +654,8 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                           color: 'white',
                         },
                         '&:hover': {
-                          background: user.userType === 'customer'
-                            ? 'rgba(16, 185, 129, 0.2)'
-                            : user.userType === 'mechanic'
-                            ? 'rgba(245, 158, 11, 0.2)'
-                            : 'rgba(139, 92, 246, 0.2)',
+                          background: '#FFF5F5',
+                          borderColor: 'rgba(211,47,47,0.3)',
                           transform: 'translateY(-2px)',
                         },
                         transition: 'all 0.3s ease',
@@ -694,11 +665,11 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                     <IconButton 
                       onClick={handleLogout}
                       sx={{
-                        color: '#ef4444',
-                        background: 'rgba(239, 68, 68, 0.1)',
-                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                        color: '#D32F2F',
+                        background: '#FFF5F5',
+                        border: '1px solid rgba(211,47,47,0.2)',
                         '&:hover': {
-                          background: 'rgba(239, 68, 68, 0.2)',
+                          background: '#FFEBEE',
                           transform: 'rotate(180deg)',
                         },
                         transition: 'all 0.3s ease',
@@ -719,13 +690,14 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                       px: 3,
                       py: 1,
                       borderRadius: 2,
-                      borderColor: 'rgba(99, 102, 241, 0.5)',
-                      color: '#6366f1',
+                      borderColor: '#E5E7EB',
+                      color: '#374151',
                       fontWeight: 600,
-                      background: 'rgba(99, 102, 241, 0.05)',
+                      background: '#F8F9FB',
                       '&:hover': {
-                        borderColor: '#6366f1',
-                        background: 'rgba(99, 102, 241, 0.1)',
+                        borderColor: '#D32F2F',
+                        color: '#D32F2F',
+                        background: '#FFF5F5',
                         transform: 'translateY(-2px)',
                       },
                       transition: 'all 0.3s ease',
@@ -738,39 +710,29 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
 
               <Fade in timeout={700}>
                 <Box sx={{ ml: 2, position: 'relative' }}>
-                  {/* Glow effect */}
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      inset: -10,
-                      background: 'radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%)',
-                      filter: 'blur(20px)',
-                      animation: 'pulse 3s ease-in-out infinite',
-                    }}
-                  />
                   <Button
                     onClick={() => navigate("/booking")}
                     variant="contained"
                     startIcon={<CalendarIcon />}
-                    endIcon={<ArrowIcon sx={{ fontSize: 16 }} />}
+                    endIcon={<ArrowIcon sx={{ fontSize: 15 }} />}
                     sx={{
-                      position: 'relative',
-                      px: 3.5,
-                      py: 1.2,
-                      borderRadius: 3,
-                      background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                      px: 3,
+                      py: 1.1,
+                      borderRadius: '10px',
+                      background: '#D32F2F',
                       fontWeight: 700,
-                      fontSize: '0.95rem',
+                      fontFamily: '"Inter", sans-serif',
+                      fontSize: '0.88rem',
                       textTransform: 'none',
-                      boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)',
-                      transition: 'all 0.3s ease',
+                      boxShadow: '0 4px 16px rgba(211,47,47,0.3)',
+                      border: 'none',
+                      transition: 'all 0.22s ease',
                       '&:hover': {
-                        transform: 'translateY(-3px) scale(1.02)',
-                        boxShadow: '0 12px 32px rgba(99, 102, 241, 0.4)',
-                        '& .MuiButton-endIcon': {
-                          transform: 'translateX(4px)',
-                        }
-                      }
+                        background: '#B71C1C',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 8px 24px rgba(211,47,47,0.4)',
+                      },
+                      '&:active': { transform: 'translateY(0)' },
                     }}
                   >
                     Book Now
@@ -782,14 +744,14 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
             {/* Mobile Menu Button */}
             <Zoom in timeout={500}>
               <IconButton 
-                color="inherit" 
                 onClick={toggleDrawer(true)} 
                 sx={{ 
                   display: { md: 'none' },
-                  background: 'rgba(99, 102, 241, 0.1)',
-                  border: '1px solid rgba(99, 102, 241, 0.3)',
+                  color: '#374151',
+                  background: '#F3F4F6',
+                  border: '1px solid #E5E7EB',
                   '&:hover': {
-                    background: 'rgba(99, 102, 241, 0.2)',
+                    background: '#E5E7EB',
                   }
                 }}
               >

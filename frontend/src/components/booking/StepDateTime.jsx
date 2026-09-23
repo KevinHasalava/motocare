@@ -104,10 +104,10 @@ const StepDateTime = ({
         <Grid container spacing={3}>
           {/* Date Selection */}
           <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, background: "#1e293b" }}>
-              <Stack direction="row" spacing={2} alignItems="center" mb={2}>
-                <CalendarMonthIcon sx={{ color: "white" }} />
-                <Typography sx={{ color: "white" }}>Select Date</Typography>
+            <Paper sx={{ p: 2.5, background: "#FFFFFF", borderRadius: 3, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
+              <Stack direction="row" spacing={1.5} alignItems="center" mb={2}>
+                <CalendarMonthIcon sx={{ color: "#D32F2F" }} />
+                <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "1rem" }}>Select Date</Typography>
               </Stack>
               <DateCalendar
                 value={date}
@@ -118,8 +118,19 @@ const StepDateTime = ({
                 }}
                 disablePast
                 sx={{
-                  "& .MuiPickersDay-root": { color: "white" },
-                  "& .Mui-disabled": { color: "#666 !important" }
+                  width: '100%',
+                  "& .MuiPickersDay-root": { 
+                    color: "#0F172A",
+                    fontWeight: 600,
+                    "&.Mui-selected": {
+                      backgroundColor: "#D32F2F !important",
+                      color: "#FFFFFF !important",
+                    },
+                    "&:hover": {
+                      backgroundColor: "#FEE2E2",
+                    }
+                  },
+                  "& .Mui-disabled": { color: "#CBD5E1 !important" }
                 }}
               />
             </Paper>
@@ -127,10 +138,10 @@ const StepDateTime = ({
 
           {/* Mechanic Selection */}
           <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, background: "#1e293b", maxHeight: 500, overflow: "auto" }}>
-              <Stack direction="row" spacing={2} alignItems="center" mb={2}>
-                <EngineeringIcon sx={{ color: "white" }} />
-                <Typography sx={{ color: "white" }}>Select Mechanic (Optional)</Typography>
+            <Paper sx={{ p: 2.5, background: "#FFFFFF", borderRadius: 3, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.03)", maxHeight: 520, overflow: "auto" }}>
+              <Stack direction="row" spacing={1.5} alignItems="center" mb={2}>
+                <EngineeringIcon sx={{ color: "#D32F2F" }} />
+                <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "1rem" }}>Select Mechanic (Optional)</Typography>
               </Stack>
               
               <Card
@@ -140,37 +151,41 @@ const StepDateTime = ({
                 }}
                 sx={{
                   cursor: "pointer", mb: 2,
-                  border: !mechanic ? "2px solid #10b981" : "1px solid #555",
-                  backgroundColor: !mechanic ? alpha("#10b981", 0.1) : "transparent"
+                  border: !mechanic ? "2px solid #D32F2F" : "1px solid #E2E8F0",
+                  backgroundColor: !mechanic ? "#FEF2F2" : "#FFFFFF",
+                  boxShadow: !mechanic ? "0 4px 12px rgba(211, 47, 47, 0.1)" : "none",
+                  transition: "all 0.2s ease"
                 }}
               >
-                <CardContent>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Typography>Any Available Mechanic</Typography>
-                    {!mechanic && <CheckCircleIcon color="success"/>}
+                <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                  <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+                    <Typography sx={{ fontWeight: 600, color: "#0F172A", fontSize: "0.95rem" }}>Any Available Mechanic</Typography>
+                    {!mechanic && <CheckCircleIcon sx={{ color: "#D32F2F" }} />}
                   </Stack>
                 </CardContent>
               </Card>
 
-              <Stack spacing={2}>
+              <Stack spacing={1.5}>
                 {mechanics.map((mech) => (
                   <Card 
                     key={mech._id}
                     onClick={() => { 
-                      setMechanic(mech); 
+                       setMechanic(mech); 
                       setTime(null); 
                     }}
                     sx={{
                       cursor: "pointer",
-                      border: mechanic?._id === mech._id ? "2px solid #10b981" : "1px solid #555",
-                      backgroundColor: mechanic?._id === mech._id ? alpha("#10b981", 0.1) : "transparent"
+                      border: mechanic?._id === mech._id ? "2px solid #D32F2F" : "1px solid #E2E8F0",
+                      backgroundColor: mechanic?._id === mech._id ? "#FEF2F2" : "#FFFFFF",
+                      boxShadow: mechanic?._id === mech._id ? "0 4px 12px rgba(211, 47, 47, 0.1)" : "none",
+                      transition: "all 0.2s ease"
                     }}
                   >
-                    <CardContent>
+                    <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
                       <Stack direction="row" spacing={2} alignItems="center">
-                        <Avatar sx={{ bgcolor: "#667eea" }}>{mech.name?.charAt(0)}</Avatar>
-                        <Typography>{mech.name}</Typography>
-                        {mechanic?._id === mech._id && <CheckCircleIcon color="success"/>}
+                        <Avatar sx={{ bgcolor: "#D32F2F", width: 36, height: 36, fontSize: "0.95rem", fontWeight: 700 }}>{mech.name?.charAt(0)}</Avatar>
+                        <Typography sx={{ fontWeight: 600, color: "#0F172A", flexGrow: 1 }}>{mech.name}</Typography>
+                        {mechanic?._id === mech._id && <CheckCircleIcon sx={{ color: "#D32F2F" }} />}
                       </Stack>
                     </CardContent>
                   </Card>
@@ -181,10 +196,10 @@ const StepDateTime = ({
 
           {/* Time slots */}
           <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, background: "#1e293b", maxHeight: 500, overflow: "auto" }}>
-              <Stack direction="row" spacing={2} alignItems="center" mb={2}>
-                <AccessTimeIcon sx={{ color: "white" }} />
-                <Typography sx={{ color: "white" }}>
+            <Paper sx={{ p: 2.5, background: "#FFFFFF", borderRadius: 3, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.03)", maxHeight: 520, overflow: "auto" }}>
+              <Stack direction="row" spacing={1.5} alignItems="center" mb={2}>
+                <AccessTimeIcon sx={{ color: "#D32F2F" }} />
+                <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "1rem" }}>
                   Select Time {!date && " (Select date first)"}
                 </Typography>
               </Stack>
@@ -201,15 +216,19 @@ const StepDateTime = ({
                         disabled={!date || !available}
                         onClick={() => setTime(dayjs(`${date.format("YYYY-MM-DD")} ${slot}`))}
                         sx={{
-                            borderColor: !date ? "#64748b" : available ? "#10b981" : "#ef4444",
-                            color: isSelected ? "white" : (available ? "#10b981" : "#ef4444"),
-                            backgroundColor: isSelected && available ? "#10b981" : "transparent",
+                            fontWeight: 600,
+                            borderRadius: 2,
+                            borderColor: !date ? "#E2E8F0" : isSelected ? "#D32F2F" : available ? "#CBD5E1" : "#FEE2E2",
+                            color: isSelected ? "#FFFFFF" : available ? "#0F172A" : "#FDA4AF",
+                            backgroundColor: isSelected ? "#D32F2F" : available ? "#FFFFFF" : "#FFF1F2",
                             "&:hover": {
-                                backgroundColor: available && !isSelected ? alpha("#10b981", 0.1) : undefined
+                                backgroundColor: isSelected ? "#B71C1C" : available ? "#FEF2F2" : undefined,
+                                borderColor: isSelected ? "#B71C1C" : available ? "#D32F2F" : undefined,
                             },
                             "&.Mui-disabled": {
-                                borderColor: !date ? "#64748b" : "#ef4444",
-                                color: !date ? "#64748b" : "#ef4444"
+                                borderColor: "#F1F5F9",
+                                color: "#94A3B8",
+                                backgroundColor: "#F8FAFC"
                             }
                         }}
                       >
@@ -225,15 +244,20 @@ const StepDateTime = ({
 
         {/* Navigation */}
         <Box mt={4} display="flex" justifyContent="space-between">
-          <Button onClick={onBack} variant="outlined" size="large">Back</Button>
+          <Button onClick={onBack} variant="outlined" size="large" sx={{ px: 4, py: 1.5, borderColor: '#CBD5E1', color: '#334155', fontWeight: 600, '&:hover': { borderColor: '#94A3B8', background: '#F1F5F9' } }}>Back</Button>
           <Button 
             disabled={!canProceed} 
             variant="contained" 
             onClick={onNext}
             size="large"
             sx={{
-              backgroundColor: "#10b981",
-              "&:hover": { backgroundColor: "#0d9668" }
+              backgroundColor: "#D32F2F",
+              fontWeight: 700,
+              px: 4,
+              py: 1.5,
+              boxShadow: '0 4px 14px rgba(211, 47, 47, 0.3)',
+              "&:hover": { backgroundColor: "#B71C1C" },
+              "&.Mui-disabled": { backgroundColor: "#E2E8F0", color: "#94A3B8" }
             }}
           >Next</Button>
         </Box>
