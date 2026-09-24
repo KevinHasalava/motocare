@@ -30,6 +30,12 @@ import UserManagement from "./pages/admin/UserManagement";
 import AdminBookingManagement from "./pages/admin/AdminBookingManagement";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+// --- NEW PUBLIC PAGES ---
+import AboutPage from "./pages/AboutPage";
+import ProcessPage from "./pages/ProcessPage";
+import ContactPage from "./pages/ContactPage";
+import FAQPage from "./pages/FAQPage";
+
 
 // --- CURRENT JOB COMPONENT IMPORTS ---
 // We keep the two working components: JobDashboard and CreateWalkInJob
@@ -186,6 +192,12 @@ export default function App() {
       <Routes>
         {/* 🏠 Default route → Redirects admin/cashier to dashboard, customers to landing */}
         <Route path="/" element={<DefaultRoute />} />
+
+        {/* --- New Public Pages --- */}
+        <Route path="/about"   element={<AboutPage />} />
+        <Route path="/process" element={<ProcessPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/faq"     element={<FAQPage />} />
 
         {/* --- Public/Customer Routes --- */}
         <Route path="/home" element={<DefaultRoute />} />

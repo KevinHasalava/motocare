@@ -16,9 +16,10 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import Logo from './Landing_Page/Logo';
+import TopBar from './TopBar';
 import { getMyVehicles } from '../api/vehicleService';
 
-const Header = ({ navItems = [], onBookNowClick, theme }) => {
+const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNowClick, theme, hideTopBar = false }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
@@ -26,6 +27,7 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
   const [vehiclesLoading, setVehiclesLoading] = useState(false);
   const [vehicleMenuAnchor, setVehicleMenuAnchor] = useState(null);
   const [profileMenuAnchor, setProfileMenuAnchor] = useState(null);
+  const [pagesMenuAnchor, setPagesMenuAnchor] = useState(null);
   const navigate = useNavigate();
   const savedUser = JSON.parse(localStorage.getItem('user'));
   const isLoggedIn = !!savedUser;
@@ -150,21 +152,38 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
   };
 
   const handleNavClick = (section) => {
-    if (section === 'vehicles' && user?.userType === 'customer') {
-      // For customers, navigate to VehiclePage
-      navigate("/VehiclePage");
-    } else if (section === 'services') {
+    const s = section.toLowerCase();
+    if (s === 'home') {
+      navigate('/');
+    } else if (s === 'about' || s === 'about us') {
+      navigate('/about');
+    } else if (s === 'process') {
+      navigate('/process');
+    } else if (s === 'contact' || s === 'contact us') {
+      navigate('/contact');
+    } else if (s === 'faq') {
+      navigate('/faq');
+    } else if (s === 'vehicles' && user?.userType === 'customer') {
+      navigate('/VehiclePage');
+    } else if (s === 'services') {
       if (user?.userType === 'admin' || user?.userType === 'mechanic') {
-        // For admin/mechanic, navigate to admin ServicesPage
-        navigate("/admin-service");
+        navigate('/admin-service');
       } else {
-        // For customers and non-logged users, navigate to customer services page
-        navigate("/services");
+        navigate('/services');
       }
     } else {
-      // For other cases, navigate to landing page sections
-      navigate(`/home#${section}`);
+      // Fallback: scroll to section on landing page
+      navigate(`/#${s}`);
     }
+  };
+
+  // Pages dropdown handlers
+  const handlePagesMenuOpen = (event) => setPagesMenuAnchor(event.currentTarget);
+  const handlePagesMenuClose = () => setPagesMenuAnchor(null);
+  const handlePageNavigate = (path) => {
+    navigate(path);
+    handlePagesMenuClose();
+    setIsMenuOpen(false);
   };
 
   // Get nav icon based on item name
@@ -173,6 +192,7 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
       'home': <HomeIcon sx={{ fontSize: 20 }} />,
       'services': <ServiceIcon sx={{ fontSize: 20 }} />,
       'vehicles': <CarIcon sx={{ fontSize: 20 }} />,
+      'about': <ProfileIcon sx={{ fontSize: 20 }} />,
     };
     return icons[item.toLowerCase()] || null;
   };
@@ -278,6 +298,47 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                   {getNavIcon(item)}
                   <ListItemText 
                     primary={item} 
+                    sx={{ 
+                      '& .MuiListItemText-primary': { 
+                        color: '#1F2937',
+                        fontWeight: 600,
+                        fontSize: '1rem'
+                      } 
+                    }} 
+                  />
+                </Stack>
+              </ListItemButton>
+            </ListItem>
+          </Fade>
+        ))}
+
+        {/* Additional Pages for Mobile */}
+        {[
+          { label: 'Process', path: '/process' },
+          { label: 'FAQ', path: '/faq' },
+        ].filter(p => !navItems.some(n => n.toLowerCase() === p.label.toLowerCase())).map((page) => (
+          <Fade in timeout={700} key={page.label}>
+            <ListItem disablePadding sx={{ mb: 1 }}>
+              <ListItemButton 
+                onClick={() => { navigate(page.path); setIsMenuOpen(false); }}
+                sx={{
+                  borderRadius: 2,
+                  py: 1.5,
+                  px: 2,
+                  background: '#FAFAFA',
+                  border: '1px solid #E5E7EB',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: '#FFF5F5',
+                    borderColor: 'rgba(211,47,47,0.3)',
+                    transform: 'translateX(8px)',
+                  }
+                }}
+              >
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <SparkleIcon sx={{ fontSize: 20, color: '#D32F2F' }} />
+                  <ListItemText 
+                    primary={page.label} 
                     sx={{ 
                       '& .MuiListItemText-primary': { 
                         color: '#1F2937',
@@ -518,6 +579,19 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
           }
         }}
       >
+        {/* Slim utility top bar (desktop only, collapsible on scroll) */}
+        {!hideTopBar && (
+          <Box sx={{
+            maxHeight: scrolled ? 0 : 40,
+            opacity: scrolled ? 0 : 1,
+            overflow: 'hidden',
+            transition: 'max-height 0.3s ease, opacity 0.25s ease',
+            display: { xs: 'none', md: 'block' },
+          }}>
+            <TopBar />
+          </Box>
+        )}
+
         <Container maxWidth="xl">
           <Toolbar disableGutters sx={{ justifyContent: 'space-between', height: 76 }}>
             <Zoom in timeout={500}>
@@ -597,7 +671,63 @@ const Header = ({ navItems = [], onBookNowClick, theme }) => {
                 </Fade>
               ))}
 
+              {/* Pages Dropdown */}
+              <Fade in timeout={600}>
+                <Box>
+                  <Button
+                    onClick={handlePagesMenuOpen}
+                    endIcon={<ExpandMoreIcon sx={{ fontSize: 16, transition: 'transform 0.2s', transform: pagesMenuAnchor ? 'rotate(180deg)' : 'rotate(0deg)' }} />}
+                    sx={{
+                      mx: 0.5, px: 2, py: 0.9, borderRadius: '10px',
+                      color: pagesMenuAnchor ? '#D32F2F' : '#374151',
+                      fontSize: '0.9rem', fontFamily: '"Inter", sans-serif', fontWeight: 600,
+                      background: pagesMenuAnchor ? '#FFF5F5' : 'transparent',
+                      transition: 'all 0.22s ease',
+                      '&:hover': { color: '#D32F2F', background: '#FFF5F5' },
+                    }}
+                  >
+                    Pages
+                  </Button>
+                  <Menu
+                    anchorEl={pagesMenuAnchor}
+                    open={Boolean(pagesMenuAnchor)}
+                    onClose={handlePagesMenuClose}
+                    PaperProps={{
+                      elevation: 0,
+                      sx: {
+                        mt: 1, borderRadius: '14px', minWidth: 180,
+                        border: '1px solid #E5E7EB',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                      },
+                    }}
+                    transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+                    anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+                  >
+                    {[
+                      { label: 'About Us',   path: '/about' },
+                      { label: 'Process',    path: '/process' },
+                      { label: 'FAQ',        path: '/faq' },
+                      { label: 'Contact Us', path: '/contact' },
+                    ].map(({ label, path }) => (
+                      <MenuItem
+                        key={label}
+                        onClick={() => handlePageNavigate(path)}
+                        sx={{
+                          py: 1.2, px: 2.5, borderRadius: '8px', mx: 0.5, my: 0.2,
+                          fontFamily: '"Inter", sans-serif', fontWeight: 600, fontSize: '0.9rem',
+                          color: '#374151',
+                          '&:hover': { background: '#FFF5F5', color: '#D32F2F' },
+                        }}
+                      >
+                        {label}
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </Box>
+              </Fade>
+
               {/* User Section */}
+
               {user ? (
                 <Fade in timeout={600}>
                   <Stack direction="row" spacing={2} alignItems="center" sx={{ ml: 3 }}>

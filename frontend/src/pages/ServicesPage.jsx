@@ -12,7 +12,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
-import TopBar from '../components/TopBar';
+import Footer from '../components/Footer';
+
 import PageHeaderBanner from '../components/PageHeaderBanner';
 import { theme, backgroundKeyframes } from '../utils/theme';
 
@@ -118,9 +119,9 @@ const ServicesPage = () => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Box sx={{ minHeight: '100vh', background: '#FFFFFF' }}>
-          <TopBar />
+
           <Header navItems={['Home', 'Services', 'About', 'Contact']} />
-          <Box sx={{ pt: { xs: '64px', md: '76px' } }}>
+          <Box sx={{ pt: { xs: '76px', md: '116px' } }}>
             <PageHeaderBanner
               title="Our Services"
               breadcrumb="Services"
@@ -150,11 +151,11 @@ const ServicesPage = () => {
       <CssBaseline />
       <GlobalStyles styles={backgroundKeyframes} />
       <Box sx={{ minHeight: '100vh', background: '#FFFFFF', position: 'relative' }}>
-        <TopBar />
+
         <Header navItems={['Home', 'Services', 'About', 'Contact']} />
 
         {/* Page Header Banner */}
-        <Box sx={{ pt: { xs: '64px', md: '76px' } }}>
+        <Box sx={{ pt: { xs: '76px', md: '116px' } }}>
           <PageHeaderBanner
             title="Our Services"
             breadcrumb="Services"
@@ -394,156 +395,60 @@ const ServicesPage = () => {
                       borderRadius: '18px',
                       background: '#FFFFFF',
                       border: '1px solid #E5E7EB',
-                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
                       overflow: 'hidden',
                       position: 'relative',
-                      transition: 'all 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
+                      transition: 'all 0.28s cubic-bezier(0.22,1,0.36,1)',
                       '&:hover': {
                         transform: 'translateY(-6px)',
-                        borderColor: '#FCA5A5',
-                        boxShadow: '0 16px 36px rgba(0,0,0,0.1)',
+                        boxShadow: '0 20px 48px rgba(0,0,0,0.14)',
+                        '& .svc-img-thumb': { transform: 'scale(1.07)' },
                       },
                     }}
                   >
                     {/* Popular badge */}
                     {service.price <= 3000 && (
-                      <Box sx={{
-                        position: 'absolute', top: 14, right: 14,
-                        px: 1.5, py: 0.4,
-                        borderRadius: '100px',
-                        background: '#D32F2F',
-                        zIndex: 2,
-                      }}>
-                        <Typography sx={{
-                          fontFamily: '"Inter", sans-serif',
-                          fontSize: '0.7rem', fontWeight: 700,
-                          color: 'white', letterSpacing: '0.06em',
-                          textTransform: 'uppercase',
-                        }}>
-                          Popular
-                        </Typography>
+                      <Box sx={{ position: 'absolute', top: 14, right: 14, px: 1.5, py: 0.4, borderRadius: '100px', background: '#D32F2F', zIndex: 2 }}>
+                        <Typography sx={{ fontFamily: '"Inter", sans-serif', fontSize: '0.7rem', fontWeight: 700, color: 'white', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Popular</Typography>
                       </Box>
                     )}
-
+                    {/* Text content */}
                     <Box sx={{ p: 3, flexGrow: 1 }}>
-                      {/* Service Header */}
-                      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={2} sx={{ minHeight: 32 }}>
-                        <Typography
-                          variant="h6" component="h2"
-                          sx={{
-                            fontFamily: '"Outfit", sans-serif',
-                            fontWeight: 700, fontSize: '1.05rem',
-                            color: '#111827', pr: 2, lineHeight: 1.3,
-                            mt: service.price <= 3000 ? 2.5 : 0,
-                          }}
-                        >
+                      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={1.5}>
+                        <Typography variant="h6" component="h2" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, fontSize: '1.05rem', color: '#111827', pr: 1, lineHeight: 1.3, mt: service.price <= 3000 ? 2.5 : 0 }}>
                           {service.name}
                         </Typography>
-                        <Chip
-                          label={service.vehicleType}
-                          size="small"
-                          sx={{
-                            bgcolor: `${getVehicleTypeColor(service.vehicleType)}18`,
-                            color: getVehicleTypeColor(service.vehicleType),
-                            border: `1px solid ${getVehicleTypeColor(service.vehicleType)}33`,
-                            fontWeight: 700, flexShrink: 0, fontSize: '0.72rem',
-                            mt: service.price <= 3000 ? 2.5 : 0,
-                          }}
+                        <Chip label={service.vehicleType} size="small"
+                          sx={{ bgcolor: `${getVehicleTypeColor(service.vehicleType)}18`, color: getVehicleTypeColor(service.vehicleType), border: `1px solid ${getVehicleTypeColor(service.vehicleType)}33`, fontWeight: 700, flexShrink: 0, fontSize: '0.72rem', mt: service.price <= 3000 ? 2.5 : 0 }}
                         />
                       </Stack>
-
-                      {/* Description */}
-                      <Typography
-                        sx={{
-                          fontFamily: '"Inter", sans-serif',
-                          color: '#4B5563', fontSize: '0.88rem',
-                          lineHeight: 1.7, mb: 3, minHeight: 52,
-                        }}
-                      >
+                      <Typography sx={{ fontFamily: '"Inter", sans-serif', color: '#4B5563', fontSize: '0.87rem', lineHeight: 1.7, minHeight: 52 }}>
                         {service.description || 'Professional service for your vehicle'}
                       </Typography>
-
-                      <Divider sx={{ mb: 2.5, borderColor: '#F3F4F6' }} />
-
-                      {/* Service Details */}
-                      <Stack spacing={1.5}>
-                        <Stack direction="row" alignItems="center" spacing={1.5}>
-                          <Box sx={{
-                            width: 28, height: 28, borderRadius: '8px',
-                            background: '#FEE2E2',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          }}>
-                            <ScheduleIcon sx={{ fontSize: '0.9rem', color: '#D32F2F' }} />
-                          </Box>
-                          <Typography sx={{
-                            fontFamily: '"Inter", sans-serif',
-                            color: '#4B5563', fontSize: '0.87rem',
-                          }}>
-                            <Box component="strong" sx={{ color: '#111827', mr: 0.5 }}>Duration:</Box>
-                            {service.duration} minutes
-                          </Typography>
-                        </Stack>
-
-                        <Stack direction="row" alignItems="center" spacing={1.5}>
-                          <Box sx={{
-                            width: 28, height: 28, borderRadius: '8px',
-                            background: '#ECFDF5',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          }}>
-                            <PriceIcon sx={{ fontSize: '0.9rem', color: '#059669' }} />
-                          </Box>
-                          <Typography sx={{
-                            fontFamily: '"Inter", sans-serif',
-                            color: '#4B5563', fontSize: '0.87rem',
-                          }}>
-                            <Box component="strong" sx={{ color: '#111827', mr: 0.5 }}>Price:</Box>
-                            LKR {service.price}
-                          </Typography>
-                        </Stack>
-
-                        <Stack direction="row" alignItems="center" spacing={1.5}>
-                          <Box sx={{
-                            width: 28, height: 28, borderRadius: '8px',
-                            background: '#F3F4F6',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          }}>
-                            <CarIcon sx={{ fontSize: '0.9rem', color: '#374151' }} />
-                          </Box>
-                          <Typography sx={{
-                            fontFamily: '"Inter", sans-serif',
-                            color: '#4B5563', fontSize: '0.87rem',
-                          }}>
-                            <Box component="strong" sx={{ color: '#111827', mr: 0.5 }}>Vehicle:</Box>
-                            {service.vehicleType}
-                          </Typography>
-                        </Stack>
-                      </Stack>
                     </Box>
-
-                    {/* Book Button */}
-                    <Box sx={{ p: 2.5, pt: 0 }}>
-                      <Button
-                        fullWidth
-                        variant="contained"
-                        startIcon={<BookIcon />}
-                        onClick={() => handleBookService(service)}
-                        sx={{
-                          py: 1.3,
-                          borderRadius: '12px',
-                          background: '#D32F2F',
-                          fontFamily: '"Inter", sans-serif',
-                          fontWeight: 700, textTransform: 'none',
-                          fontSize: '0.9rem',
-                          boxShadow: '0 4px 14px rgba(211, 47, 47, 0.35)',
-                          '&:hover': {
-                            background: '#B71C1C',
-                            transform: 'translateY(-2px)',
-                            boxShadow: '0 8px 20px rgba(211, 47, 47, 0.45)',
-                          },
-                        }}
-                      >
-                        Book This Service
-                      </Button>
+                    {/* Image footer */}
+                    <Box sx={{ position: 'relative', height: 160, overflow: 'hidden', flexShrink: 0 }}>
+                      <Box
+                        className="svc-img-thumb"
+                        sx={{ position: 'absolute', inset: 0, backgroundImage: `url("${getServiceImage(service.vehicleType)}")`, backgroundSize: 'cover', backgroundPosition: 'center', transition: 'transform 0.45s ease' }}
+                      />
+                      <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)' }} />
+                      <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2 }}>
+                        <Stack direction="row" spacing={2} sx={{ mb: 1.2 }}>
+                          <Stack direction="row" spacing={0.5} alignItems="center">
+                            <ScheduleIcon sx={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.72)' }} />
+                            <Typography sx={{ fontFamily: '"Inter", sans-serif', fontSize: '0.78rem', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{service.duration} min</Typography>
+                          </Stack>
+                          <Stack direction="row" spacing={0.5} alignItems="center">
+                            <PriceIcon sx={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.72)' }} />
+                            <Typography sx={{ fontFamily: '"Inter", sans-serif', fontSize: '0.78rem', color: '#fff', fontWeight: 700 }}>LKR {service.price}</Typography>
+                          </Stack>
+                        </Stack>
+                        <Button fullWidth variant="contained" startIcon={<BookIcon />} onClick={() => handleBookService(service)}
+                          sx={{ py: 1.1, borderRadius: '10px', background: '#D32F2F', fontFamily: '"Inter", sans-serif', fontWeight: 700, textTransform: 'none', fontSize: '0.88rem', boxShadow: '0 4px 14px rgba(211,47,47,0.5)', '&:hover': { background: '#B71C1C' } }}>
+                          Book This Service
+                        </Button>
+                      </Box>
                     </Box>
                   </Box>
                 </Grid>
@@ -613,6 +518,7 @@ const ServicesPage = () => {
             </Box>
           )}
         </Container>
+        <Footer />
       </Box>
     </ThemeProvider>
   );

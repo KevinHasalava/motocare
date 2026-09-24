@@ -349,7 +349,7 @@ export const backgroundKeyframes = {
 
 // ─── Mock Data (content locked — do not edit) ─────────────────
 export const mockData = {
-  navItems: ['Features', 'Process', 'About', 'Contact'],
+  navItems: ['Home', 'Services', 'About', 'Contact'],
 
   features: [
     {

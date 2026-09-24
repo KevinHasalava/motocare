@@ -20,10 +20,12 @@ const serviceLinks = [
 ];
 
 const quickLinks = [
-  { label: 'Book Service', href: '/booking' },
-  { label: 'View Services', href: '/services' },
-  { label: 'My Bookings', href: '/my-bookings' },
-  { label: 'My Profile', href: '/profile' },
+  { label: 'Home',       href: '/' },
+  { label: 'About Us',   href: '/about' },
+  { label: 'Services',   href: '/services' },
+  { label: 'Process',    href: '/process' },
+  { label: 'Contact Us', href: '/contact' },
+  { label: 'FAQ',        href: '/faq' },
 ];
 
 const Footer = () => (

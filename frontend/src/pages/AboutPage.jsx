@@ -16,7 +16,6 @@ import {
 } from '@mui/icons-material';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import TopBar from '../components/TopBar';
 import PageHeaderBanner from '../components/PageHeaderBanner';
 import { theme } from '../utils/theme';
 
@@ -56,11 +55,10 @@ const AboutPage = () => (
   <ThemeProvider theme={theme}>
     <CssBaseline />
     <Box sx={{ minHeight: '100vh', background: '#FFFFFF' }}>
-      <TopBar />
       <Header navItems={NAV_ITEMS} />
 
       {/* Header banner — offset for sticky header + topbar */}
-      <Box sx={{ pt: { xs: '64px', md: '76px' } }}>
+      <Box sx={{ pt: { xs: '76px', md: '116px' } }}>
         <PageHeaderBanner
           title="About Us"
           breadcrumb="About Us"

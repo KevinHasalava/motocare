@@ -112,7 +112,7 @@ const Landing = () => {
         
         {/* Header */}
         <Header 
-          navItems={mockData.navItems} 
+          navItems={['Home', 'Services', 'About', 'Contact']} 
           onBookNowClick={handleBookServiceClick} 
           theme={theme}
         />
