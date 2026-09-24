@@ -15,25 +15,27 @@ import HeaderWrapper from '../HeaderWrapper';
 
 // --- Styled Components (Unchanged) ---
 const AdminContainer = styled(Box)(({ theme }) => ({
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F8F9FB',
     minHeight: '100vh',
-    padding: theme.spacing(2),
+    padding: theme.spacing(3),
 }));
 
 const AdminPaper = styled(Paper)(({ theme }) => ({
     maxWidth: 1200,
     margin: '0 auto',
-    borderRadius: '4px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+    borderRadius: '16px',
+    border: '1px solid #E5E7EB',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+    backgroundColor: '#FFFFFF',
     overflow: 'hidden',
 }));
 
-// 💡 AdminHeader style updated to accommodate the new button/chip arrangement
+// AdminHeader style updated to light premium automotive design
 const AdminHeader = styled(Box)(({ theme }) => ({
-    backgroundColor: '#2c3e50',
-    color: '#ffffff',
-    padding: theme.spacing(2.5),
-    borderBottom: '3px solid #3498db',
+    backgroundColor: '#FFFFFF',
+    color: '#111827',
+    padding: theme.spacing(3),
+    borderBottom: '2px solid #D32F2F',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -41,9 +43,9 @@ const AdminHeader = styled(Box)(({ theme }) => ({
 }));
 
 const SectionHeader = styled(Box)(({ theme }) => ({
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#F9FAFB',
     padding: theme.spacing(1.5, 2),
-    borderBottom: '1px solid #dee2e6',
+    borderBottom: '1px solid #E5E7EB',
     display: 'flex',
     alignItems: 'center',
     marginTop: theme.spacing(2),
@@ -372,13 +374,13 @@ const EditJob = ({ isViewMode = false }) => {
         <AdminContainer>
             <HeaderWrapper />
             <AdminPaper>
-                <AdminHeader sx={{ mt: 8, opacity: 0.9 }}>
+                <AdminHeader sx={{ mt: 8 }}>
                     {/* Left side: Title and Job ID */}
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <Typography variant="h5" fontWeight={600}>
+                        <Typography variant="h5" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#111827' }}>
                             {currentMode} Job: {jobData.jobId || jobId}
                         </Typography>
-                        <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                        <Typography variant="body2" sx={{ color: '#6B7280' }}>
                             Internal ID: {jobId}
                         </Typography>
                     </Box>
@@ -391,15 +393,20 @@ const EditJob = ({ isViewMode = false }) => {
                             color={getStatusColor(formData.status)}
                             sx={{ fontSize: '1rem', height: 32 }}
                         />
-                         {/* 💡 NEW: Download PDF Button */}
+                         {/* Download PDF Button */}
                         <Button
                             variant="contained"
                             onClick={handleDownloadPdf}
                             disabled={downloading}
                             startIcon={downloading ? <CircularProgress size={18} color="inherit" /> : <GetApp />}
                             sx={{
-                                backgroundColor: '#3498db',
-                                '&:hover': { backgroundColor: '#2980b9' },
+                                backgroundColor: '#D32F2F',
+                                borderRadius: '10px',
+                                fontWeight: 700,
+                                px: 2.5,
+                                py: 1,
+                                boxShadow: '0 4px 14px rgba(211,47,47,0.3)',
+                                '&:hover': { backgroundColor: '#B71C1C' },
                             }}
                         >
                             {downloading ? 'Preparing PDF...' : 'Download PDF'}

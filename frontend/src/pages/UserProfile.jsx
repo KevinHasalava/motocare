@@ -296,7 +296,7 @@ const UserProfilePage = () => {
                 severity="error" 
                 sx={{ 
                   background: 'rgba(239, 68, 68, 0.1)',
-                  color: 'white',
+                  color: '#991B1B',
                   border: '1px solid rgba(239, 68, 68, 0.3)'
                 }}
               >

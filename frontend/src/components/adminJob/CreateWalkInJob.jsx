@@ -15,31 +15,33 @@ import { validatePhoneNumber, handlePhoneInput } from '../../utils/validationUti
 
 // --- Styled Components (No changes) ---
 const AdminContainer = styled(Box)(({ theme }) => ({
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F8F9FB',
     minHeight: '100vh',
-    padding: theme.spacing(2),
+    padding: theme.spacing(3),
 }));
 
 const AdminPaper = styled(Paper)(({ theme }) => ({
-    maxWidth: '95%', // Use percentage for better responsiveness
+    maxWidth: '95%',
     width: '100%',
     margin: '0 auto',
-    borderRadius: '4px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+    borderRadius: '16px',
+    border: '1px solid #E5E7EB',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+    backgroundColor: '#FFFFFF',
     overflow: 'hidden',
 }));
 
-const AdminHeader    = styled(Box)(({ theme }) => ({
-    backgroundColor: '#2c3e50',
-    color: '#ffffff',
-    padding: theme.spacing(2.5),
-    borderBottom: '3px solid #3498db',
+const AdminHeader = styled(Box)(({ theme }) => ({
+    backgroundColor: '#FFFFFF',
+    color: '#111827',
+    padding: theme.spacing(3),
+    borderBottom: '2px solid #D32F2F',
 }));
 
 const SectionHeader = styled(Box)(({ theme }) => ({
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#F9FAFB',
     padding: theme.spacing(1.5, 2),
-    borderBottom: '1px solid #dee2e6',
+    borderBottom: '1px solid #E5E7EB',
     display: 'flex',
     alignItems: 'center',
     marginTop: theme.spacing(2),
@@ -498,11 +500,11 @@ const CreateWalkInJob = () => {
             <HeaderWrapper />
             {/* <AdminHeader/> */}
             <AdminPaper>
-                <AdminHeader>
-                    <Typography variant="h5" fontWeight={600} sx={{ mt: 4, opacity: 0.9 }}>
+                <AdminHeader sx={{ mt: 8 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#111827' }}>
                         Walk-In Job Creation
                     </Typography>
-                    <Typography variant="body2" sx={{ mt: 4, opacity: 0.9 }}>
+                    <Typography variant="body2" sx={{ color: '#6B7280', mt: 0.5 }}>
                         Create service jobs for walk-in customers
                     </Typography>
                 </AdminHeader>
@@ -891,9 +893,14 @@ const CreateWalkInJob = () => {
                                 disabled={loading || jobConflict}
                                 startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <AddCircleOutline />}
                                 sx={{
-                                    backgroundColor: '#3498db',
+                                    backgroundColor: '#D32F2F',
+                                    borderRadius: '10px',
+                                    fontWeight: 700,
+                                    px: 3,
+                                    py: 1.2,
+                                    boxShadow: '0 4px 14px rgba(211,47,47,0.3)',
                                     '&:hover': {
-                                        backgroundColor: '#2980b9',
+                                        backgroundColor: '#B71C1C',
                                     }
                                 }}
                             >

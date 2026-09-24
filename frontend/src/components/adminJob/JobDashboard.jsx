@@ -15,26 +15,28 @@ import { getAllJobs, updateJobStatus, deleteJob, autoCompletePastJobs } from '..
 import HeaderWrapper from '../HeaderWrapper';
 
 
-// --- Styled Components (Unchanged) ---
+// --- Styled Components (Light Premium Automotive Theme) ---
 const AdminContainer = styled(Box)(({ theme }) => ({
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F8F9FB',
     minHeight: '100vh',
-    padding: theme.spacing(2),
+    padding: theme.spacing(3),
 }));
 
 const AdminPaper = styled(Paper)(({ theme }) => ({
     maxWidth: 1600,
     margin: '0 auto',
-    borderRadius: '4px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+    borderRadius: '16px',
+    border: '1px solid #E5E7EB',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+    backgroundColor: '#FFFFFF',
     overflow: 'hidden',
 }));
 
 const AdminHeader = styled(Box)(({ theme }) => ({
-    backgroundColor: '#2c3e50',
-    color: '#ffffff',
-    padding: theme.spacing(2.5),
-    borderBottom: '3px solid #3498db',
+    backgroundColor: '#FFFFFF',
+    color: '#111827',
+    padding: theme.spacing(3),
+    borderBottom: '2px solid #D32F2F',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -201,13 +203,13 @@ const JobDashboard = () => {
         <AdminContainer>
             <HeaderWrapper />
             <AdminPaper>
-                <AdminHeader sx={{ mt: 8, opacity: 0.9 }}>
-                    <Typography variant="h5" fontWeight={600}>
+                <AdminHeader sx={{ mt: 8 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#111827' }}>
                         All Service Jobs Dashboard
                     </Typography>
                     
                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mt: { xs: 4, md: 0 } }}>
-                        {/* NEW: Search Input Field */}
+                        {/* Search Input Field */}
                         <TextField
                             variant="outlined"
                             size="small"
@@ -215,36 +217,46 @@ const JobDashboard = () => {
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
                             InputProps={{
-                                startAdornment: <SearchOutlined sx={{ mr: 1, color: 'rgba(255, 255, 255, 0.7)' }} />,
+                                startAdornment: <SearchOutlined sx={{ mr: 1, color: '#6B7280' }} />,
                                 sx: { 
-                                    color: 'white', 
-                                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2) !important' },
-                                    '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.5) !important' }
+                                    color: '#111827', 
+                                    backgroundColor: '#F9FAFB',
+                                    borderRadius: '10px',
+                                    '& fieldset': { borderColor: '#E5E7EB !important' },
+                                    '&:hover fieldset': { borderColor: '#D1D5DB !important' },
+                                    '&.Mui-focused fieldset': { borderColor: '#D32F2F !important' }
                                 }
                             }}
                         />
 
                         <Tooltip title="Refresh Data">
-                            <IconButton color="inherit" onClick={fetchJobs} disabled={loading}>
+                            <IconButton sx={{ color: '#4B5563', '&:hover': { color: '#D32F2F' } }} onClick={fetchJobs} disabled={loading}>
                                 <RefreshOutlined />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Auto Complete Past Jobs">
                             <IconButton 
-                                color="inherit" 
+                                sx={{ color: '#4B5563', mr: 1, '&:hover': { color: '#D32F2F' } }} 
                                 onClick={handleAutoCompletePastJobs} 
                                 disabled={autoCompleting || loading}
-                                sx={{ mr: 1 }}
                             >
-                                {autoCompleting ? <CircularProgress size={20} color="inherit" /> : <CheckCircleOutline />}
+                                {autoCompleting ? <CircularProgress size={20} sx={{ color: '#D32F2F' }} /> : <CheckCircleOutline />}
                             </IconButton>
                         </Tooltip>
                         <Button 
                             variant="contained" 
                             size="small"
                             onClick={() => navigate('/admin/walkinjob')} 
-                            sx={{ ml: 0, backgroundColor: '#3498db', '&:hover': { backgroundColor: '#2980b9' } }}
+                            sx={{
+                                ml: 0,
+                                backgroundColor: '#D32F2F',
+                                borderRadius: '10px',
+                                fontWeight: 700,
+                                px: 2.5,
+                                py: 1,
+                                boxShadow: '0 4px 14px rgba(211,47,47,0.3)',
+                                '&:hover': { backgroundColor: '#B71C1C' }
+                            }}
                         >
                             + New Walk-In Job
                         </Button>

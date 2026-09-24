@@ -13,22 +13,13 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
-  Divider,
-  Badge,
 } from "@mui/material";
 import {
   Logout as LogoutIcon,
   Dashboard as DashboardIcon,
   Payment as PaymentIcon,
-  Receipt as InvoiceIcon,
   History as HistoryIcon,
-  Person as ProfileIcon,
-  Home as HomeIcon,
-  Build as BuildIcon,
   AddTask as AddTaskIcon,
-  Settings as SettingsIcon,
-  Engineering as EngineeringIcon,
-  Receipt as ReceiptIcon,
   KeyboardArrowDown,
   Assignment,
   VerifiedUser,
@@ -72,22 +63,23 @@ const CashierHeader = () => {
     handleClose();
   };
 
-  // Reusable nav button style
+  // Reusable nav button style (Light Premium Automotive Theme)
   const navButtonStyle = {
     mx: 0.5,
-    px: 2.5,
+    px: 2,
     py: 1,
     borderRadius: 2,
-    color: "rgba(255,255,255,0.85)",
+    color: "#374151",
     fontSize: "0.95rem",
     fontWeight: 600,
+    fontFamily: '"Outfit", sans-serif',
     position: "relative",
     overflow: "hidden",
-    transition: "all 0.3s ease",
+    transition: "all 0.25s ease",
     "&:hover": {
-      color: "white",
-      background: "rgba(99, 102, 241, 0.1)",
-      transform: "translateY(-2px)",
+      color: "#D32F2F",
+      background: "rgba(211, 47, 47, 0.04)",
+      transform: "translateY(-1px)",
     },
     "&::before": {
       content: '""',
@@ -97,8 +89,8 @@ const CashierHeader = () => {
       transform: "translateX(-50%)",
       width: 0,
       height: "2px",
-      background: "linear-gradient(90deg, #6366f1, #a855f7)",
-      transition: "width 0.3s ease",
+      background: "#D32F2F",
+      transition: "width 0.25s ease",
     },
     "&:hover::before": {
       width: "80%",
@@ -112,10 +104,11 @@ const CashierHeader = () => {
   return (
     <AppBar
       position="fixed"
-      elevation={2}
+      elevation={0}
       sx={{
-        background: "linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%)",
-        borderBottom: "1px solid rgba(255,255,255,0.08)",
+        background: "#FFFFFF",
+        borderBottom: "1px solid #E5E7EB",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
       }}
     >
       <Toolbar sx={{ justifyContent: "space-between", minHeight: 70 }}>
@@ -128,10 +121,10 @@ const CashierHeader = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 700,
-              background: "linear-gradient(90deg, #f59e0b, #ef4444)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              fontWeight: 800,
+              fontFamily: '"Outfit", sans-serif',
+              color: "#111827",
+              letterSpacing: "-0.01em",
               cursor: "pointer",
             }}
             onClick={() => navigate("/cashier-dashboard")}
@@ -170,50 +163,51 @@ const CashierHeader = () => {
             PaperProps={{
               sx: {
                 mt: 1,
-                background: 'linear-gradient(135deg, #1a1f2e 0%, #0a0e1a 100%)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: '#FFFFFF',
+                border: '1px solid #E5E7EB',
                 borderRadius: 2,
                 minWidth: 200,
+                boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
               }
             }}
           >
             <MenuItem 
               onClick={() => handleMenuItemClick("/cashier")}
               sx={{ 
-                color: 'rgba(255,255,255,0.9)',
+                color: '#1F2937',
                 '&:hover': { 
-                  background: 'rgba(16, 185, 129, 0.1)',
-                  color: 'white'
+                  background: 'rgba(211, 47, 47, 0.05)',
+                  color: '#D32F2F'
                 }
               }}
             >
-              <ListItemIcon><PaymentIcon sx={{ color: '#10b981' }} /></ListItemIcon>
+              <ListItemIcon><PaymentIcon sx={{ color: '#D32F2F' }} /></ListItemIcon>
               <ListItemText>Process Payments</ListItemText>
             </MenuItem>
             <MenuItem 
               onClick={() => handleMenuItemClick("/payment-history")}
               sx={{ 
-                color: 'rgba(255,255,255,0.9)',
+                color: '#1F2937',
                 '&:hover': { 
-                  background: 'rgba(59, 130, 246, 0.1)',
-                  color: 'white'
+                  background: 'rgba(211, 47, 47, 0.05)',
+                  color: '#D32F2F'
                 }
               }}
             >
-              <ListItemIcon><HistoryIcon sx={{ color: '#3b82f6' }} /></ListItemIcon>
+              <ListItemIcon><HistoryIcon sx={{ color: '#D32F2F' }} /></ListItemIcon>
               <ListItemText>Payment History</ListItemText>
             </MenuItem>
             <MenuItem 
               onClick={() => handleMenuItemClick("/cashier/slip-verification")}
               sx={{ 
-                color: 'rgba(255,255,255,0.9)',
+                color: '#1F2937',
                 '&:hover': { 
-                  background: 'rgba(245, 158, 11, 0.1)',
-                  color: 'white'
+                  background: 'rgba(211, 47, 47, 0.05)',
+                  color: '#D32F2F'
                 }
               }}
             >
-              <ListItemIcon><VerifiedUser sx={{ color: '#f59e0b' }} /></ListItemIcon>
+              <ListItemIcon><VerifiedUser sx={{ color: '#D32F2F' }} /></ListItemIcon>
               <ListItemText>Slip Verification</ListItemText>
             </MenuItem>
           </Menu>
@@ -233,37 +227,38 @@ const CashierHeader = () => {
             PaperProps={{
               sx: {
                 mt: 1,
-                background: 'linear-gradient(135deg, #1a1f2e 0%, #0a0e1a 100%)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: '#FFFFFF',
+                border: '1px solid #E5E7EB',
                 borderRadius: 2,
                 minWidth: 200,
+                boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
               }
             }}
           >
             <MenuItem 
               onClick={() => handleMenuItemClick("/admin/walkinjob")}
               sx={{ 
-                color: 'rgba(255,255,255,0.9)',
+                color: '#1F2937',
                 '&:hover': { 
-                  background: 'rgba(16, 185, 129, 0.1)',
-                  color: 'white'
+                  background: 'rgba(211, 47, 47, 0.05)',
+                  color: '#D32F2F'
                 }
               }}
             >
-              <ListItemIcon><AddTaskIcon sx={{ color: '#10b981' }} /></ListItemIcon>
+              <ListItemIcon><AddTaskIcon sx={{ color: '#D32F2F' }} /></ListItemIcon>
               <ListItemText>Create Walk-in Job</ListItemText>
             </MenuItem>
             <MenuItem 
               onClick={() => handleMenuItemClick("/admin/jobs")}
               sx={{ 
-                color: 'rgba(255,255,255,0.9)',
+                color: '#1F2937',
                 '&:hover': { 
-                  background: 'rgba(99, 102, 241, 0.1)',
-                  color: 'white'
+                  background: 'rgba(211, 47, 47, 0.05)',
+                  color: '#D32F2F'
                 }
               }}
             >
-              <ListItemIcon><Assignment sx={{ color: '#6366f1' }} /></ListItemIcon>
+              <ListItemIcon><Assignment sx={{ color: '#D32F2F' }} /></ListItemIcon>
               <ListItemText>View All Jobs</ListItemText>
             </MenuItem>
           </Menu>
@@ -276,8 +271,9 @@ const CashierHeader = () => {
               avatar={
                 <Avatar
                   sx={{
-                    background: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)",
+                    background: "#D32F2F",
                     color: "white !important",
+                    fontWeight: 700,
                   }}
                 >
                   {user.name?.charAt(0).toUpperCase()}
@@ -286,14 +282,14 @@ const CashierHeader = () => {
               label={user.name}
               onClick={() => navigate("/profile")} 
               sx={{
-                background: "rgba(245, 158, 11, 0.1)",
-                border: "1px solid rgba(245, 158, 11, 0.3)",
-                color: "white",
+                background: "#FEE2E2",
+                border: "1px solid #FECACA",
+                color: "#B91C1C",
                 fontWeight: 600,
                 px: 1,
                 cursor: "pointer",
                 "&:hover": {
-                  background: "rgba(245, 158, 11, 0.2)",
+                  background: "#FCD34D30",
                 },
                 "& .MuiChip-avatar": {
                   color: "white",
@@ -303,11 +299,11 @@ const CashierHeader = () => {
             <IconButton
               onClick={handleLogout}
               sx={{
-                color: "#ef4444",
-                background: "rgba(239, 68, 68, 0.1)",
-                border: "1px solid rgba(239, 68, 68, 0.2)",
+                color: "#D32F2F",
+                background: "rgba(211, 47, 47, 0.08)",
+                border: "1px solid rgba(211, 47, 47, 0.2)",
                 "&:hover": {
-                  background: "rgba(239, 68, 68, 0.2)",
+                  background: "rgba(211, 47, 47, 0.16)",
                   transform: "rotate(180deg)",
                 },
                 transition: "all 0.3s ease",
@@ -325,13 +321,14 @@ const CashierHeader = () => {
               px: 3,
               py: 1,
               borderRadius: 2,
-              borderColor: "rgba(99, 102, 241, 0.5)",
-              color: "#6366f1",
+              borderColor: "#D32F2F",
+              color: "#D32F2F",
               fontWeight: 600,
-              background: "rgba(99, 102, 241, 0.05)",
+              background: "rgba(211, 47, 47, 0.05)",
               "&:hover": {
-                borderColor: "#6366f1",
-                background: "rgba(99, 102, 241, 0.1)",
+                borderColor: "#B71C1C",
+                background: "#D32F2F",
+                color: "white",
                 transform: "translateY(-2px)",
               },
               transition: "all 0.3s ease",
