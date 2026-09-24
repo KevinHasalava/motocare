@@ -1,11 +1,7 @@
-// frontend/src/components/Landing_Page/BeforeAfterSection.jsx — Real Auto Transformation Showcase
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Container, Grid, Typography, Stack, Button, Chip } from '@mui/material';
+import { Box, Container, Grid, Typography, Stack, Button } from '@mui/material';
 import {
-  AutoAwesome as SparkleIcon,
   CheckCircle as CheckIcon,
-  Compare as CompareIcon,
-  ArrowForward as ArrowIcon,
 } from '@mui/icons-material';
 
 function useScrollReveal(threshold = 0.1) {
@@ -31,8 +27,8 @@ const TRANSFORMATIONS = [
     beforeLabel: 'Heavy Sludge & Grime',
     afterLabel: 'Factory Showroom Clean',
     desc: 'Deep steam decontamination, electrical connection sealing, and UV protective polymer dress for engine plastics and rubber hoses.',
-    beforeImage: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=600&q=80&auto=format&fit=crop',
-    afterImage: 'https://images.unsplash.com/photo-1625047509168-a7026f36de04?w=600&q=80&auto=format&fit=crop',
+    beforeImage: '/oil_change.jpg',
+    afterImage: '/service_diagnostics.jpg',
     benefit: 'Prevents rubber hose rot & fire hazards',
   },
   {
@@ -41,8 +37,8 @@ const TRANSFORMATIONS = [
     beforeLabel: 'Grooved & Corroded Discs',
     afterLabel: 'Sub-Micron Mirrored Finish',
     desc: 'On-car precision lathe resurfacing eliminates brake pulsation, removes rust lips, and guarantees optimal pad contact area.',
-    beforeImage: 'https://images.unsplash.com/photo-1600790142055-619df03207e6?w=600&q=80&auto=format&fit=crop',
-    afterImage: 'https://images.unsplash.com/photo-1613214149922-f1809c99b414?w=600&q=80&auto=format&fit=crop',
+    beforeImage: '/service_brakes.jpg',
+    afterImage: '/service_alignment.jpg',
     benefit: '30% shorter stopping distance',
   },
   {
@@ -51,8 +47,8 @@ const TRANSFORMATIONS = [
     beforeLabel: 'Swirl Marks & Dull Clearcoat',
     afterLabel: '9H Glass-Like Hydrophobic Gloss',
     desc: 'Rotary compounding removes 95% of micro-scratches, followed by dual-action jewel polish and baked 9H nano-ceramic coating.',
-    beforeImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&auto=format&fit=crop',
-    afterImage: 'https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=600&q=80&auto=format&fit=crop',
+    beforeImage: '/hero_car.jpg',
+    afterImage: '/service_detailing.jpg',
     benefit: '3-year ceramic hydrophobic warranty',
   },
 ];

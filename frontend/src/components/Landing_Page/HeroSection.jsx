@@ -9,8 +9,6 @@ import {
   Build as BuildIcon,
   Speed as SpeedIcon,
   Shield as ShieldIcon,
-  Engineering as EngineeringIcon,
-  PhoneInTalk as PhoneIcon,
 } from '@mui/icons-material';
 
 const HeroSection = ({ isVisible, onBookNowClick, stats }) => {
@@ -71,10 +69,10 @@ const HeroSection = ({ isVisible, onBookNowClick, stats }) => {
           background: '#070B13',
         }}
       >
-        {/* ── Background: Real High-Tech Automotive Service Center ───────── */}
+        {/* ── Background: Real High-Tech Automotive Service Center Workshop ───────── */}
         <Box
           component="img"
-          src="https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=1920&q=85&auto=format&fit=crop"
+          src="/workshop_hero.jpg"
           alt="Moto-Care Modern Automotive Service Center Workshop"
           sx={{
             position: 'absolute',
@@ -82,22 +80,29 @@ const HeroSection = ({ isVisible, onBookNowClick, stats }) => {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            objectPosition: 'center 45%',
-            opacity: 0.58,
-            transform: textVisible ? 'scale(1)' : 'scale(1.06)',
-            transition: 'transform 8s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease',
+            objectPosition: 'center 40%',
+            opacity: 0.78,
+            zIndex: 0,
+            transform: textVisible ? 'scale(1)' : 'scale(1.05)',
+            transition: 'transform 8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease',
           }}
         />
 
-        {/* ── Multi-layer Vignette & Contrast Overlay ─────────────────── */}
+        {/* ── High-Contrast Workshop Overlay: Dark text shadow on left, bright workshop on right ─ */}
         <Box sx={{
           position: 'absolute', inset: 0, zIndex: 1,
           background: `
-            linear-gradient(98deg,
-              rgba(7, 11, 19, 0.94) 0%,
-              rgba(7, 11, 19, 0.85) 42%,
-              rgba(7, 11, 19, 0.45) 75%,
-              rgba(7, 11, 19, 0.70) 100%
+            linear-gradient(90deg,
+              rgba(7, 11, 19, 0.95) 0%,
+              rgba(7, 11, 19, 0.86) 38%,
+              rgba(7, 11, 19, 0.42) 72%,
+              rgba(7, 11, 19, 0.25) 100%
+            ),
+            linear-gradient(180deg,
+              rgba(7, 11, 19, 0.25) 0%,
+              transparent 35%,
+              transparent 70%,
+              rgba(7, 11, 19, 0.95) 100%
             )
           `,
         }} />

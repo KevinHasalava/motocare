@@ -51,9 +51,9 @@ import CashierSlipVerification from "./components/Cashier/CashierSlipVerificatio
 import CashierDashboard from "./pages/CashierDashboard";
 import MyPayments from "./pages/MyPayments"; 
 
-// --- NEW ADMIN MANAGEMENT IMPORTS ---
 import AdminVehicleManagement from "./pages/admin/AdminVehicleManagement";
 import AdminPaymentManagement from "./pages/admin/AdminPaymentManagement";
+import Logo from "./components/Landing_Page/Logo";
 // ------------------------------------
 
 // ── Branded Loading Splash Screen ────────────────────────────
@@ -88,76 +88,63 @@ const LoadingScreen = () => {
     <div
       id="mc-loading-screen"
       className={loaded ? 'mc-loaded' : ''}
-      style={{ fontFamily: "'Outfit', sans-serif", background: '#FFFFFF' }}
+      style={{
+        fontFamily: "'Outfit', sans-serif",
+        background: '#070B13',
+        position: 'fixed',
+        inset: 0,
+        zIndex: 99999,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: 'opacity 0.6s ease, transform 0.6s ease',
+      }}
     >
-      {/* Light accent orbs */}
+      {/* Ambient Red Glow */}
       <div style={{
-        position: 'absolute', top: '20%', right: '15%',
-        width: 280, height: 280, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(211,47,47,0.05) 0%, transparent 70%)',
-        filter: 'blur(40px)',
-      }} />
-      <div style={{
-        position: 'absolute', bottom: '25%', left: '15%',
-        width: 200, height: 200, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(211,47,47,0.03) 0%, transparent 70%)',
-        filter: 'blur(30px)',
+        position: 'absolute', top: '35%',
+        width: 320, height: 320, borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(211,47,47,0.18) 0%, transparent 70%)',
+        filter: 'blur(70px)',
+        pointerEvents: 'none',
       }} />
 
-      {/* Logo mark */}
+      {/* Official Luxury Logo mark */}
       <div style={{
         position: 'relative',
-        marginBottom: 32,
+        marginBottom: 28,
         display: 'flex',
         alignItems: 'center',
-        gap: 16,
+        justifyContent: 'center',
+        animation: 'mc-pulse 2s ease-in-out infinite',
       }}>
-        {/* Icon container */}
-        <div style={{
-          width: 72, height: 72, borderRadius: 20,
-          background: 'linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 8px 32px rgba(211,47,47,0.28)',
-          animation: 'mc-float 3s ease-in-out infinite',
-          flexShrink: 0,
-        }}>
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-            <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z" fill="white"/>
-          </svg>
-        </div>
-        {/* Brand name */}
-        <div>
-          <div style={{
-            fontSize: 36, fontWeight: 900, letterSpacing: '-0.02em',
-            color: '#111827',
-            lineHeight: 1,
-          }}>Moto-Care</div>
-          <div style={{
-            fontSize: 12, fontWeight: 600, letterSpacing: '0.18em',
-            color: '#6B7280', textTransform: 'uppercase', marginTop: 4,
-          }}>Auto Service Platform</div>
-        </div>
+        <Logo size="large" variant="white" clickable={false} />
       </div>
 
       {/* Progress bar */}
       <div style={{
         width: 220, height: 3, borderRadius: 2,
-        background: '#F3F4F6',
+        background: 'rgba(255, 255, 255, 0.1)',
         overflow: 'hidden',
-        marginBottom: 18,
+        marginBottom: 16,
       }}>
         <div style={{
           height: '100%', borderRadius: 2,
           background: 'linear-gradient(90deg, #D32F2F, #EF4444)',
-          animation: 'mc-loader-progress 2s ease-out forwards',
+          animation: 'mc-loader-progress 1.5s ease-out forwards',
         }} />
       </div>
 
       {/* Status text */}
       <div style={{
-        fontSize: 13, fontWeight: 500, letterSpacing: '0.06em',
-        color: '#9CA3AF',
-      }}>Starting engine...</div>
+        fontSize: 12, fontWeight: 700, letterSpacing: '0.14em',
+        textTransform: 'uppercase',
+        color: 'rgba(255, 255, 255, 0.45)',
+        fontFamily: "'Inter', sans-serif",
+      }}>
+        Starting Engine...
+      </div>
     </div>
   );
 };

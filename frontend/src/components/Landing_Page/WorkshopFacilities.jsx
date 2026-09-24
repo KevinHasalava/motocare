@@ -2,12 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Container, Grid, Typography, Stack, Button } from '@mui/material';
 import {
-  Build as WrenchIcon,
-  Speed as SpeedIcon,
-  Engineering as MechIcon,
   CheckCircle as CheckIcon,
-  ArrowForward as ArrowIcon,
-  CameraAlt as CameraIcon,
   Tv as LoungeIcon,
 } from '@mui/icons-material';
 
@@ -32,7 +27,7 @@ const FACILITIES = [
     title: '12 Hydraulic Lift Stations',
     category: 'Heavy Service Bay',
     description: 'Equipped with commercial 2-post and 4-post hydraulic hoists capable of lifting everything from city compacts to heavy luxury SUVs.',
-    image: 'https://images.unsplash.com/photo-1613214149922-f1809c99b414?w=800&q=80&auto=format&fit=crop',
+    image: '/workshop_hero.jpg',
     stat: '12 Stations',
     points: ['2-Post & 4-Post Hoists', 'Rapid Undercarriage Inspection', 'Heavy-Duty 5-Ton Rating'],
   },
@@ -40,7 +35,7 @@ const FACILITIES = [
     title: 'Computerized Diagnostic Bay',
     category: 'Diagnostic Suite',
     description: 'Factory-level computerized scanners communicating directly with European, Japanese, and American vehicle ECUs for pin-point fault isolation.',
-    image: 'https://images.unsplash.com/photo-1625047509168-a7026f36de04?w=800&q=80&auto=format&fit=crop',
+    image: '/service_diagnostics.jpg',
     stat: '100% Digital',
     points: ['Bosch & Launch Scanners', 'Live Sensor Telemetry', 'Zero Guesswork Repairs'],
   },
@@ -48,7 +43,7 @@ const FACILITIES = [
     title: '3D Laser Wheel Alignment Rig',
     category: 'Precision Alignment',
     description: 'Sub-millimeter optical sensors analyze steering angles, camber, and caster to restore razor-sharp factory handling and prevent tire wear.',
-    image: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=800&q=80&auto=format&fit=crop',
+    image: '/service_alignment.jpg',
     stat: '0.01mm Precision',
     points: ['High-Definition Camera Rig', 'Road-Force Balancing', 'Full Alignment Certificate'],
   },
@@ -56,7 +51,7 @@ const FACILITIES = [
     title: 'Dust-Free Detailing & Ceramic Booth',
     category: 'Aesthetic Studio',
     description: 'Sealed, positive-pressure environment with daylight-balanced CRI lighting designed for flawless paint correction and nano-ceramic bonding.',
-    image: 'https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=800&q=80&auto=format&fit=crop',
+    image: '/service_detailing.jpg',
     stat: '9H Hardness',
     points: ['Filtered Positive Airflow', 'CRI 98+ Inspection Lights', 'Infrared Curing Lamps'],
   },
