@@ -1,384 +1,518 @@
-// frontend/src/components/Landing_Page/HeroSection.jsx — Light Premium Theme
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  Container, Box, Typography, Button, Stack, Grid, Chip
-} from '@mui/material';
+// frontend/src/components/Landing_Page/HeroSection.jsx
+// Ultra-Premium Automotive Service Center Hero with Visible Workshop & Rich Animations
+import React, { useState, useEffect } from 'react';
+import { Container, Box, Typography, Button, Stack } from '@mui/material';
 import {
   ArrowForward as ArrowRightIcon,
   CalendarMonth as CalendarIcon,
   CheckCircle as CheckIcon,
-  Star as StarIcon,
+  Build as BuildIcon,
+  Speed as SpeedIcon,
+  Shield as ShieldIcon,
+  Engineering as EngineeringIcon,
+  PhoneInTalk as PhoneIcon,
 } from '@mui/icons-material';
 
-// ── Scroll-reveal hook ───────────────────────────────────────
-function useScrollReveal(options = {}) {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
-      { threshold: 0.15, ...options }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-  return [ref, visible];
-}
+const HeroSection = ({ isVisible, onBookNowClick, stats }) => {
+  const [textVisible, setTextVisible] = useState(false);
+  const [statsRef, setStatsRef] = useState(null);
+  const [statsVisible, setStatsVisible] = useState(false);
 
-const HeroSection = ({ isVisible, onBookNowClick, stats, theme }) => {
-  const [heroRef, heroVisible] = useScrollReveal({ threshold: 0.05 });
-  const [statsRef, statsVisible] = useScrollReveal({ threshold: 0.1 });
+  useEffect(() => {
+    const t = setTimeout(() => setTextVisible(true), 60);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!statsRef) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setStatsVisible(true); obs.disconnect(); } },
+      { threshold: 0.1 }
+    );
+    obs.observe(statsRef);
+    return () => obs.disconnect();
+  }, [statsRef]);
+
+  const workshopFeatures = [
+    {
+      title: 'Computer Diagnostics',
+      desc: 'Bosch 3D ECU Scanning & Real-time Live Sensor Calibration.',
+      stat: '99.8%',
+      statLabel: 'Accuracy',
+      icon: <SpeedIcon sx={{ color: '#EF4444', fontSize: 20 }} />,
+    },
+    {
+      title: 'Heavy Service Bays',
+      desc: '12 dedicated hydraulic lifts for rapid, safe underbody service.',
+      stat: '12 Bays',
+      statLabel: 'Available',
+      icon: <BuildIcon sx={{ color: '#EF4444', fontSize: 20 }} />,
+    },
+    {
+      title: '100% Genuine Guarantee',
+      desc: 'Official factory OEM parts backed by a 12-month warranty.',
+      stat: '1 Year',
+      statLabel: 'Full Warranty',
+      icon: <ShieldIcon sx={{ color: '#EF4444', fontSize: 20 }} />,
+    },
+  ];
 
   return (
-    <Box
-      component="section"
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        background: '#FFFFFF',
-        pt: { xs: 10, md: 12 },
-        pb: { xs: 6, md: 8 },
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Light background decorations */}
-      <Box sx={{
-        position: 'absolute', top: 0, right: 0,
-        width: { xs: '60%', md: '50%' }, height: '100%',
-        background: 'linear-gradient(135deg, #F8F9FB 0%, #FFF5F5 100%)',
-        zIndex: 0,
-        clipPath: 'polygon(15% 0%, 100% 0%, 100% 100%, 0% 100%)',
-      }} />
-      <Box sx={{
-        position: 'absolute', top: '10%', right: '5%',
-        width: 300, height: 300, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(211,47,47,0.06) 0%, transparent 70%)',
-        filter: 'blur(40px)',
-        zIndex: 0,
-      }} />
+    <Box component="section" sx={{ position: 'relative' }}>
 
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-        <Grid container spacing={{ xs: 4, md: 8 }} alignItems="center">
-          {/* ── Left: Text Content ─────────────────────────────── */}
-          <Grid item xs={12} md={6}>
-            <Box
-              ref={heroRef}
-              sx={{
-                opacity: heroVisible || isVisible ? 1 : 0,
-                transform: heroVisible || isVisible ? 'translateX(0)' : 'translateX(-40px)',
-                transition: 'opacity 0.7s ease, transform 0.7s ease',
-              }}
-            >
-              {/* Eyebrow tag */}
-              <Chip
-                icon={<Box sx={{ width: 6, height: 6, borderRadius: '50%', background: '#D32F2F', ml: 1 }} />}
-                label="Next Generation Auto Care"
-                sx={{
-                  mb: 3,
-                  background: '#FFEBEE',
-                  color: '#D32F2F',
-                  fontWeight: 700,
-                  fontSize: '0.72rem',
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  border: '1px solid rgba(211,47,47,0.2)',
-                  borderRadius: '100px',
-                  height: 32,
-                  '& .MuiChip-icon': { color: '#D32F2F' },
-                }}
-              />
+      {/* ═══════════════════ CINEMATIC HERO ═══════════════════════════════════ */}
+      <Box
+        sx={{
+          position: 'relative',
+          minHeight: { xs: '92vh', md: '100vh' },
+          display: 'flex',
+          alignItems: 'center',
+          overflow: 'hidden',
+          background: '#070B13',
+        }}
+      >
+        {/* ── Background: Real High-Tech Automotive Service Center ───────── */}
+        <Box
+          component="img"
+          src="https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=1920&q=85&auto=format&fit=crop"
+          alt="Moto-Care Modern Automotive Service Center Workshop"
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center 45%',
+            opacity: 0.58,
+            transform: textVisible ? 'scale(1)' : 'scale(1.06)',
+            transition: 'transform 8s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease',
+          }}
+        />
 
-              {/* Watermark word — decorative depth effect */}
+        {/* ── Multi-layer Vignette & Contrast Overlay ─────────────────── */}
+        <Box sx={{
+          position: 'absolute', inset: 0, zIndex: 1,
+          background: `
+            linear-gradient(98deg,
+              rgba(7, 11, 19, 0.94) 0%,
+              rgba(7, 11, 19, 0.85) 42%,
+              rgba(7, 11, 19, 0.45) 75%,
+              rgba(7, 11, 19, 0.70) 100%
+            )
+          `,
+        }} />
+
+        {/* ── Radial Red Glow Accent ──────────────────────────────────── */}
+        <Box sx={{
+          position: 'absolute', top: '20%', left: '-8%',
+          width: 600, height: 600, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(211,47,47,0.18) 0%, transparent 70%)',
+          filter: 'blur(90px)', zIndex: 1,
+          pointerEvents: 'none',
+        }} />
+
+        {/* ── Subtle Technical Dot Grid ───────────────────────────────── */}
+        <Box sx={{
+          position: 'absolute', inset: 0, zIndex: 1,
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)`,
+          backgroundSize: '40px 40px',
+          pointerEvents: 'none',
+        }} />
+
+        {/* ── Main Content Container ──────────────────────────────────── */}
+        <Container
+          maxWidth="xl"
+          sx={{
+            position: 'relative',
+            zIndex: 2,
+            pt: { xs: '88px', md: '104px' },
+            pb: { xs: 8, md: 10 },
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: { xs: 4, lg: 6 } }}>
+
+            {/* ── LEFT: Typography & CTAs ─────────────────────────────── */}
+            <Box sx={{ flex: '1 1 auto', maxWidth: { xs: '100%', lg: '62%' } }}>
+
+              {/* Eyebrow badge */}
               <Box
-                aria-hidden="true"
                 sx={{
-                  position: 'absolute',
-                  top: { xs: -20, md: -32 },
-                  left: { xs: -10, md: -20 },
-                  fontSize: { xs: '7rem', sm: '9rem', md: '12rem', lg: '15rem' },
-                  fontFamily: '"Outfit", sans-serif',
-                  fontWeight: 900,
-                  letterSpacing: '-0.06em',
-                  color: '#0F172A',
-                  opacity: 0.04,
-                  userSelect: 'none',
-                  pointerEvents: 'none',
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1,
-                  zIndex: 0,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 1.2,
+                  background: 'rgba(211,47,47,0.14)',
+                  border: '1px solid rgba(211,47,47,0.4)',
+                  borderRadius: '100px',
+                  px: 2.2,
+                  py: 0.7,
+                  mb: 3,
+                  opacity: textVisible ? 1 : 0,
+                  transform: textVisible ? 'translateY(0)' : 'translateY(-14px)',
+                  transition: 'opacity 0.6s ease, transform 0.6s ease',
+                  backdropFilter: 'blur(8px)',
                 }}
               >
-                AUTOCARE
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: '#EF4444',
+                    boxShadow: '0 0 10px #EF4444',
+                    animation: 'mc-pulse 2s ease-in-out infinite',
+                  }}
+                />
+                <Typography sx={{
+                  fontSize: '0.74rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: '#FCA5A5',
+                  fontFamily: '"Inter", sans-serif',
+                }}>
+                  Sri Lanka's Premier Auto Service Center
+                </Typography>
               </Box>
 
-              {/* Main headline */}
-              <Typography
-                variant="h1"
-                component="h1"
+              {/* ── Massive Headline ───────────────────────────────────── */}
+              <Box
                 sx={{
-                  fontSize: { xs: '2.8rem', sm: '3.8rem', md: '5rem', lg: '5.8rem' },
-                  mb: 3,
-                  color: '#111827',
-                  letterSpacing: '-0.04em',
-                  lineHeight: { xs: 1.1, md: 1.05 },
-                  position: 'relative',
-                  zIndex: 1,
+                  opacity: textVisible ? 1 : 0,
+                  transform: textVisible ? 'translateY(0)' : 'translateY(32px)',
+                  transition: 'opacity 0.7s ease 0.1s, transform 0.7s ease 0.1s',
+                  mb: 3.5,
                 }}
               >
-                Premium{' '}
-                <Box
-                  component="span"
+                <Typography
+                  component="h1"
                   sx={{
-                    color: '#D32F2F',
-                    position: 'relative',
-                    '&::after': {
-                      content: '""',
-                      position: 'absolute',
-                      bottom: '-4px', left: 0, right: 0,
-                      height: '3px',
-                      background: '#D32F2F',
-                      borderRadius: '2px',
-                    }
+                    fontFamily: '"Outfit", sans-serif',
+                    fontWeight: 900,
+                    fontSize: { xs: '2.8rem', sm: '4rem', md: '5.2rem', lg: '5.8rem' },
+                    lineHeight: 1.02,
+                    letterSpacing: '-0.03em',
+                    color: '#FFFFFF',
+                    textTransform: 'uppercase',
                   }}
                 >
-                  Auto Care
-                </Box>
-                <br />
-                You Can Trust
-              </Typography>
+                  Precision Care
+                </Typography>
+                <Typography
+                  component="div"
+                  sx={{
+                    fontFamily: '"Outfit", sans-serif',
+                    fontWeight: 900,
+                    fontSize: { xs: '2.8rem', sm: '4rem', md: '5.2rem', lg: '5.8rem' },
+                    lineHeight: 1.02,
+                    letterSpacing: '-0.03em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      background: 'linear-gradient(135deg, #EF4444 0%, #FF7878 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
+                  >
+                    For Every Drive.
+                  </Box>
+                </Typography>
+              </Box>
 
-              {/* Subtitle */}
-              <Typography
-                variant="body1"
+              {/* ── Description with Red Accent Bar ────────────────────── */}
+              <Stack
+                direction="row"
+                spacing={2.5}
+                alignItems="stretch"
                 sx={{
-                  mb: { xs: 4, md: 5 },
-                  lineHeight: 1.8,
-                  fontSize: { xs: '1rem', md: '1.1rem' },
-                  color: '#6B7280',
-                  maxWidth: 480,
+                  mb: 4,
+                  opacity: textVisible ? 1 : 0,
+                  transform: textVisible ? 'translateY(0)' : 'translateY(20px)',
+                  transition: 'opacity 0.65s ease 0.25s, transform 0.65s ease 0.25s',
                 }}
               >
-                Transform your vehicle maintenance experience with our digital platform.
-                Smart scheduling, real-time updates, and premium service quality — all in one place.
-              </Typography>
+                <Box sx={{
+                  width: 4,
+                  background: 'linear-gradient(180deg, #D32F2F 0%, rgba(211,47,47,0.15) 100%)',
+                  borderRadius: 2,
+                  flexShrink: 0,
+                }} />
+                <Typography sx={{
+                  color: 'rgba(255,255,255,0.78)',
+                  fontSize: { xs: '0.98rem', md: '1.08rem' },
+                  lineHeight: 1.8,
+                  fontFamily: '"Inter", sans-serif',
+                  maxWidth: 540,
+                }}>
+                  From state-of-the-art computerized diagnostics to factory-standard repairs,
+                  Moto-Care delivers dealer-quality service with total transparency and zero compromise.
+                </Typography>
+              </Stack>
 
-              {/* Trust indicators */}
-              <Stack direction="row" spacing={2} sx={{ mb: 4 }} flexWrap="wrap" gap={1}>
-                {['Certified Mechanics', 'Same-day Service', 'Digital Records'].map((item) => (
-                  <Stack key={item} direction="row" alignItems="center" spacing={0.5}>
-                    <CheckIcon sx={{ color: '#D32F2F', fontSize: 18 }} />
-                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#374151' }}>{item}</Typography>
+              {/* ── Real Service Center Trust Badges ───────────────────── */}
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={{ xs: 1.5, sm: 3 }}
+                sx={{
+                  mb: 5,
+                  opacity: textVisible ? 1 : 0,
+                  transform: textVisible ? 'translateY(0)' : 'translateY(16px)',
+                  transition: 'opacity 0.65s ease 0.35s, transform 0.65s ease 0.35s',
+                }}
+              >
+                {[
+                  'Certified Master Technicians',
+                  '100% Genuine OEM Parts',
+                  'Live Digital Progress Tracking',
+                ].map((item) => (
+                  <Stack key={item} direction="row" alignItems="center" spacing={1}>
+                    <CheckIcon sx={{ color: '#EF4444', fontSize: 18 }} />
+                    <Typography sx={{
+                      color: 'rgba(255,255,255,0.85)',
+                      fontSize: '0.88rem',
+                      fontWeight: 600,
+                      fontFamily: '"Inter", sans-serif',
+                    }}>
+                      {item}
+                    </Typography>
                   </Stack>
                 ))}
               </Stack>
 
-              {/* CTA Buttons */}
+              {/* ── CTAs ──────────────────────────────────────────────── */}
               <Stack
                 direction={{ xs: 'column', sm: 'row' }}
                 spacing={2}
-                alignItems={{ xs: 'stretch', sm: 'center' }}
+                sx={{
+                  opacity: textVisible ? 1 : 0,
+                  transform: textVisible ? 'translateY(0)' : 'translateY(18px)',
+                  transition: 'opacity 0.65s ease 0.45s, transform 0.65s ease 0.45s',
+                }}
               >
-                {/* Primary CTA */}
                 <Button
                   onClick={onBookNowClick}
                   size="large"
                   startIcon={<CalendarIcon />}
-                  endIcon={<ArrowRightIcon />}
+                  id="hero-book-appointment-btn"
                   sx={{
-                    px: 4,
-                    py: 1.7,
-                    fontSize: '1rem',
+                    px: 4.2,
+                    py: 1.8,
+                    fontSize: '1.02rem',
                     fontWeight: 700,
                     fontFamily: '"Inter", sans-serif',
-                    borderRadius: '12px',
-                    background: '#D32F2F',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%)',
                     color: 'white',
-                    boxShadow: '0 6px 24px rgba(211,47,47,0.3)',
-                    border: 'none',
-                    transition: 'all 0.22s ease',
+                    boxShadow: '0 8px 30px rgba(211,47,47,0.45)',
+                    textTransform: 'none',
+                    letterSpacing: '0.01em',
+                    transition: 'all 0.25s ease',
                     '&:hover': {
-                      background: '#B71C1C',
+                      background: 'linear-gradient(135deg, #E53935 0%, #C62828 100%)',
                       transform: 'translateY(-3px)',
-                      boxShadow: '0 12px 32px rgba(211,47,47,0.4)',
+                      boxShadow: '0 16px 40px rgba(211,47,47,0.55)',
                     },
-                    '&:active': { transform: 'translateY(0)' },
                   }}
                 >
-                  Book Your Service
+                  Book Service Appointment
                 </Button>
 
-                {/* Secondary CTA */}
                 <Button
                   variant="outlined"
                   size="large"
-                  onClick={() => window.location.href = '/services'}
+                  endIcon={<ArrowRightIcon />}
+                  onClick={() => {
+                    const el = document.getElementById('services');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    else window.location.href = '/services';
+                  }}
+                  id="hero-view-services-btn"
                   sx={{
                     px: 4,
-                    py: 1.7,
+                    py: 1.8,
                     fontSize: '1rem',
                     fontWeight: 600,
                     fontFamily: '"Inter", sans-serif',
-                    borderRadius: '12px',
-                    borderColor: '#E5E7EB',
-                    color: '#374151',
-                    background: 'transparent',
-                    transition: 'all 0.22s ease',
+                    borderRadius: '10px',
+                    borderColor: 'rgba(255,255,255,0.3)',
+                    color: 'white',
+                    textTransform: 'none',
+                    backdropFilter: 'blur(8px)',
+                    background: 'rgba(255,255,255,0.04)',
+                    transition: 'all 0.25s ease',
                     '&:hover': {
-                      borderColor: '#D32F2F',
-                      color: '#D32F2F',
-                      background: '#FFF5F5',
-                      transform: 'translateY(-2px)',
+                      borderColor: 'rgba(255,255,255,0.7)',
+                      background: 'rgba(255,255,255,0.1)',
+                      transform: 'translateY(-3px)',
                     },
                   }}
                 >
-                  View Services
+                  Explore Services
                 </Button>
               </Stack>
             </Box>
-          </Grid>
 
-          {/* ── Right: Hero Image ───────────────────────────────── */}
-          <Grid item xs={12} md={6}>
+            {/* ── RIGHT: Floating Interactive Workshop Feature Cards ──── */}
             <Box
               sx={{
-                position: 'relative',
-                opacity: heroVisible || isVisible ? 1 : 0,
-                transform: heroVisible || isVisible ? 'translateX(0)' : 'translateX(40px)',
-                transition: 'opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s',
+                display: { xs: 'none', lg: 'flex' },
+                flexDirection: 'column',
+                gap: 2.5,
+                flex: '0 0 auto',
+                width: '35%',
+                opacity: textVisible ? 1 : 0,
+                transform: textVisible ? 'translateX(0)' : 'translateX(40px)',
+                transition: 'opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s',
               }}
             >
-              {/* Main image */}
-              <Box
-                component="img"
-                src="https://images.unsplash.com/photo-1632823470024-fd99de7c2c27?w=800&q=80&auto=format&fit=crop"
-                alt="Professional mechanic servicing a vehicle"
-                sx={{
-                  width: '100%',
-                  height: { xs: 280, md: 460 },
-                  objectFit: 'cover',
-                  borderRadius: '24px',
-                  boxShadow: '0 24px 60px rgba(0,0,0,0.15)',
-                  display: 'block',
-                }}
-              />
-              {/* Rating badge */}
-              <Box sx={{
-                position: 'absolute', bottom: 24, left: -16,
-                background: 'white',
-                borderRadius: '16px',
-                p: 2,
-                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                border: '1px solid #E5E7EB',
-                display: 'flex', alignItems: 'center', gap: 1.5,
-                animation: 'mc-float 4s ease-in-out infinite',
-              }}>
-                <Box sx={{ display: 'flex', gap: 0.25 }}>
-                  {[...Array(5)].map((_, i) => (
-                    <StarIcon key={i} sx={{ color: '#F59E0B', fontSize: 18 }} />
-                  ))}
-                </Box>
-                <Box>
-                  <Typography sx={{ fontWeight: 800, fontSize: '1rem', color: '#111827', lineHeight: 1 }}>4.9/5</Typography>
-                  <Typography sx={{ fontSize: '0.72rem', color: '#6B7280', fontWeight: 500 }}>5,000+ Reviews</Typography>
-                </Box>
-              </Box>
-              {/* Experience badge */}
-              <Box sx={{
-                position: 'absolute', top: 20, right: -16,
-                background: '#D32F2F',
-                borderRadius: '16px',
-                p: 2,
-                boxShadow: '0 8px 24px rgba(211,47,47,0.35)',
-                textAlign: 'center',
-                animation: 'mc-float 5s ease-in-out infinite 1s',
-              }}>
-                <Typography sx={{ fontWeight: 900, fontSize: '1.4rem', color: 'white', lineHeight: 1 }}>15+</Typography>
-                <Typography sx={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)', fontWeight: 600 }}>Years Exp.</Typography>
-              </Box>
-            </Box>
-          </Grid>
-        </Grid>
-
-        {/* ── Stats Row ──────────────────────────────────────── */}
-        <Box ref={statsRef} sx={{ mt: { xs: 8, md: 10 } }}>
-          <Grid container spacing={{ xs: 2, md: 3 }} justifyContent="center" alignItems="stretch">
-            {stats.map((stat, i) => (
-              <Grid
-                item
-                xs={6}
-                md={3}
-                key={stat.label}
-                sx={{
-                  opacity: statsVisible || isVisible ? 1 : 0,
-                  transform: statsVisible || isVisible ? 'translateY(0)' : 'translateY(24px)',
-                  transition: `opacity 0.5s ease ${i * 0.1}s, transform 0.5s ease ${i * 0.1}s`,
-                }}
-              >
+              {workshopFeatures.map((card, i) => (
                 <Box
+                  key={card.title}
                   sx={{
-                    height: '100%',
-                    p: { xs: 2.5, md: 3 },
+                    background: 'rgba(17, 24, 39, 0.72)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255,255,255,0.12)',
                     borderRadius: '16px',
-                    background: '#FFFFFF',
-                    border: '1px solid #E5E7EB',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
-                    textAlign: 'center',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.22s ease',
+                    p: 2.8,
+                    transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
+                    animation: `mc-float ${5 + i}s ease-in-out infinite ${i * 0.9}s`,
                     '&:hover': {
-                      transform: 'translateY(-6px)',
-                      borderColor: 'rgba(211,47,47,0.3)',
-                      boxShadow: '0 16px 40px rgba(0,0,0,0.1)',
+                      background: 'rgba(23, 32, 51, 0.88)',
+                      borderColor: 'rgba(211,47,47,0.5)',
+                      transform: 'translateX(-8px) scale(1.02)',
+                      boxShadow: '0 20px 50px rgba(0,0,0,0.4), 0 0 20px rgba(211,47,47,0.15)',
                     },
                   }}
                 >
-                  {/* Icon */}
-                  <Box sx={{ mb: 1.5, '& svg': { fontSize: 28 } }}>
-                    {stat.icon}
-                  </Box>
+                  <Stack direction="row" spacing={2} alignItems="flex-start">
+                    <Box
+                      sx={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: '12px',
+                        background: 'rgba(211,47,47,0.12)',
+                        border: '1px solid rgba(211,47,47,0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {card.icon}
+                    </Box>
 
-                  {/* Value */}
-                  <Typography
-                    variant="h4"
-                    component="div"
-                    sx={{
-                      fontFamily: '"Outfit", sans-serif',
-                      fontWeight: 800,
-                      fontSize: { xs: '1.6rem', md: '2rem' },
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1,
-                      mb: 0.75,
-                      color: '#D32F2F',
-                    }}
-                  >
-                    {stat.value}
-                  </Typography>
-
-                  {/* Label */}
-                  <Typography
-                    sx={{
-                      fontFamily: '"Inter", sans-serif',
-                      fontSize: { xs: '0.75rem', md: '0.82rem' },
-                      fontWeight: 500,
-                      color: '#6B7280',
-                      letterSpacing: '0.02em',
-                    }}
-                  >
-                    {stat.label}
-                  </Typography>
+                    <Box sx={{ flex: 1 }}>
+                      <Stack direction="row" justifyContent="space-between" alignItems="baseline" sx={{ mb: 0.5 }}>
+                        <Typography sx={{
+                          fontFamily: '"Outfit", sans-serif',
+                          fontWeight: 700,
+                          fontSize: '1.05rem',
+                          color: '#FFFFFF',
+                        }}>
+                          {card.title}
+                        </Typography>
+                        <Typography sx={{
+                          fontFamily: '"Outfit", sans-serif',
+                          fontWeight: 900,
+                          fontSize: '1.25rem',
+                          color: '#EF4444',
+                        }}>
+                          {card.stat}
+                        </Typography>
+                      </Stack>
+                      <Typography sx={{
+                        fontSize: '0.82rem',
+                        color: 'rgba(255,255,255,0.65)',
+                        lineHeight: 1.6,
+                        fontFamily: '"Inter", sans-serif',
+                      }}>
+                        {card.desc}
+                      </Typography>
+                    </Box>
+                  </Stack>
                 </Box>
-              </Grid>
+              ))}
+            </Box>
+
+          </Box>
+        </Container>
+
+        {/* ── Bottom Gradient Transition into Stats Bar ───────────── */}
+        <Box sx={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          height: 60,
+          background: 'linear-gradient(180deg, transparent 0%, #0A0F1E 100%)',
+          zIndex: 2,
+          pointerEvents: 'none',
+        }} />
+      </Box>
+
+      {/* ═════════════════ DARK STATS BAR ══════════════════════════════════ */}
+      <Box
+        ref={(el) => setStatsRef(el)}
+        sx={{
+          background: '#0A0F1E',
+          py: { xs: 4, md: 4.5 },
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          position: 'relative',
+          zIndex: 3,
+        }}
+      >
+        <Container maxWidth="lg">
+          <Stack
+            direction="row"
+            flexWrap="wrap"
+            justifyContent={{ xs: 'center', md: 'space-around' }}
+            alignItems="center"
+          >
+            {(stats || []).map((stat, i) => (
+              <Box
+                key={stat.label || i}
+                sx={{
+                  textAlign: 'center',
+                  px: { xs: 3, md: 5 },
+                  py: { xs: 2, md: 0 },
+                  borderRight: { md: i < (stats.length - 1) ? '1px solid rgba(255,255,255,0.08)' : 'none' },
+                  opacity: statsVisible ? 1 : 0,
+                  transform: statsVisible ? 'translateY(0)' : 'translateY(20px)',
+                  transition: `opacity 0.5s ease ${i * 0.12}s, transform 0.5s ease ${i * 0.12}s`,
+                  cursor: 'default',
+                  '&:hover .stat-num': { color: '#EF4444' },
+                }}
+              >
+                <Typography
+                  className="stat-num"
+                  sx={{
+                    fontFamily: '"Outfit", sans-serif',
+                    fontWeight: 900,
+                    fontSize: { xs: '2.1rem', md: '2.6rem' },
+                    color: '#FFFFFF',
+                    lineHeight: 1,
+                    mb: 0.6,
+                    transition: 'color 0.25s ease',
+                  }}
+                >
+                  {stat.value}
+                </Typography>
+                <Typography sx={{
+                  fontFamily: '"Inter", sans-serif',
+                  fontSize: { xs: '0.72rem', md: '0.78rem' },
+                  fontWeight: 600,
+                  color: 'rgba(255,255,255,0.5)',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                }}>
+                  {stat.label}
+                </Typography>
+              </Box>
             ))}
-          </Grid>
-        </Box>
-      </Container>
+          </Stack>
+        </Container>
+      </Box>
+
     </Box>
   );
 };

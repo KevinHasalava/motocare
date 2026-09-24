@@ -12,14 +12,14 @@ import {
   Home as HomeIcon, DirectionsCar as CarIcon, Build as ServiceIcon,
   AutoAwesome as SparkleIcon, ArrowForward as ArrowIcon, 
   Dashboard as DashboardIcon, ExpandMore as ExpandMoreIcon,
-  Settings as SettingsIcon, Payment as PaymentIcon
+  Settings as SettingsIcon, Payment as PaymentIcon,
+  Phone as PhoneIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import Logo from './Landing_Page/Logo';
-import TopBar from './TopBar';
 import { getMyVehicles } from '../api/vehicleService';
 
-const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNowClick, theme, hideTopBar = false }) => {
+const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNowClick, theme }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
@@ -152,14 +152,22 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
   };
 
   const handleNavClick = (section) => {
-    const s = section.toLowerCase();
+    const s = section.toLowerCase().replace(/\s+/g, '-');
     if (s === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       navigate('/');
-    } else if (s === 'about' || s === 'about us') {
+      return;
+    }
+    const target = document.getElementById(s);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    if (s === 'about' || s === 'about-us') {
       navigate('/about');
     } else if (s === 'process') {
       navigate('/process');
-    } else if (s === 'contact' || s === 'contact us') {
+    } else if (s === 'contact' || s === 'contact-us') {
       navigate('/contact');
     } else if (s === 'faq') {
       navigate('/faq');
@@ -172,7 +180,6 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
         navigate('/services');
       }
     } else {
-      // Fallback: scroll to section on landing page
       navigate(`/#${s}`);
     }
   };
@@ -579,21 +586,8 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
           }
         }}
       >
-        {/* Slim utility top bar (desktop only, collapsible on scroll) */}
-        {!hideTopBar && (
-          <Box sx={{
-            maxHeight: scrolled ? 0 : 40,
-            opacity: scrolled ? 0 : 1,
-            overflow: 'hidden',
-            transition: 'max-height 0.3s ease, opacity 0.25s ease',
-            display: { xs: 'none', md: 'block' },
-          }}>
-            <TopBar />
-          </Box>
-        )}
-
         <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ justifyContent: 'space-between', height: 76 }}>
+          <Toolbar disableGutters sx={{ justifyContent: 'space-between', height: 72, px: { xs: 1, md: 0 } }}>
             <Zoom in timeout={500}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Logo size="medium" variant="default" clickable={true} onClick={handleLogoClick} />
@@ -671,60 +665,7 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
                 </Fade>
               ))}
 
-              {/* Pages Dropdown */}
-              <Fade in timeout={600}>
-                <Box>
-                  <Button
-                    onClick={handlePagesMenuOpen}
-                    endIcon={<ExpandMoreIcon sx={{ fontSize: 16, transition: 'transform 0.2s', transform: pagesMenuAnchor ? 'rotate(180deg)' : 'rotate(0deg)' }} />}
-                    sx={{
-                      mx: 0.5, px: 2, py: 0.9, borderRadius: '10px',
-                      color: pagesMenuAnchor ? '#D32F2F' : '#374151',
-                      fontSize: '0.9rem', fontFamily: '"Inter", sans-serif', fontWeight: 600,
-                      background: pagesMenuAnchor ? '#FFF5F5' : 'transparent',
-                      transition: 'all 0.22s ease',
-                      '&:hover': { color: '#D32F2F', background: '#FFF5F5' },
-                    }}
-                  >
-                    Pages
-                  </Button>
-                  <Menu
-                    anchorEl={pagesMenuAnchor}
-                    open={Boolean(pagesMenuAnchor)}
-                    onClose={handlePagesMenuClose}
-                    PaperProps={{
-                      elevation: 0,
-                      sx: {
-                        mt: 1, borderRadius: '14px', minWidth: 180,
-                        border: '1px solid #E5E7EB',
-                        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-                      },
-                    }}
-                    transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-                    anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-                  >
-                    {[
-                      { label: 'About Us',   path: '/about' },
-                      { label: 'Process',    path: '/process' },
-                      { label: 'FAQ',        path: '/faq' },
-                      { label: 'Contact Us', path: '/contact' },
-                    ].map(({ label, path }) => (
-                      <MenuItem
-                        key={label}
-                        onClick={() => handlePageNavigate(path)}
-                        sx={{
-                          py: 1.2, px: 2.5, borderRadius: '8px', mx: 0.5, my: 0.2,
-                          fontFamily: '"Inter", sans-serif', fontWeight: 600, fontSize: '0.9rem',
-                          color: '#374151',
-                          '&:hover': { background: '#FFF5F5', color: '#D32F2F' },
-                        }}
-                      >
-                        {label}
-                      </MenuItem>
-                    ))}
-                  </Menu>
-                </Box>
-              </Fade>
+              {/* Pages dropdown removed — links are in navItems */}
 
               {/* User Section */}
 
@@ -809,66 +750,103 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
                     </IconButton>
                   </Stack>
                 </Fade>
-              ) : (
-                <Fade in timeout={600}>
-                  <Button 
-                    onClick={() => navigate("/login")} 
-                    variant="outlined" 
-                    startIcon={<LoginIcon />}
-                    sx={{
-                      ml: 3,
-                      px: 3,
-                      py: 1,
-                      borderRadius: 2,
-                      borderColor: '#E5E7EB',
-                      color: '#374151',
-                      fontWeight: 600,
-                      background: '#F8F9FB',
-                      '&:hover': {
-                        borderColor: '#D32F2F',
-                        color: '#D32F2F',
-                        background: '#FFF5F5',
-                        transform: 'translateY(-2px)',
-                      },
-                      transition: 'all 0.3s ease',
-                    }}
-                  >
-                    Login
-                  </Button>
-                </Fade>
-              )}
-
-              <Fade in timeout={700}>
-                <Box sx={{ ml: 2, position: 'relative' }}>
-                  <Button
-                    onClick={() => navigate("/booking")}
-                    variant="contained"
-                    startIcon={<CalendarIcon />}
-                    endIcon={<ArrowIcon sx={{ fontSize: 15 }} />}
-                    sx={{
-                      px: 3,
-                      py: 1.1,
-                      borderRadius: '10px',
-                      background: '#D32F2F',
-                      fontWeight: 700,
-                      fontFamily: '"Inter", sans-serif',
-                      fontSize: '0.88rem',
-                      textTransform: 'none',
-                      boxShadow: '0 4px 16px rgba(211,47,47,0.3)',
-                      border: 'none',
-                      transition: 'all 0.22s ease',
-                      '&:hover': {
-                        background: '#B71C1C',
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 8px 24px rgba(211,47,47,0.4)',
-                      },
-                      '&:active': { transform: 'translateY(0)' },
-                    }}
-                  >
-                    Book Now
-                  </Button>
+                {/* Hotline pill for logged-in user */}
+                <Box
+                  component="a"
+                  href="tel:+94912283456"
+                  sx={{
+                    display: { xs: 'none', lg: 'inline-flex' },
+                    alignItems: 'center',
+                    gap: 1,
+                    textDecoration: 'none',
+                    px: 1.8,
+                    py: 0.8,
+                    borderRadius: '100px',
+                    background: '#F9FAFB',
+                    border: '1px solid #E5E7EB',
+                    color: '#374151',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    fontFamily: '"Inter", sans-serif',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      background: '#FFF5F5',
+                      borderColor: 'rgba(211,47,47,0.3)',
+                      color: '#D32F2F',
+                      transform: 'translateY(-1px)',
+                    }
+                  }}
+                >
+                  <PhoneIcon sx={{ fontSize: 15, color: '#D32F2F' }} />
+                  <span>091 228 3456</span>
                 </Box>
-              </Fade>
+              ) : (
+                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ ml: 2 }}>
+                  {/* Hotline quick call pill */}
+                  <Box
+                    component="a"
+                    href="tel:+94912283456"
+                    sx={{
+                      display: { xs: 'none', lg: 'inline-flex' },
+                      alignItems: 'center',
+                      gap: 1,
+                      textDecoration: 'none',
+                      px: 2,
+                      py: 0.85,
+                      borderRadius: '100px',
+                      background: '#F9FAFB',
+                      border: '1px solid #E5E7EB',
+                      color: '#374151',
+                      fontSize: '0.84rem',
+                      fontWeight: 600,
+                      fontFamily: '"Inter", sans-serif',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        background: '#FFF5F5',
+                        borderColor: 'rgba(211,47,47,0.3)',
+                        color: '#D32F2F',
+                        transform: 'translateY(-1px)',
+                      }
+                    }}
+                  >
+                    <PhoneIcon sx={{ fontSize: 16, color: '#D32F2F' }} />
+                    <span>091 228 3456</span>
+                  </Box>
+
+                  {/* Refined Luxury Sign In Button */}
+                  <Fade in timeout={600}>
+                    <Button
+                      onClick={() => navigate("/login")}
+                      variant="outlined"
+                      startIcon={<LoginIcon sx={{ fontSize: 18 }} />}
+                      id="header-login-btn"
+                      sx={{
+                        px: 3,
+                        py: 0.95,
+                        borderRadius: '10px',
+                        borderColor: '#E5E7EB',
+                        color: '#1F2937',
+                        fontWeight: 700,
+                        fontSize: '0.88rem',
+                        fontFamily: '"Inter", sans-serif',
+                        textTransform: 'none',
+                        background: '#FFFFFF',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        transition: 'all 0.22s ease',
+                        '&:hover': {
+                          borderColor: '#D32F2F',
+                          color: '#D32F2F',
+                          background: '#FFF5F5',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 4px 14px rgba(211,47,47,0.15)',
+                        },
+                      }}
+                    >
+                      Sign In
+                    </Button>
+                  </Fade>
+                </Stack>
+              )}
             </Stack>
 
             {/* Mobile Menu Button */}
