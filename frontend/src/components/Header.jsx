@@ -10,7 +10,7 @@ import {
   Event as CalendarIcon, Menu as MenuIcon, Close as CloseIcon,
   Login as LoginIcon, AccountCircle as ProfileIcon, Logout as LogoutIcon,
   Home as HomeIcon, DirectionsCar as CarIcon, Build as ServiceIcon,
-  AutoAwesome as SparkleIcon, ArrowForward as ArrowIcon, 
+  AutoAwesome as SparkleIcon, ArrowForward as ArrowIcon,
   Dashboard as DashboardIcon, ExpandMore as ExpandMoreIcon,
   Settings as SettingsIcon, Payment as PaymentIcon,
   Phone as PhoneIcon
@@ -49,7 +49,7 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
     if (savedUser) {
       const userData = JSON.parse(savedUser);
       setUser(userData);
-      
+
       // Fetch vehicles if user is a customer
       if (userData.userType === 'customer') {
         fetchUserVehicles();
@@ -97,7 +97,7 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
   // Get role-specific dashboard text
   const getRoleDashboardText = () => {
     if (!user) return "Login";
-    
+
     const userType = user.userType || 'customer'; // Fallback to customer
     switch (userType) {
       case 'mechanic':
@@ -206,9 +206,9 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
 
   // Drawer content for mobile
   const drawerContent = (
-    <Box 
-      sx={{ 
-        width: 320, 
+    <Box
+      sx={{
+        width: 320,
         height: '100%',
         background: '#FFFFFF',
         position: 'relative',
@@ -217,9 +217,9 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
       }}
     >
       {/* Header */}
-      <Box 
-        sx={{ 
-          p: 3, 
+      <Box
+        sx={{
+          p: 3,
           background: '#F8F9FB',
           borderBottom: '1px solid #E5E7EB',
           position: 'relative',
@@ -227,9 +227,9 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
       >
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Logo size="medium" variant="default" clickable={true} onClick={handleLogoClick} />
-          <IconButton 
+          <IconButton
             onClick={toggleDrawer(false)}
-            sx={{ 
+            sx={{
               color: '#374151',
               background: '#F3F4F6',
               '&:hover': {
@@ -247,45 +247,45 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
       {/* Navigation Items */}
       <List sx={{ p: 2 }}>
         {/* ✅ Admin Dashboard link (only visible for admins) */}
-{isAdmin && (
-  <Fade in timeout={200}>
-    <ListItem disablePadding sx={{ mb: 1 }}>
-      <ListItemButton 
-        onClick={() => { navigate('/admin-dashboard'); setIsMenuOpen(false); }}
-        sx={{
-          borderRadius: 2,
-          py: 1.5,
-          px: 2,
-          background: '#FFF5F5',
-          border: '1px solid rgba(211,47,47,0.2)',
-          transition: 'all 0.3s ease',
-          '&:hover': {
-            background: '#FFEBEE',
-            transform: 'translateX(8px)',
-          }
-        }}
-      >
-        <Stack direction="row" spacing={2} alignItems="center">
-          <DashboardIcon sx={{ fontSize: 20, color: '#D32F2F' }} />
-          <ListItemText 
-            primary="Admin Dashboard" 
-            sx={{ 
-              '& .MuiListItemText-primary': { 
-                color: '#111827',
-                fontWeight: 600,
-                fontSize: '1rem'
-              } 
-            }} 
-          />
-        </Stack>
-      </ListItemButton>
-    </ListItem>
-  </Fade>
-)}
+        {isAdmin && (
+          <Fade in timeout={200}>
+            <ListItem disablePadding sx={{ mb: 1 }}>
+              <ListItemButton
+                onClick={() => { navigate('/admin-dashboard'); setIsMenuOpen(false); }}
+                sx={{
+                  borderRadius: 2,
+                  py: 1.5,
+                  px: 2,
+                  background: '#FFF5F5',
+                  border: '1px solid rgba(211,47,47,0.2)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: '#FFEBEE',
+                    transform: 'translateX(8px)',
+                  }
+                }}
+              >
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <DashboardIcon sx={{ fontSize: 20, color: '#D32F2F' }} />
+                  <ListItemText
+                    primary="Admin Dashboard"
+                    sx={{
+                      '& .MuiListItemText-primary': {
+                        color: '#111827',
+                        fontWeight: 600,
+                        fontSize: '1rem'
+                      }
+                    }}
+                  />
+                </Stack>
+              </ListItemButton>
+            </ListItem>
+          </Fade>
+        )}
         {navItems.map((item, index) => (
           <Fade in timeout={300 + index * 100} key={item}>
             <ListItem disablePadding sx={{ mb: 1 }}>
-              <ListItemButton 
+              <ListItemButton
                 onClick={() => { handleNavClick(item.toLowerCase()); setIsMenuOpen(false); }}
                 sx={{
                   borderRadius: 2,
@@ -303,15 +303,15 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
               >
                 <Stack direction="row" spacing={2} alignItems="center">
                   {getNavIcon(item)}
-                  <ListItemText 
-                    primary={item} 
-                    sx={{ 
-                      '& .MuiListItemText-primary': { 
+                  <ListItemText
+                    primary={item}
+                    sx={{
+                      '& .MuiListItemText-primary': {
                         color: '#1F2937',
                         fontWeight: 600,
                         fontSize: '1rem'
-                      } 
-                    }} 
+                      }
+                    }}
                   />
                 </Stack>
               </ListItemButton>
@@ -326,7 +326,7 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
         ].filter(p => !navItems.some(n => n.toLowerCase() === p.label.toLowerCase())).map((page) => (
           <Fade in timeout={700} key={page.label}>
             <ListItem disablePadding sx={{ mb: 1 }}>
-              <ListItemButton 
+              <ListItemButton
                 onClick={() => { navigate(page.path); setIsMenuOpen(false); }}
                 sx={{
                   borderRadius: 2,
@@ -344,15 +344,15 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
               >
                 <Stack direction="row" spacing={2} alignItems="center">
                   <SparkleIcon sx={{ fontSize: 20, color: '#D32F2F' }} />
-                  <ListItemText 
-                    primary={page.label} 
-                    sx={{ 
-                      '& .MuiListItemText-primary': { 
+                  <ListItemText
+                    primary={page.label}
+                    sx={{
+                      '& .MuiListItemText-primary': {
                         color: '#1F2937',
                         fontWeight: 600,
                         fontSize: '1rem'
-                      } 
-                    }} 
+                      }
+                    }}
                   />
                 </Stack>
               </ListItemButton>
@@ -366,9 +366,9 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
         {user ? (
           <Fade in>
             <Box>
-              <Box 
-                sx={{ 
-                  p: 2.5, 
+              <Box
+                sx={{
+                  p: 2.5,
                   mb: 3,
                   borderRadius: 3,
                   background: '#F8F9FB',
@@ -376,8 +376,8 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
                 }}
               >
                 <Stack direction="row" alignItems="center" spacing={2}>
-                  <Avatar 
-                    sx={{ 
+                  <Avatar
+                    sx={{
                       background: 'linear-gradient(135deg, #D32F2F 0%, #EF4444 100%)',
                       width: 48,
                       height: 48
@@ -389,10 +389,10 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
                     <Typography variant="body1" sx={{ color: '#111827', fontWeight: 600 }}>
                       {user.name}
                     </Typography>
-                    <Chip 
-                      label="Logged In" 
+                    <Chip
+                      label="Logged In"
                       size="small"
-                      sx={{ 
+                      sx={{
                         mt: 0.5,
                         background: '#FFEBEE',
                         color: '#D32F2F',
@@ -403,11 +403,11 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
                   </Box>
                 </Stack>
               </Box>
-              
-              <Button 
-                variant="outlined" 
-                fullWidth 
-                startIcon={<ProfileIcon />} 
+
+              <Button
+                variant="outlined"
+                fullWidth
+                startIcon={<ProfileIcon />}
                 onClick={() => { handleRoleBasedNavigation(); setIsMenuOpen(false); }}
                 sx={{
                   py: 1.5,
@@ -429,9 +429,9 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
               {/* Vehicles Section for Customers */}
               {user.userType === 'customer' && (
                 <Box sx={{ mb: 2 }}>
-                  <Button 
-                    variant="outlined" 
-                    fullWidth 
+                  <Button
+                    variant="outlined"
+                    fullWidth
                     startIcon={vehiclesLoading ? <CircularProgress size={16} /> : <CarIcon />}
                     onClick={() => { navigate("/VehiclePage"); setIsMenuOpen(false); }}
                     sx={{
@@ -449,7 +449,7 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
                   >
                     My Vehicles {vehicles.length > 0 && `(${vehicles.length})`}
                   </Button>
-                  
+
                   {vehicles.length > 0 && (
                     <Box sx={{ pl: 2, maxHeight: 150, overflowY: 'auto' }}>
                       {vehicles.slice(0, 3).map((vehicle) => (
@@ -477,8 +477,8 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
                         </Button>
                       ))}
                       {vehicles.length > 3 && (
-                        <Typography 
-                          variant="caption" 
+                        <Typography
+                          variant="caption"
                           sx={{ color: '#9CA3AF', pl: 1 }}
                         >
                           +{vehicles.length - 3} more vehicles
@@ -488,11 +488,11 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
                   )}
                 </Box>
               )}
-              
-              <Button 
-                variant="contained" 
-                fullWidth 
-                startIcon={<LogoutIcon />} 
+
+              <Button
+                variant="contained"
+                fullWidth
+                startIcon={<LogoutIcon />}
                 onClick={handleLogout}
                 sx={{
                   py: 1.5,
@@ -540,7 +540,7 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
           fullWidth
           startIcon={<CalendarIcon />}
           onClick={() => navigate("/booking")}
-          sx={{ 
+          sx={{
             mt: 2,
             py: 1.8,
             borderRadius: 2,
@@ -595,16 +595,16 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
             </Zoom>
 
             {/* Desktop Nav Items */}
-            <Stack 
-              direction="row" 
-              spacing={0.5} 
-              alignItems="center" 
+            <Stack
+              direction="row"
+              spacing={0.5}
+              alignItems="center"
               sx={{ display: { xs: 'none', md: 'flex' } }}
             >
               {/* ✅ Admin Dashboard button (desktop) */}
               {isAdmin && (
                 <Fade in timeout={200}>
-                  <Button 
+                  <Button
                     onClick={() => navigate('/admin-dashboard')}
                     startIcon={<DashboardIcon />}
                     sx={{
@@ -625,7 +625,7 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
               )}
               {navItems.map((item, index) => (
                 <Fade in timeout={300 + index * 100} key={item}>
-                  <Button 
+                  <Button
                     onClick={() => handleNavClick(item.toLowerCase())}
                     sx={{
                       mx: 0.5,
@@ -703,8 +703,8 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
                     {/* User Profile Chip */}
                     <Chip
                       avatar={
-                        <Avatar 
-                          sx={{ 
+                        <Avatar
+                          sx={{
                             background: 'linear-gradient(135deg, #D32F2F 0%, #EF4444 100%)',
                             color: 'white !important'
                           }}
@@ -733,7 +733,7 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
                       }}
                     />
 
-                    <IconButton 
+                    <IconButton
                       onClick={handleLogout}
                       sx={{
                         color: '#D32F2F',
@@ -750,351 +750,353 @@ const Header = ({ navItems = ['Home', 'Services', 'About', 'Contact'], onBookNow
                     </IconButton>
                   </Stack>
                 </Fade>
-                {/* Hotline pill for logged-in user */}
-                <Box
-                  component="a"
-                  href="tel:+94912283456"
-                  sx={{
-                    display: { xs: 'none', lg: 'inline-flex' },
-                    alignItems: 'center',
-                    gap: 1,
-                    textDecoration: 'none',
-                    px: 1.8,
-                    py: 0.8,
-                    borderRadius: '100px',
-                    background: '#F9FAFB',
-                    border: '1px solid #E5E7EB',
-                    color: '#374151',
-                    fontSize: '0.82rem',
-                    fontWeight: 600,
-                    fontFamily: '"Inter", sans-serif',
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      background: '#FFF5F5',
-                      borderColor: 'rgba(211,47,47,0.3)',
-                      color: '#D32F2F',
-                      transform: 'translateY(-1px)',
-                    }
-                  }}
-                >
-                  <PhoneIcon sx={{ fontSize: 15, color: '#D32F2F' }} />
-                  <span>091 228 3456</span>
-                </Box>
-              ) : (
-                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ ml: 2 }}>
-                  {/* Hotline quick call pill */}
-                  <Box
-                    component="a"
-                    href="tel:+94912283456"
-                    sx={{
-                      display: { xs: 'none', lg: 'inline-flex' },
-                      alignItems: 'center',
-                      gap: 1,
-                      textDecoration: 'none',
-                      px: 2,
-                      py: 0.85,
-                      borderRadius: '100px',
-                      background: '#F9FAFB',
-                      border: '1px solid #E5E7EB',
-                      color: '#374151',
-                      fontSize: '0.84rem',
-                      fontWeight: 600,
-                      fontFamily: '"Inter", sans-serif',
-                      transition: 'all 0.2s ease',
-                      '&:hover': {
-                        background: '#FFF5F5',
-                        borderColor: 'rgba(211,47,47,0.3)',
-                        color: '#D32F2F',
-                        transform: 'translateY(-1px)',
-                      }
-                    }}
-                  >
-                    <PhoneIcon sx={{ fontSize: 16, color: '#D32F2F' }} />
-                    <span>091 228 3456</span>
-                  </Box>
-
-                  {/* Refined Luxury Sign In Button */}
-                  <Fade in timeout={600}>
-                    <Button
-                      onClick={() => navigate("/login")}
-                      variant="outlined"
-                      startIcon={<LoginIcon sx={{ fontSize: 18 }} />}
-                      id="header-login-btn"
-                      sx={{
-                        px: 3,
-                        py: 0.95,
-                        borderRadius: '10px',
-                        borderColor: '#E5E7EB',
-                        color: '#1F2937',
-                        fontWeight: 700,
-                        fontSize: '0.88rem',
-                        fontFamily: '"Inter", sans-serif',
-                        textTransform: 'none',
-                        background: '#FFFFFF',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                        transition: 'all 0.22s ease',
-                        '&:hover': {
-                          borderColor: '#D32F2F',
-                          color: '#D32F2F',
-                          background: '#FFF5F5',
-                          transform: 'translateY(-2px)',
-                          boxShadow: '0 4px 14px rgba(211,47,47,0.15)',
-                        },
-                      }}
-                    >
-                      Sign In
-                    </Button>
-                  </Fade>
-                </Stack>
-              )}
-            </Stack>
-
-            {/* Mobile Menu Button */}
-            <Zoom in timeout={500}>
-              <IconButton 
-                onClick={toggleDrawer(true)} 
-                sx={{ 
-                  display: { md: 'none' },
-                  color: '#374151',
-                  background: '#F3F4F6',
+                    {/* Hotline pill for logged-in user */}
+              <Box
+                component="a"
+                href="tel:+94912283456"
+                sx={{
+                  display: { xs: 'none', lg: 'inline-flex' },
+                  alignItems: 'center',
+                  gap: 1,
+                  textDecoration: 'none',
+                  px: 1.8,
+                  py: 0.8,
+                  borderRadius: '100px',
+                  background: '#F9FAFB',
                   border: '1px solid #E5E7EB',
+                  color: '#374151',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  fontFamily: '"Inter", sans-serif',
+                  transition: 'all 0.2s ease',
                   '&:hover': {
-                    background: '#E5E7EB',
+                    background: '#FFF5F5',
+                    borderColor: 'rgba(211,47,47,0.3)',
+                    color: '#D32F2F',
+                    transform: 'translateY(-1px)',
                   }
                 }}
               >
-                <MenuIcon />
-              </IconButton>
-            </Zoom>
-          </Toolbar>
-        </Container>
-      </AppBar>
-
-      <Drawer 
-        anchor="right" 
-        open={isMenuOpen} 
-        onClose={toggleDrawer(false)}
-        sx={{
-          '& .MuiDrawer-paper': {
-            background: 'transparent',
-            boxShadow: 'none',
-          }
-        }}
-      >
-        {drawerContent}
-      </Drawer>
-
-      {/* Vehicle Menu */}
-      <Menu
-        anchorEl={vehicleMenuAnchor}
-        open={Boolean(vehicleMenuAnchor)}
-        onClose={handleVehicleMenuClose}
-        PaperProps={{
-          sx: {
-            background: 'rgba(10, 14, 26, 0.95)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(34, 197, 94, 0.2)',
-            borderRadius: 2,
-            mt: 1,
-            minWidth: 280,
-            maxHeight: 400,
-          }
-        }}
-      >
-        <Box sx={{ p: 2 }}>
-          <Typography variant="h6" sx={{ color: '#22c55e', fontWeight: 600, mb: 1 }}>
-            My Vehicles
-          </Typography>
-          <Divider sx={{ bgcolor: 'rgba(34, 197, 94, 0.2)', mb: 1 }} />
-        </Box>
-        
-        {vehiclesLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
-            <CircularProgress size={24} sx={{ color: '#22c55e' }} />
-          </Box>
-        ) : vehicles.length > 0 ? (
-          vehicles.map((vehicle) => (
-            <MenuItem
-              key={vehicle._id}
-              onClick={() => handleVehicleSelect(vehicle._id)}
+                <PhoneIcon sx={{ fontSize: 15, color: '#D32F2F' }} />
+                <span>091 228 3456</span>
+              </Box>
+            </Stack>
+          </Fade>
+          ) : (
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ ml: 2 }}>
+            {/* Hotline quick call pill */}
+            <Box
+              component="a"
+              href="tel:+94912283456"
               sx={{
-                mx: 1,
-                mb: 0.5,
-                borderRadius: 1,
-                color: 'white',
+                display: { xs: 'none', lg: 'inline-flex' },
+                alignItems: 'center',
+                gap: 1,
+                textDecoration: 'none',
+                px: 2,
+                py: 0.85,
+                borderRadius: '100px',
+                background: '#F9FAFB',
+                border: '1px solid #E5E7EB',
+                color: '#374151',
+                fontSize: '0.84rem',
+                fontWeight: 600,
+                fontFamily: '"Inter", sans-serif',
+                transition: 'all 0.2s ease',
                 '&:hover': {
-                  background: 'rgba(34, 197, 94, 0.1)',
-                  color: '#22c55e',
+                  background: '#FFF5F5',
+                  borderColor: 'rgba(211,47,47,0.3)',
+                  color: '#D32F2F',
+                  transform: 'translateY(-1px)',
                 }
               }}
             >
-              <Stack>
-                <Typography variant="body2" fontWeight={600}>
-                  {vehicle.make} {vehicle.model}
-                </Typography>
-                <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                  {vehicle.licensePlate} • {vehicle.year}
-                </Typography>
-              </Stack>
-            </MenuItem>
-          ))
-        ) : (
-          <MenuItem disabled sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
-            <Typography variant="body2">No vehicles found</Typography>
-          </MenuItem>
-        )}
-        
-        <Divider sx={{ bgcolor: 'rgba(34, 197, 94, 0.2)', mx: 2, my: 1 }} />
-        <MenuItem
-          onClick={() => { navigate("/VehiclePage"); handleVehicleMenuClose(); }}
-          sx={{
-            mx: 1,
-            mb: 1,
-            borderRadius: 1,
+              <PhoneIcon sx={{ fontSize: 16, color: '#D32F2F' }} />
+              <span>091 228 3456</span>
+            </Box>
+
+            {/* Refined Luxury Sign In Button */}
+            <Fade in timeout={600}>
+              <Button
+                onClick={() => navigate("/login")}
+                variant="outlined"
+                startIcon={<LoginIcon sx={{ fontSize: 18 }} />}
+                id="header-login-btn"
+                sx={{
+                  px: 3,
+                  py: 0.95,
+                  borderRadius: '10px',
+                  borderColor: '#E5E7EB',
+                  color: '#1F2937',
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  fontFamily: '"Inter", sans-serif',
+                  textTransform: 'none',
+                  background: '#FFFFFF',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                  transition: 'all 0.22s ease',
+                  '&:hover': {
+                    borderColor: '#D32F2F',
+                    color: '#D32F2F',
+                    background: '#FFF5F5',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 14px rgba(211,47,47,0.15)',
+                  },
+                }}
+              >
+                Sign In
+              </Button>
+            </Fade>
+          </Stack>
+              )}
+        </Stack>
+
+        {/* Mobile Menu Button */}
+        <Zoom in timeout={500}>
+          <IconButton
+            onClick={toggleDrawer(true)}
+            sx={{
+              display: { md: 'none' },
+              color: '#374151',
+              background: '#F3F4F6',
+              border: '1px solid #E5E7EB',
+              '&:hover': {
+                background: '#E5E7EB',
+              }
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+        </Zoom>
+      </Toolbar>
+    </Container >
+      </AppBar >
+
+  <Drawer
+    anchor="right"
+    open={isMenuOpen}
+    onClose={toggleDrawer(false)}
+    sx={{
+      '& .MuiDrawer-paper': {
+        background: 'transparent',
+        boxShadow: 'none',
+      }
+    }}
+  >
+    {drawerContent}
+  </Drawer>
+
+{/* Vehicle Menu */ }
+<Menu
+  anchorEl={vehicleMenuAnchor}
+  open={Boolean(vehicleMenuAnchor)}
+  onClose={handleVehicleMenuClose}
+  PaperProps={{
+    sx: {
+      background: 'rgba(10, 14, 26, 0.95)',
+      backdropFilter: 'blur(20px)',
+      border: '1px solid rgba(34, 197, 94, 0.2)',
+      borderRadius: 2,
+      mt: 1,
+      minWidth: 280,
+      maxHeight: 400,
+    }
+  }}
+>
+  <Box sx={{ p: 2 }}>
+    <Typography variant="h6" sx={{ color: '#22c55e', fontWeight: 600, mb: 1 }}>
+      My Vehicles
+    </Typography>
+    <Divider sx={{ bgcolor: 'rgba(34, 197, 94, 0.2)', mb: 1 }} />
+  </Box>
+
+  {vehiclesLoading ? (
+    <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+      <CircularProgress size={24} sx={{ color: '#22c55e' }} />
+    </Box>
+  ) : vehicles.length > 0 ? (
+    vehicles.map((vehicle) => (
+      <MenuItem
+        key={vehicle._id}
+        onClick={() => handleVehicleSelect(vehicle._id)}
+        sx={{
+          mx: 1,
+          mb: 0.5,
+          borderRadius: 1,
+          color: 'white',
+          '&:hover': {
             background: 'rgba(34, 197, 94, 0.1)',
             color: '#22c55e',
-            '&:hover': {
-              background: 'rgba(34, 197, 94, 0.2)',
-            }
-          }}
-        >
-          <CarIcon sx={{ mr: 1 }} />
-          Manage All Vehicles
-        </MenuItem>
-      </Menu>
-
-      {/* Profile Menu */}
-      <Menu
-        anchorEl={profileMenuAnchor}
-        open={Boolean(profileMenuAnchor)}
-        onClose={handleProfileMenuClose}
-        PaperProps={{
-          sx: {
-            background: 'rgba(10, 14, 26, 0.95)',
-            backdropFilter: 'blur(20px)',
-            border: user?.userType === 'customer'
-              ? '1px solid rgba(16, 185, 129, 0.2)'
-              : user?.userType === 'mechanic'
-              ? '1px solid rgba(245, 158, 11, 0.2)'
-              : '1px solid rgba(139, 92, 246, 0.2)',
-            borderRadius: 2,
-            mt: 1,
-            minWidth: 200,
           }
         }}
       >
-        <Box sx={{ p: 2 }}>
-          <Typography variant="h6" sx={{ 
-            color: user?.userType === 'customer' 
-              ? '#10b981' 
-              : user?.userType === 'mechanic'
-              ? '#f59e0b'
-              : '#8b5cf6',
-            fontWeight: 600, 
-            mb: 1 
-          }}>
-            {user?.name}
+        <Stack>
+          <Typography variant="body2" fontWeight={600}>
+            {vehicle.make} {vehicle.model}
           </Typography>
-          <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-            {user?.userType || 'user'} • {user?.email}
+          <Typography variant="caption" sx={{ opacity: 0.7 }}>
+            {vehicle.licensePlate} • {vehicle.year}
           </Typography>
-          <Divider sx={{ 
-            bgcolor: user?.userType === 'customer'
-              ? 'rgba(16, 185, 129, 0.2)'
-              : user?.userType === 'mechanic'
-              ? 'rgba(245, 158, 11, 0.2)'
-              : 'rgba(139, 92, 246, 0.2)',
-            mt: 1 
-          }} />
-        </Box>
-        
-        <MenuItem
-          onClick={() => { handleRoleBasedNavigation(); handleProfileMenuClose(); }}
-          sx={{
-            mx: 1,
-            mb: 0.5,
-            borderRadius: 1,
-            color: 'white',
-            '&:hover': {
-              background: user?.userType === 'customer'
-                ? 'rgba(16, 185, 129, 0.1)'
-                : user?.userType === 'mechanic'
-                ? 'rgba(245, 158, 11, 0.1)'
-                : 'rgba(139, 92, 246, 0.1)',
-              color: user?.userType === 'customer'
-                ? '#10b981'
-                : user?.userType === 'mechanic'
-                ? '#f59e0b'
-                : '#8b5cf6',
-            }
-          }}
-        >
-          {user?.userType === 'customer' ? (
-            <ProfileIcon sx={{ mr: 1 }} />
-          ) : (
-            <DashboardIcon sx={{ mr: 1 }} />
-          )}
-          {getRoleDashboardText()}
-        </MenuItem>
+        </Stack>
+      </MenuItem>
+    ))
+  ) : (
+    <MenuItem disabled sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+      <Typography variant="body2">No vehicles found</Typography>
+    </MenuItem>
+  )}
 
-        {user?.userType === 'customer' && (
-          <MenuItem
-            onClick={() => { navigate("/my-bookings"); handleProfileMenuClose(); }}
-            sx={{
-              mx: 1,
-              mb: 0.5,
-              borderRadius: 1,
-              color: 'white',
-              '&:hover': {
-                background: 'rgba(99, 102, 241, 0.1)',
-                color: '#6366f1',
-              }
-            }}
-          >
-            <CalendarIcon sx={{ mr: 1 }} />
-            My Bookings
-          </MenuItem>
-        )}
+  <Divider sx={{ bgcolor: 'rgba(34, 197, 94, 0.2)', mx: 2, my: 1 }} />
+  <MenuItem
+    onClick={() => { navigate("/VehiclePage"); handleVehicleMenuClose(); }}
+    sx={{
+      mx: 1,
+      mb: 1,
+      borderRadius: 1,
+      background: 'rgba(34, 197, 94, 0.1)',
+      color: '#22c55e',
+      '&:hover': {
+        background: 'rgba(34, 197, 94, 0.2)',
+      }
+    }}
+  >
+    <CarIcon sx={{ mr: 1 }} />
+    Manage All Vehicles
+  </MenuItem>
+</Menu>
 
-        {user?.userType === 'customer' && (
-          <MenuItem
-            onClick={() => { navigate("/my-payments"); handleProfileMenuClose(); }}
-            sx={{
-              mx: 1,
-              mb: 0.5,
-              borderRadius: 1,
-              color: 'white',
-              '&:hover': {
-                background: 'rgba(99, 102, 241, 0.1)',
-                color: '#6366f1',
-              }
-            }}
-          >
-            <PaymentIcon sx={{ mr: 1 }} />
-            Payments
-          </MenuItem>
-        )}
+{/* Profile Menu */ }
+<Menu
+  anchorEl={profileMenuAnchor}
+  open={Boolean(profileMenuAnchor)}
+  onClose={handleProfileMenuClose}
+  PaperProps={{
+    sx: {
+      background: 'rgba(10, 14, 26, 0.95)',
+      backdropFilter: 'blur(20px)',
+      border: user?.userType === 'customer'
+        ? '1px solid rgba(16, 185, 129, 0.2)'
+        : user?.userType === 'mechanic'
+          ? '1px solid rgba(245, 158, 11, 0.2)'
+          : '1px solid rgba(139, 92, 246, 0.2)',
+      borderRadius: 2,
+      mt: 1,
+      minWidth: 200,
+    }
+  }}
+>
+  <Box sx={{ p: 2 }}>
+    <Typography variant="h6" sx={{
+      color: user?.userType === 'customer'
+        ? '#10b981'
+        : user?.userType === 'mechanic'
+          ? '#f59e0b'
+          : '#8b5cf6',
+      fontWeight: 600,
+      mb: 1
+    }}>
+      {user?.name}
+    </Typography>
+    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+      {user?.userType || 'user'} • {user?.email}
+    </Typography>
+    <Divider sx={{
+      bgcolor: user?.userType === 'customer'
+        ? 'rgba(16, 185, 129, 0.2)'
+        : user?.userType === 'mechanic'
+          ? 'rgba(245, 158, 11, 0.2)'
+          : 'rgba(139, 92, 246, 0.2)',
+      mt: 1
+    }} />
+  </Box>
 
-        <MenuItem
-          onClick={() => { navigate("/profile"); handleProfileMenuClose(); }}
-          sx={{
-            mx: 1,
-            mb: 1,
-            borderRadius: 1,
-            color: 'white',
-            '&:hover': {
-              background: 'rgba(99, 102, 241, 0.1)',
-              color: '#6366f1',
-            }
-          }}
-        >
-          <SettingsIcon sx={{ mr: 1 }} />
-          Settings
-        </MenuItem>
-      </Menu>
+  <MenuItem
+    onClick={() => { handleRoleBasedNavigation(); handleProfileMenuClose(); }}
+    sx={{
+      mx: 1,
+      mb: 0.5,
+      borderRadius: 1,
+      color: 'white',
+      '&:hover': {
+        background: user?.userType === 'customer'
+          ? 'rgba(16, 185, 129, 0.1)'
+          : user?.userType === 'mechanic'
+            ? 'rgba(245, 158, 11, 0.1)'
+            : 'rgba(139, 92, 246, 0.1)',
+        color: user?.userType === 'customer'
+          ? '#10b981'
+          : user?.userType === 'mechanic'
+            ? '#f59e0b'
+            : '#8b5cf6',
+      }
+    }}
+  >
+    {user?.userType === 'customer' ? (
+      <ProfileIcon sx={{ mr: 1 }} />
+    ) : (
+      <DashboardIcon sx={{ mr: 1 }} />
+    )}
+    {getRoleDashboardText()}
+  </MenuItem>
 
-      {/* Add animations */}
-      <style jsx global>{`
+  {user?.userType === 'customer' && (
+    <MenuItem
+      onClick={() => { navigate("/my-bookings"); handleProfileMenuClose(); }}
+      sx={{
+        mx: 1,
+        mb: 0.5,
+        borderRadius: 1,
+        color: 'white',
+        '&:hover': {
+          background: 'rgba(99, 102, 241, 0.1)',
+          color: '#6366f1',
+        }
+      }}
+    >
+      <CalendarIcon sx={{ mr: 1 }} />
+      My Bookings
+    </MenuItem>
+  )}
+
+  {user?.userType === 'customer' && (
+    <MenuItem
+      onClick={() => { navigate("/my-payments"); handleProfileMenuClose(); }}
+      sx={{
+        mx: 1,
+        mb: 0.5,
+        borderRadius: 1,
+        color: 'white',
+        '&:hover': {
+          background: 'rgba(99, 102, 241, 0.1)',
+          color: '#6366f1',
+        }
+      }}
+    >
+      <PaymentIcon sx={{ mr: 1 }} />
+      Payments
+    </MenuItem>
+  )}
+
+  <MenuItem
+    onClick={() => { navigate("/profile"); handleProfileMenuClose(); }}
+    sx={{
+      mx: 1,
+      mb: 1,
+      borderRadius: 1,
+      color: 'white',
+      '&:hover': {
+        background: 'rgba(99, 102, 241, 0.1)',
+        color: '#6366f1',
+      }
+    }}
+  >
+    <SettingsIcon sx={{ mr: 1 }} />
+    Settings
+  </MenuItem>
+</Menu>
+
+{/* Add animations */ }
+<style jsx global>{`
         @keyframes pulse {
           0%, 100% { opacity: 0.3; }
           50% { opacity: 0.5; }
