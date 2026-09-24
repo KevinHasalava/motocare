@@ -180,10 +180,10 @@ const MechanicPortal = () => {
     if (!user) {
         return (
             <ThemeProvider theme={theme}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#0f172a' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#F8F9FB' }}>
                     <HeaderWrapper />
                     <Container component="main" maxWidth="md" sx={{ mt: 12, mb: 4, flexGrow: 1 }}>
-                        <Typography variant="h6" color="white" align="center">
+                        <Typography variant="h6" color="text.secondary" align="center">
                             Loading...
                         </Typography>
                     </Container>
@@ -196,7 +196,7 @@ const MechanicPortal = () => {
     if (user.userType !== 'mechanic') {
         return (
             <ThemeProvider theme={theme}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#0f172a' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#F8F9FB' }}>
                     <HeaderWrapper />
                     <Container component="main" maxWidth="md" sx={{ mt: 12, mb: 4, flexGrow: 1 }}>
                         <Alert severity="error" sx={{ mb: 3 }}>
@@ -211,99 +211,64 @@ const MechanicPortal = () => {
 
     return (
         <ThemeProvider theme={theme}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#0f172a' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#F8F9FB' }}>
                 <HeaderWrapper />
                 
                 <Container component="main" maxWidth="xl" sx={{ mt: 12, mb: 4, flexGrow: 1, px: { xs: 2, sm: 3 } }}>
                     {/* Header Section */}
                     <Box sx={{ mb: 4 }}>
                         <Typography variant="h4" sx={{ 
-                            fontWeight: 700, 
-                            color: 'white', 
+                            fontWeight: 800, 
+                            color: '#111827', 
                             mb: 1,
                             display: 'flex',
                             alignItems: 'center',
-                            gap: 2
+                            gap: 2,
+                            fontFamily: '"Outfit", sans-serif',
                         }}>
-                            <BuildIcon sx={{ fontSize: '2rem', color: '#ff9800' }} />
+                            <Box sx={{ width: 44, height: 44, borderRadius: '12px', background: '#D32F2F', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(211,47,47,0.3)' }}>
+                                <BuildIcon sx={{ fontSize: '1.4rem', color: 'white' }} />
+                            </Box>
                             Mechanic Portal
                         </Typography>
-                        <Typography variant="h6" sx={{ color: '#94a3b8', fontWeight: 400 }}>
+                        <Typography variant="h6" sx={{ color: '#6B7280', fontWeight: 400 }}>
                             Welcome back, {user.name}! Manage your assigned jobs and track your work.
                         </Typography>
                     </Box>
 
                     {/* Stats Cards */}
                     <Grid container spacing={3} sx={{ mb: 4 }}>
-                        <Grid item xs={6} sm={3}>
-                            <Card sx={{ 
-                                background: 'linear-gradient(135deg, #3b82f6, #1e40af)',
-                                color: 'white',
-                                textAlign: 'center'
-                            }}>
-                                <CardContent>
-                                    <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                                        {filterJobs(0).length}
-                                    </Typography>
-                                    <Typography variant="body2">Today's Jobs</Typography>
-                                </CardContent>
+                        {[
+                          { label: "Today's Jobs", count: filterJobs(0).length, color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
+                          { label: 'Ongoing', count: filterJobs(1).length, color: '#D97706', bg: '#FFFBEB', border: '#FDE68A' },
+                          { label: 'Upcoming', count: filterJobs(2).length, color: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE' },
+                          { label: 'Completed', count: filterJobs(3).length, color: '#059669', bg: '#ECFDF5', border: '#A7F3D0' },
+                        ].map(({ label, count, color, bg, border }) => (
+                          <Grid item xs={6} sm={3} key={label}>
+                            <Card sx={{ background: bg, border: `1px solid ${border}`, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', textAlign: 'center', borderRadius: '14px' }}>
+                              <CardContent>
+                                <Typography variant="h4" sx={{ fontWeight: 800, color, fontFamily: '"Outfit", sans-serif' }}>
+                                  {count}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: '#6B7280', fontWeight: 600 }}>{label}</Typography>
+                              </CardContent>
                             </Card>
-                        </Grid>
-                        <Grid item xs={6} sm={3}>
-                            <Card sx={{ 
-                                background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                                color: 'white',
-                                textAlign: 'center'
-                            }}>
-                                <CardContent>
-                                    <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                                        {filterJobs(1).length}
-                                    </Typography>
-                                    <Typography variant="body2">Ongoing</Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={6} sm={3}>
-                            <Card sx={{ 
-                                background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-                                color: 'white',
-                                textAlign: 'center'
-                            }}>
-                                <CardContent>
-                                    <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                                        {filterJobs(2).length}
-                                    </Typography>
-                                    <Typography variant="body2">Upcoming</Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={6} sm={3}>
-                            <Card sx={{ 
-                                background: 'linear-gradient(135deg, #10b981, #059669)',
-                                color: 'white',
-                                textAlign: 'center'
-                            }}>
-                                <CardContent>
-                                    <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                                        {filterJobs(3).length}
-                                    </Typography>
-                                    <Typography variant="body2">Completed</Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
+                          </Grid>
+                        ))}
                     </Grid>
 
                     {/* Tab Navigation */}
-                    <Paper sx={{ mb: 3, background: '#1e293b' }}>
+                    <Paper sx={{ mb: 3, background: '#FFFFFF', border: '1px solid #E5E7EB', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', borderRadius: '14px', overflow: 'hidden' }}>
                         <Tabs 
                             value={tabValue} 
                             onChange={handleTabChange}
                             sx={{
                                 '& .MuiTab-root': { 
-                                    color: '#94a3b8',
-                                    '&.Mui-selected': { color: '#f59e0b' }
+                                    color: '#6B7280',
+                                    fontWeight: 600,
+                                    '&.Mui-selected': { color: '#D32F2F' }
                                 },
-                                '& .MuiTabs-indicator': { backgroundColor: '#f59e0b' }
+                                '& .MuiTabs-indicator': { backgroundColor: '#D32F2F' }
                             }}
                         >
                             <Tab label="Today's Jobs" />
@@ -316,8 +281,8 @@ const MechanicPortal = () => {
                     {/* Loading State */}
                     {loading && (
                         <Box sx={{ mb: 3 }}>
-                            <LinearProgress sx={{ backgroundColor: '#374151' }} />
-                            <Typography sx={{ color: '#94a3b8', mt: 2, textAlign: 'center' }}>
+                            <LinearProgress sx={{ '& .MuiLinearProgress-bar': { backgroundColor: '#D32F2F' } }} />
+                            <Typography sx={{ color: '#6B7280', mt: 2, textAlign: 'center' }}>
                                 Loading your jobs...
                             </Typography>
                         </Box>
@@ -333,12 +298,12 @@ const MechanicPortal = () => {
                     {/* Jobs List */}
                     {!loading && !error && (
                         filteredJobs.length === 0 ? (
-                            <Paper sx={{ p: 4, textAlign: 'center', background: '#1e293b' }}>
-                                <BuildIcon sx={{ fontSize: 60, color: '#6b7280', mb: 2 }} />
-                                <Typography variant="h6" sx={{ color: 'white', mb: 1 }}>
+                            <Paper sx={{ p: 4, textAlign: 'center', background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                                <BuildIcon sx={{ fontSize: 60, color: '#D1D5DB', mb: 2 }} />
+                                <Typography variant="h6" sx={{ color: '#111827', mb: 1, fontWeight: 700 }}>
                                     No jobs found
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+                                <Typography variant="body2" sx={{ color: '#6B7280' }}>
                                     {tabValue === 0 && "No jobs scheduled for today"}
                                     {tabValue === 1 && "No ongoing jobs at the moment"}
                                     {tabValue === 2 && "No upcoming jobs scheduled"}
@@ -354,21 +319,24 @@ const MechanicPortal = () => {
                                     return (
                                         <Grid item xs={12} md={6} lg={4} key={job._id}>
                                             <Card sx={{
-                                                background: 'linear-gradient(135deg, #1e293b, #0f172a)',
+                                                background: '#FFFFFF',
                                                 border: `2px solid ${statusColor}`,
+                                                borderRadius: '14px',
+                                                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
                                                 transition: 'all 0.3s ease',
                                                 '&:hover': {
                                                     transform: 'translateY(-4px)',
-                                                    boxShadow: `0 10px 30px ${statusColor}30`
+                                                    boxShadow: `0 12px 32px ${statusColor}30`
                                                 }
                                             }}>
                                                 <CardContent sx={{ p: 3 }}>
                                                     {/* Header */}
                                                     <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 2 }}>
                                                         <Typography variant="h6" sx={{ 
-                                                            color: 'white', 
-                                                            fontWeight: 600,
-                                                            flex: 1
+                                                            color: '#111827', 
+                                                            fontWeight: 700,
+                                                            flex: 1,
+                                                            fontFamily: '"Outfit", sans-serif',
                                                         }}>
                                                             Job #{job.jobId}
                                                         </Typography>
@@ -386,19 +354,19 @@ const MechanicPortal = () => {
                                                     {/* Service Details */}
                                                     <Box sx={{ 
                                                         p: 2, 
-                                                        bgcolor: 'rgba(99, 102, 241, 0.1)', 
-                                                        borderRadius: 1,
+                                                        bgcolor: '#F8F9FB', 
+                                                        borderRadius: '10px',
                                                         mb: 2,
-                                                        border: '1px solid rgba(99, 102, 241, 0.3)'
+                                                        border: '1px solid #E5E7EB'
                                                     }}>
                                                         <Typography variant="body1" sx={{ 
-                                                            color: '#a5b4fc', 
-                                                            fontWeight: 600,
-                                                            mb: 1
+                                                            color: '#D32F2F', 
+                                                            fontWeight: 700,
+                                                            mb: 0.5
                                                         }}>
                                                             {job.service?.name || 'Service not specified'}
                                                         </Typography>
-                                                        <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+                                                        <Typography variant="body2" sx={{ color: '#6B7280' }}>
                                                             Duration: {job.service?.duration || 'N/A'} mins
                                                         </Typography>
                                                     </Box>
@@ -406,27 +374,27 @@ const MechanicPortal = () => {
                                                     {/* Vehicle & Customer Info */}
                                                     <Stack spacing={1.5} sx={{ mb: 2 }}>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                            <CarIcon sx={{ color: '#6b7280', fontSize: '1rem' }} />
-                                                            <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+                                                            <CarIcon sx={{ color: '#9CA3AF', fontSize: '1rem' }} />
+                                                            <Typography variant="body2" sx={{ color: '#374151' }}>
                                                                 {job.vehicle?.vehicleNumber || 'Vehicle number not available'} - {job.vehicle?.brand} {job.vehicle?.model}
                                                             </Typography>
                                                         </Box>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                            <PersonIcon sx={{ color: '#6b7280', fontSize: '1rem' }} />
-                                                            <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+                                                            <PersonIcon sx={{ color: '#9CA3AF', fontSize: '1rem' }} />
+                                                            <Typography variant="body2" sx={{ color: '#374151' }}>
                                                                 {job.user?.name || 'Customer name not available'}
                                                             </Typography>
                                                         </Box>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                            <AccessTimeIcon sx={{ color: '#6b7280', fontSize: '1rem' }} />
-                                                            <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+                                                            <AccessTimeIcon sx={{ color: '#9CA3AF', fontSize: '1rem' }} />
+                                                            <Typography variant="body2" sx={{ color: '#374151' }}>
                                                                 {dayjs(job.booking?.date || job.date).format('ddd, D MMM YYYY, h:mm A')}
                                                             </Typography>
                                                         </Box>
                                                         {job.workHours && (
                                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                <TimerIcon sx={{ color: '#6b7280', fontSize: '1rem' }} />
-                                                                <Typography variant="body2" sx={{ color: '#22c55e', fontWeight: 600 }}>
+                                                                <TimerIcon sx={{ color: '#9CA3AF', fontSize: '1rem' }} />
+                                                                <Typography variant="body2" sx={{ color: '#059669', fontWeight: 600 }}>
                                                                     Work Hours: {job.workHours}
                                                                 </Typography>
                                                             </Box>
@@ -437,17 +405,19 @@ const MechanicPortal = () => {
                                                     {job.notes && (
                                                         <Accordion sx={{ 
                                                             mb: 2, 
-                                                            bgcolor: 'rgba(0,0,0,0.2)',
+                                                            bgcolor: '#F8F9FB',
+                                                            border: '1px solid #E5E7EB',
+                                                            borderRadius: '10px !important',
                                                             '&:before': { display: 'none' }
                                                         }}>
-                                                            <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}>
-                                                                <Typography sx={{ color: '#94a3b8', fontSize: '0.875rem' }}>
+                                                            <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#6B7280' }} />}>
+                                                                <Typography sx={{ color: '#374151', fontSize: '0.875rem', fontWeight: 600 }}>
                                                                     Work Notes
                                                                 </Typography>
                                                             </AccordionSummary>
                                                             <AccordionDetails>
                                                                 <Typography sx={{ 
-                                                                    color: '#d1d5db', 
+                                                                    color: '#6B7280', 
                                                                     fontSize: '0.875rem',
                                                                     whiteSpace: 'pre-line'
                                                                 }}>
@@ -490,11 +460,11 @@ const MechanicPortal = () => {
                                                             }}
                                                             sx={{
                                                                 flex: 1,
-                                                                borderColor: '#6366f1',
-                                                                color: '#6366f1',
+                                                                borderColor: '#D32F2F',
+                                                                color: '#D32F2F',
                                                                 '&:hover': {
-                                                                    bgcolor: 'rgba(99, 102, 241, 0.1)',
-                                                                    borderColor: '#6366f1'
+                                                                    bgcolor: '#FFF5F5',
+                                                                    borderColor: '#D32F2F'
                                                                 }
                                                             }}
                                                         >
@@ -514,19 +484,18 @@ const MechanicPortal = () => {
                 <Footer />
 
                 {/* Status Update Dialog */}
-                <Dialog open={statusDialogOpen} onClose={() => setStatusDialogOpen(false)} maxWidth="sm" fullWidth>
-                    <DialogTitle sx={{ background: '#1e293b', color: 'white' }}>
-                        Update Job Status - Job #{selectedJob?.jobId}
+                <Dialog open={statusDialogOpen} onClose={() => setStatusDialogOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: '16px' } }}>
+                    <DialogTitle sx={{ background: '#FFFFFF', color: '#111827', borderBottom: '1px solid #E5E7EB', fontFamily: '"Outfit", sans-serif', fontWeight: 800 }}>
+                        Update Job Status — Job #{selectedJob?.jobId}
                     </DialogTitle>
-                    <DialogContent sx={{ background: '#0f172a', pt: 3 }}>
+                    <DialogContent sx={{ background: '#FFFFFF', pt: 3 }}>
                         <Stack spacing={3}>
                             <FormControl fullWidth>
-                                <InputLabel sx={{ color: '#94a3b8' }}>Status</InputLabel>
+                                <InputLabel>Status</InputLabel>
                                 <Select
                                     value={newStatus}
                                     onChange={(e) => setNewStatus(e.target.value)}
                                     label="Status"
-                                    sx={{ color: 'white' }}
                                 >
                                     <MenuItem value="Booked">Booked</MenuItem>
                                     <MenuItem value="Ongoing">Ongoing</MenuItem>
@@ -539,10 +508,6 @@ const MechanicPortal = () => {
                                 onChange={(e) => setWorkHours(e.target.value)}
                                 placeholder="e.g., 2.5 hours"
                                 fullWidth
-                                sx={{
-                                    '& .MuiInputLabel-root': { color: '#94a3b8' },
-                                    '& .MuiOutlinedInput-root': { color: 'white' }
-                                }}
                             />
                             <TextField
                                 label="Work Notes (Optional)"
@@ -552,21 +517,17 @@ const MechanicPortal = () => {
                                 rows={3}
                                 placeholder="Add any work notes..."
                                 fullWidth
-                                sx={{
-                                    '& .MuiInputLabel-root': { color: '#94a3b8' },
-                                    '& .MuiOutlinedInput-root': { color: 'white' }
-                                }}
                             />
                         </Stack>
                     </DialogContent>
-                    <DialogActions sx={{ background: '#0f172a', p: 3 }}>
-                        <Button onClick={() => setStatusDialogOpen(false)} sx={{ color: '#94a3b8' }}>
+                    <DialogActions sx={{ background: '#FFFFFF', borderTop: '1px solid #E5E7EB', p: 2 }}>
+                        <Button onClick={() => setStatusDialogOpen(false)} sx={{ color: '#6B7280' }}>
                             Cancel
                         </Button>
                         <Button 
                             onClick={handleStatusUpdate} 
                             variant="contained"
-                            sx={{ bgcolor: '#f59e0b', '&:hover': { bgcolor: '#d97706' } }}
+                            sx={{ bgcolor: '#D32F2F', '&:hover': { bgcolor: '#B71C1C' }, borderRadius: '8px' }}
                         >
                             Update Job
                         </Button>
@@ -574,11 +535,11 @@ const MechanicPortal = () => {
                 </Dialog>
 
                 {/* Add Note Dialog */}
-                <Dialog open={noteDialogOpen} onClose={() => setNoteDialogOpen(false)} maxWidth="sm" fullWidth>
-                    <DialogTitle sx={{ background: '#1e293b', color: 'white' }}>
-                        Add Work Note - Job #{selectedJob?.jobId}
+                <Dialog open={noteDialogOpen} onClose={() => setNoteDialogOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: '16px' } }}>
+                    <DialogTitle sx={{ background: '#FFFFFF', color: '#111827', borderBottom: '1px solid #E5E7EB', fontFamily: '"Outfit", sans-serif', fontWeight: 800 }}>
+                        Add Work Note — Job #{selectedJob?.jobId}
                     </DialogTitle>
-                    <DialogContent sx={{ background: '#0f172a', pt: 3 }}>
+                    <DialogContent sx={{ background: '#FFFFFF', pt: 3 }}>
                         <TextField
                             label="Work Note"
                             value={workNote}
@@ -588,21 +549,17 @@ const MechanicPortal = () => {
                             placeholder="Add your work note here..."
                             fullWidth
                             autoFocus
-                            sx={{
-                                '& .MuiInputLabel-root': { color: '#94a3b8' },
-                                '& .MuiOutlinedInput-root': { color: 'white' }
-                            }}
                         />
                     </DialogContent>
-                    <DialogActions sx={{ background: '#0f172a', p: 3 }}>
-                        <Button onClick={() => setNoteDialogOpen(false)} sx={{ color: '#94a3b8' }}>
+                    <DialogActions sx={{ background: '#FFFFFF', borderTop: '1px solid #E5E7EB', p: 2 }}>
+                        <Button onClick={() => setNoteDialogOpen(false)} sx={{ color: '#6B7280' }}>
                             Cancel
                         </Button>
                         <Button 
                             onClick={handleAddNote} 
                             variant="contained"
                             disabled={!workNote.trim()}
-                            sx={{ bgcolor: '#6366f1', '&:hover': { bgcolor: '#5338f7' } }}
+                            sx={{ bgcolor: '#D32F2F', '&:hover': { bgcolor: '#B71C1C' }, borderRadius: '8px' }}
                         >
                             Add Note
                         </Button>

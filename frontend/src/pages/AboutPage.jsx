@@ -147,24 +147,27 @@ const AboutPage = () => (
       </Box>
 
       {/* ── Stats Row ────────────────────────────────────────── */}
-      <Box sx={{ py: { xs: 8, md: 10 }, background: '#111827' }}>
-        <Container maxWidth="lg">
+      <Box sx={{ py: { xs: 8, md: 10 }, background: '#D32F2F', position: 'relative', overflow: 'hidden' }}>
+        {/* Subtle dot pattern overlay */}
+        <Box sx={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0)', backgroundSize: '28px 28px' }} />
+        <Container maxWidth="lg" sx={{ position: 'relative' }}>
           <Grid container spacing={4} justifyContent="center">
             {STATS.map(({ label, value, Icon }) => (
               <Grid item xs={6} md={3} key={label}>
                 <Box sx={{ textAlign: 'center' }}>
                   <Box sx={{
                     width: 56, height: 56, borderRadius: '16px',
-                    background: 'rgba(211,47,47,0.15)',
+                    background: 'rgba(255,255,255,0.15)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     mx: 'auto', mb: 2,
+                    backdropFilter: 'blur(4px)',
                   }}>
-                    <Icon sx={{ color: '#EF4444', fontSize: 26 }} />
+                    <Icon sx={{ color: 'white', fontSize: 26 }} />
                   </Box>
                   <Typography sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 900, fontSize: { xs: '2rem', md: '2.6rem' }, color: '#fff', lineHeight: 1, mb: 0.5 }}>
                     {value}
                   </Typography>
-                  <Typography sx={{ fontFamily: '"Inter", sans-serif', fontSize: '0.82rem', fontWeight: 500, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <Typography sx={{ fontFamily: '"Inter", sans-serif', fontSize: '0.82rem', fontWeight: 500, color: 'rgba(255,255,255,0.75)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     {label}
                   </Typography>
                 </Box>

@@ -34,14 +34,11 @@ import AdminFooter from "../../components/AdminFooter";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-// Dark theme override ONLY for this page
-const darkOverrideTheme = createTheme({
+// Light theme for this page
+const lightTheme = createTheme({
   palette: {
-    mode: "dark",
-    text: {
-      primary: "#fff",
-      secondary: "#e5e7eb", // light gray instead of black
-    },
+    mode: 'light',
+    background: { default: '#F8F9FB', paper: '#FFFFFF' },
   },
 });
 
@@ -103,19 +100,16 @@ const AdminDashboard = () => {
           const { ctx: context, chartArea } = chart;
           if (!chartArea) return null;
           const gradient = context.createLinearGradient(
-            0,
-            chartArea.bottom,
-            0,
-            chartArea.top
+            0, chartArea.bottom, 0, chartArea.top
           );
-          gradient.addColorStop(0, "rgba(99,102,241,0.8)");
-          gradient.addColorStop(1, "rgba(168,85,247,0.9)");
+          gradient.addColorStop(0, "rgba(211,47,47,0.7)");
+          gradient.addColorStop(1, "rgba(183,28,28,0.9)");
           return gradient;
         },
         borderRadius: 8,
-        borderWidth: 2,
-        borderColor: "rgba(255,255,255,0.15)",
-        hoverBackgroundColor: "rgba(255,255,255,0.85)",
+        borderWidth: 1,
+        borderColor: "rgba(211,47,47,0.3)",
+        hoverBackgroundColor: "rgba(211,47,47,0.95)",
       },
     ],
   };
@@ -124,16 +118,18 @@ const AdminDashboard = () => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { labels: { color: "white", font: { weight: "bold", size: 14 } } },
+      legend: { labels: { color: "#374151", font: { weight: "bold", size: 14 } } },
       tooltip: {
-        backgroundColor: "rgba(17,24,39,0.95)",
-        titleColor: "white",
-        bodyColor: "#e5e7eb",
+        backgroundColor: "rgba(255,255,255,0.97)",
+        titleColor: "#111827",
+        bodyColor: "#6B7280",
+        borderColor: '#E5E7EB',
+        borderWidth: 1,
       },
     },
     scales: {
-      x: { ticks: { color: "#d1d5db" }, grid: { color: "rgba(255,255,255,0.1)" } },
-      y: { ticks: { color: "#d1d5db" }, grid: { color: "rgba(255,255,255,0.1)" } },
+      x: { ticks: { color: "#6B7280" }, grid: { color: "rgba(0,0,0,0.05)" } },
+      y: { ticks: { color: "#6B7280" }, grid: { color: "rgba(0,0,0,0.05)" } },
     },
   };
 
@@ -142,14 +138,14 @@ const AdminDashboard = () => {
       sx={{
         minHeight: 160,
         p: 3,
-        borderRadius: 3,
-        background: `linear-gradient(135deg, ${color}50 0%, ${color}20 100%)`,
-        border: `1px solid ${color}70`,
-        boxShadow: "0 8px 20px rgba(0,0,0,0.25)",
+        borderRadius: '16px',
+        background: '#FFFFFF',
+        border: `1px solid ${color}30`,
+        boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
         cursor: path ? "pointer" : "default",
         transition: "all 0.3s ease",
         "&:hover": path
-          ? { transform: "translateY(-5px) scale(1.02)", boxShadow: "0 12px 30px rgba(0,0,0,0.35)" }
+          ? { transform: "translateY(-5px)", boxShadow: `0 12px 32px ${color}25` }
           : {},
       }}
       onClick={() => path && navigate(path)}
@@ -159,25 +155,26 @@ const AdminDashboard = () => {
           sx={{
             width: 60,
             height: 60,
-            borderRadius: "50%",
-            background: color,
+            borderRadius: "14px",
+            background: `${color}15`,
+            border: `1px solid ${color}30`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: "white",
+            color: color,
             fontSize: 32,
           }}
         >
           {icon}
         </Box>
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "white" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#374151" }}>
             {title}
           </Typography>
-          <Typography variant="h4" sx={{ fontWeight: 900, color: "white" }}>
+          <Typography variant="h4" sx={{ fontWeight: 900, color: "#111827", fontFamily: '"Outfit", sans-serif' }}>
             {value}
           </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.85, color: "white" }}>
+          <Typography variant="body2" sx={{ color: "#6B7280" }}>
             {description}
           </Typography>
         </Box>
@@ -186,8 +183,8 @@ const AdminDashboard = () => {
   );
 
   return (
-    <ThemeProvider theme={darkOverrideTheme}>
-      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#111827" }}>
+    <ThemeProvider theme={lightTheme}>
+      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#F8F9FB" }}>
         <AdminHeader />
 
         <Box component="main" sx={{ flexGrow: 1, pt: 12, pb: 4 }}>
@@ -197,14 +194,13 @@ const AdminDashboard = () => {
               gutterBottom
               align="center"
               sx={{
-                fontWeight: 800,
+                fontWeight: 900,
                 mb: 4,
-                background: "linear-gradient(90deg,#6366f1,#a855f7)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                color: '#111827',
+                fontFamily: '"Outfit", sans-serif',
               }}
             >
-              🚗 Admin Dashboard
+              Admin Dashboard
             </Typography>
 
             <Grid container spacing={3}>
@@ -224,7 +220,7 @@ const AdminDashboard = () => {
                   value={stats.bookings}
                   description="Service bookings"
                   icon={<BookOnline />}
-                  color="#f43f5e"
+                  color="#D32F2F"
                   path="/admin/bookings"
                 />
               </Grid>
@@ -276,8 +272,8 @@ const AdminDashboard = () => {
                  value={stats.inventory}
                  description="Spare parts stock"
                  icon={<Inventory />}
-                 color="#14b8a6" // teal-ish
-                 path="/inventory" // Fixed: navigate to correct route
+                 color="#14b8a6"
+                 path="/inventory"
               />
               </Grid>
 
@@ -285,9 +281,10 @@ const AdminDashboard = () => {
                 <Card
                   sx={{
                     p: 4,
-                    borderRadius: 4,
-                    background: "radial-gradient(circle at top, #1e3a8a 0%, #111827 70%)",
-                    boxShadow: "0 15px 40px rgba(99,102,241,0.3)",
+                    borderRadius: '16px',
+                    background: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
                     height: 500,
                     display: "flex",
                     flexDirection: "column",
@@ -296,7 +293,7 @@ const AdminDashboard = () => {
                 >
                   <Typography
                     variant="h5"
-                    sx={{ mb: 3, color: "white", fontWeight: 800, textAlign: "center" }}
+                    sx={{ mb: 3, color: '#111827', fontWeight: 800, textAlign: "center", fontFamily: '"Outfit", sans-serif' }}
                   >
                     📊 Service Center Stats Overview
                   </Typography>

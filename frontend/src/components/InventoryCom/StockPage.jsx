@@ -6,8 +6,6 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DescriptionIcon from '@mui/icons-material/Description';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
 // PDF generation now handled by backend API with custom letterhead template
 import { getStockMovements, deleteStockMovement } from '../../api/stockApi';
 import AddStockInForm from './AddStockInForm';
@@ -24,31 +22,19 @@ const StockPage = () => {
   const [openOutDialog, setOpenOutDialog] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [dateFilter, setDateFilter] = useState('all');
-  const [mode, setMode] = useState('light'); // State for dark/light mode
 
   const theme = useMemo(
     () =>
       createTheme({
         palette: {
-          mode,
-          ...(mode === 'light'
-            ? {
-                // Palette for light mode
-                background: {
-                  default: '#f5f5f5',
-                  paper: '#fff',
-                },
-              }
-            : {
-                // Palette for dark mode
-                background: {
-                  default: '#121212',
-                  paper: '#1d1d1d',
-                },
-              }),
+          mode: 'light',
+          background: {
+            default: '#F8F9FB',
+            paper: '#fff',
+          },
         },
       }),
-    [mode],
+    [],
   );
 
   const fetchStockMovements = async () => {
@@ -200,22 +186,15 @@ const StockPage = () => {
     }
   });
 
-  const toggleMode = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 10, color: 'text.primary' }}>
         <AdminHeader />
         <Container maxWidth="xl">
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: '#111827', fontFamily: '"Outfit", sans-serif' }}>
               Stock Movements
             </Typography>
-            <IconButton onClick={toggleMode} color="inherit">
-              {mode === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
-            </IconButton>
           </Box>
           
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>

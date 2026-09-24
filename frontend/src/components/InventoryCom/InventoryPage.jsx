@@ -7,8 +7,6 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CloseIcon from '@mui/icons-material/Close';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 // New Import for PDF download
 import DownloadIcon from '@mui/icons-material/Download'; 
@@ -43,34 +41,22 @@ const InventoryPage = () => {
 
   // UI States
   const [searchTerm, setSearchTerm] = useState('');
-  const [mode, setMode] = useState('light');
+  const [mode] = useState('light');
   const [snackbarMessage, setSnackbarMessage] = useState({ open: false, message: '', severity: 'success' });
 
   const theme = useMemo(
     () =>
       createTheme({
         palette: {
-          mode,
-          ...(mode === 'light'
-            ? {
-                // Palette for light mode
-                background: { default: '#f5f5f5', paper: '#fff' },
-                warning: {
-                    main: '#ff9800',
-                    light: '#ffb74d',
-                }
-              }
-            : {
-                // Palette for dark mode
-                background: { default: '#121212', paper: '#1d1d1d' },
-                warning: {
-                    main: '#ffb74d',
-                    light: '#ffb74d',
-                }
-              }),
+          mode: 'light',
+          background: { default: '#F8F9FB', paper: '#fff' },
+          warning: {
+            main: '#ff9800',
+            light: '#ffb74d',
+          }
         },
       }),
-    [mode]
+    []
   );
 
   const fetchItems = async () => {
@@ -128,7 +114,6 @@ const InventoryPage = () => {
     item.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const toggleMode = () => setMode(prev => prev === 'light' ? 'dark' : 'light');
 
   const handleLowStockRequest = () => {
     const lowStockItems = inventory.filter(item => item.quantity <= item.lowStockThreshold);
@@ -206,10 +191,7 @@ const InventoryPage = () => {
         <AdminHeader />
         <Container maxWidth="xl">
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Inventory Dashboard</Typography>
-            <IconButton onClick={toggleMode} color="inherit">
-              {mode === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
-            </IconButton>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#111827', fontFamily: '"Outfit", sans-serif' }}>Inventory Dashboard</Typography>
           </Box>
 
           {loading ? (

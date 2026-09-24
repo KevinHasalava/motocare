@@ -157,7 +157,7 @@ const ServicesPage = () => {
 
 
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#111827" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#F8F9FB" }}>
             <AdminHeader />
 
             <Box component="main" sx={{ flexGrow: 1, pt: 10, pb: 4 }}>
@@ -165,9 +165,10 @@ const ServicesPage = () => {
                     <Paper
                         sx={{
                             p: 4,
-                            borderRadius: 4,
-                            background: "radial-gradient(circle at top, #1e3a8a 0%, #111827 70%)",
-                            boxShadow: "0 10px 30px rgba(99,102,241,0.25)",
+                            borderRadius: '16px',
+                            background: '#FFFFFF',
+                            border: '1px solid #E5E7EB',
+                            boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
                         }}
                     >
                         {/* Header */}
@@ -175,14 +176,13 @@ const ServicesPage = () => {
                             variant="h4"
                             gutterBottom
                             sx={{
-                                fontWeight: 800,
+                                fontWeight: 900,
                                 mb: 3,
-                                background: "linear-gradient(90deg,#6366f1,#a855f7)",
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
+                                color: '#111827',
+                                fontFamily: '"Outfit", sans-serif',
                             }}
                         >
-                            🔧 Manage Services
+                            Manage Services
                         </Typography>
 
                         {/* Alerts */}
@@ -275,12 +275,13 @@ const ServicesPage = () => {
                                 startIcon={<AddCircleIcon />}
                                 onClick={() => handleOpen()}
                                 sx={{
-                                    background: "linear-gradient(90deg,#6366f1,#a855f7)",
+                                    background: '#D32F2F',
                                     color: "white",
                                     borderRadius: "50px",
                                     px: 3,
                                     py: 1.2,
                                     fontWeight: 600,
+                                    '&:hover': { background: '#B71C1C' },
                                 }}
                             >
                                 Add New Service

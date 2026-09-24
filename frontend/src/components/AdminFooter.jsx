@@ -9,8 +9,8 @@ const AdminFooter = () => (
       px: 2,
       mt: "auto",
       textAlign: "center",
-      borderTop: "1px solid rgba(255,255,255,0.1)",
-      background: "#0f172a", // dark navy for consistency
+      borderTop: "3px solid #D32F2F",
+      background: "#111827", // dark charcoal footer — premium contrast
       color: "#9ca3af",      // gray-400
     }}
   >

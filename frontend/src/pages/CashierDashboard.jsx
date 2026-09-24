@@ -28,12 +28,13 @@ const CashierContainer = styled(Box)(({ theme }) => ({
 }));
 
 const WelcomeSection = styled(Paper)(({ theme }) => ({
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: '#D32F2F',
     color: 'white',
     padding: theme.spacing(4),
     margin: theme.spacing(3, 0),
-    borderRadius: '12px',
+    borderRadius: '16px',
     textAlign: 'center',
+    boxShadow: '0 8px 32px rgba(211,47,47,0.25)',
 }));
 
 const ActionCard = styled(Card)(({ theme }) => ({
@@ -165,9 +166,9 @@ const CashierDashboard = () => {
                                     onClick={() => navigate('/cashier')}
                                     sx={{
                                         py: 2,
-                                        background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                                        background: '#D32F2F',
                                         '&:hover': {
-                                            background: 'linear-gradient(45deg, #1565c0, #2196f3)',
+                                            background: '#B71C1C',
                                         }
                                     }}
                                 >
